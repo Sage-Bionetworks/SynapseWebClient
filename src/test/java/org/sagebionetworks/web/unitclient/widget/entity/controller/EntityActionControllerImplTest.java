@@ -70,8 +70,6 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityChildrenResponse;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -90,6 +88,8 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
 import org.sagebionetworks.repo.model.download.ActionRequiredList;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
+import org.sagebionetworks.repo.model.download.AddToDownloadListStatsRequest;
+import org.sagebionetworks.repo.model.download.AddToDownloadListStatsResponse;
 import org.sagebionetworks.repo.model.download.EnableTwoFa;
 import org.sagebionetworks.repo.model.download.MeetAccessRequirement;
 import org.sagebionetworks.repo.model.download.RequestDownload;
@@ -148,9 +148,11 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
+import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
@@ -427,6 +429,14 @@ public class EntityActionControllerImplTest {
   @Mock
   CreateGridSessionDialog mockCreateGridSessionDialog;
 
+  @Mock
+  AsynchronousJobTracker mockAsynchronousJobTracker;
+
+  @Captor
+  ArgumentCaptor<
+    UpdatingAsynchProgressHandler<AddToDownloadListStatsResponse>
+  > updatingProgressHandlerCaptor;
+
   @Captor
   ArgumentCaptor<
     CreateTableViewWizardProps.OnComplete
@@ -554,7 +564,8 @@ public class EntityActionControllerImplTest {
         mockPopupUtils,
         mockQueryClientProvider,
         mockKeyFactoryProvider,
-        mockFeatureFlagConfig
+        mockFeatureFlagConfig,
+        mockAsynchronousJobTracker
       );
 
     parentId = "syn456";
@@ -5161,10 +5172,9 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testConfigureContainerDownload() {
-    EntityChildrenResponse fileChildrenResponse = new EntityChildrenResponse();
-    fileChildrenResponse.setPage(Collections.singletonList(new EntityHeader()));
-    when(mockSynapseJavascriptClient.getEntityChildren(any()))
-      .thenReturn(getDoneFuture(fileChildrenResponse));
+    AddToDownloadListStatsResponse statsResponse =
+      new AddToDownloadListStatsResponse();
+    statsResponse.setFileCount(5L); // Non-zero file count
 
     entityBundle.setEntity(new Project());
     entityBundle.getEntity().setId(entityId);
@@ -5180,6 +5190,18 @@ public class EntityActionControllerImplTest {
       currentEntityArea,
       mockAddToDownloadListWidget
     );
+
+    // Verify the async job was started
+    verify(mockAsynchronousJobTracker)
+      .startAndTrack(
+        eq(AsynchType.AddToDownloadListStats),
+        any(AddToDownloadListStatsRequest.class),
+        eq(AsynchronousProgressWidget.WAIT_MS),
+        updatingProgressHandlerCaptor.capture()
+      );
+
+    // Simulate async callback with files found
+    updatingProgressHandlerCaptor.getValue().onComplete(statsResponse);
 
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
     verify(mockActionMenu).setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, true);
@@ -5232,16 +5254,16 @@ public class EntityActionControllerImplTest {
         "There are no downloadable items in this folder."
       );
 
-    // No need to see if there are any files
-    verify(mockSynapseJavascriptClient, never()).getEntityChildren(any());
+    // No need to check for files when hasChildren is false
+    verify(mockAsynchronousJobTracker, never())
+      .startAndTrack(any(), any(), anyInt(), any());
   }
 
   @Test
   public void testConfigureContainerDownloadNoFileChildren() {
-    EntityChildrenResponse fileChildrenResponse = new EntityChildrenResponse();
-    fileChildrenResponse.setPage(Collections.emptyList());
-    when(mockSynapseJavascriptClient.getEntityChildren(any()))
-      .thenReturn(getDoneFuture(fileChildrenResponse));
+    AddToDownloadListStatsResponse statsResponse =
+      new AddToDownloadListStatsResponse();
+    statsResponse.setFileCount(0L); // Zero file count - no accessible files
 
     entityBundle.setEntity(new Project());
     entityBundle.getEntity().setId(entityId);
@@ -5258,12 +5280,24 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
 
+    // Verify the async job was started
+    verify(mockAsynchronousJobTracker)
+      .startAndTrack(
+        eq(AsynchType.AddToDownloadListStats),
+        any(AddToDownloadListStatsRequest.class),
+        eq(AsynchronousProgressWidget.WAIT_MS),
+        updatingProgressHandlerCaptor.capture()
+      );
+
+    // Simulate async callback with no files found
+    updatingProgressHandlerCaptor.getValue().onComplete(statsResponse);
+
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
     verify(mockActionMenu).setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, false);
     verify(mockActionMenu)
       .setActionTooltipText(
         Action.ADD_TO_DOWNLOAD_CART,
-        "There are no files in this folder."
+        "This folder has no accessible files"
       );
     verify(mockActionMenu)
       .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);

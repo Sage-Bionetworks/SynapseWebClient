@@ -13,6 +13,7 @@ import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.P
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.SettableFuture;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -20,7 +21,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,9 +29,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityChildrenRequest;
-import org.sagebionetworks.repo.model.EntityChildrenResponse;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -43,10 +40,14 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
+import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.download.ActionRequiredList;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
+import org.sagebionetworks.repo.model.download.AddToDownloadListRequest;
+import org.sagebionetworks.repo.model.download.AddToDownloadListStatsRequest;
+import org.sagebionetworks.repo.model.download.AddToDownloadListStatsResponse;
 import org.sagebionetworks.repo.model.download.EnableTwoFa;
 import org.sagebionetworks.repo.model.download.MeetAccessRequirement;
 import org.sagebionetworks.repo.model.download.RequestDownload;
@@ -108,9 +109,12 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.ShareThisPage;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.docker.modal.AddDockerCommitModal;
@@ -310,6 +314,7 @@ public class EntityActionControllerImpl
   QueryClient queryClient;
   KeyFactoryProvider keyFactoryProvider;
   FeatureFlagConfig featureFlagConfig;
+  AsynchronousJobTracker asyncJobTracker;
 
   @Inject
   public EntityActionControllerImpl(
@@ -324,7 +329,8 @@ public class EntityActionControllerImpl
     PopupUtilsView popupUtilsView,
     QueryClientProvider queryClientProvider,
     KeyFactoryProvider keyFactoryProvider,
-    FeatureFlagConfig featureFlagConfig
+    FeatureFlagConfig featureFlagConfig,
+    AsynchronousJobTracker asyncJobTracker
   ) {
     super();
     this.view = view;
@@ -339,6 +345,7 @@ public class EntityActionControllerImpl
     this.queryClient = queryClientProvider.getQueryClient();
     this.keyFactoryProvider = keyFactoryProvider;
     this.featureFlagConfig = featureFlagConfig;
+    this.asyncJobTracker = asyncJobTracker;
     entityUpdatedWizardCallback =
       new WizardCallback() {
         @Override
@@ -951,8 +958,8 @@ public class EntityActionControllerImpl
     return restrictionInformationFuture;
   }
 
-  private FluentFuture configureContainerDownload() {
-    FluentFuture<EntityChildrenResponse> future = getDoneFuture(null);
+  private FluentFuture<Void> configureContainerDownload() {
+    SettableFuture<Void> settableFuture = SettableFuture.create();
 
     if (
       (entity instanceof Project && EntityArea.FILES.equals(currentArea)) ||
@@ -973,24 +980,36 @@ public class EntityActionControllerImpl
       if (Boolean.TRUE.equals(entityBundle.getHasChildren())) {
         actionMenu.setDownloadMenuEnabled(true);
         actionMenu.setDownloadMenuTooltipText(null);
-        // Check if the container has any files
-        EntityChildrenRequest filesRequest = new EntityChildrenRequest();
-        filesRequest.setParentId(entity.getId());
-        filesRequest.setIncludeSumFileSizes(false);
-        filesRequest.setIncludeTotalChildCount(false);
-        filesRequest.setIncludeTypes(
-          Collections.singletonList(EntityType.file)
-        );
-        future = getSynapseJavascriptClient().getEntityChildren(filesRequest);
-        future.addCallback(
-          new FutureCallback<EntityChildrenResponse>() {
+        // Check if the container has any accessible files (recursively)
+        AddToDownloadListRequest downloadRequest =
+          new AddToDownloadListRequest();
+        downloadRequest.setParentId(entity.getId());
+        downloadRequest.setRecursive(true);
+
+        AddToDownloadListStatsRequest statsRequest =
+          new AddToDownloadListStatsRequest();
+        statsRequest.setRequest(downloadRequest);
+
+        asyncJobTracker.startAndTrack(
+          AsynchType.AddToDownloadListStats,
+          statsRequest,
+          AsynchronousProgressWidget.WAIT_MS,
+          new UpdatingAsynchProgressHandler<AddToDownloadListStatsResponse>() {
             @Override
-            public void onSuccess(EntityChildrenResponse result) {
-              if (result.getPage().isEmpty()) {
+            public void onUpdate(AsynchronousJobStatus status) {}
+
+            @Override
+            public void onComplete(
+              AddToDownloadListStatsResponse statsResponse
+            ) {
+              if (
+                statsResponse.getFileCount() == null ||
+                statsResponse.getFileCount() == 0
+              ) {
                 actionMenu.setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, false);
                 actionMenu.setActionTooltipText(
                   Action.ADD_TO_DOWNLOAD_CART,
-                  "There are no files in this folder."
+                  "This folder has no accessible files"
                 );
               } else {
                 actionMenu.setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, true);
@@ -999,23 +1018,37 @@ public class EntityActionControllerImpl
                   null
                 );
               }
+              settableFuture.set(null);
             }
 
             @Override
-            public void onFailure(Throwable t) {
-              view.showErrorMessage(t.getMessage());
+            public void onFailure(Throwable failure) {
+              view.showErrorMessage(failure.getMessage());
+              settableFuture.set(null);
             }
-          },
-          directExecutor()
+
+            @Override
+            public void onCancel() {
+              settableFuture.set(null);
+            }
+
+            @Override
+            public boolean isAttached() {
+              return true;
+            }
+          }
         );
       } else {
         actionMenu.setDownloadMenuEnabled(false);
         actionMenu.setDownloadMenuTooltipText(
           "There are no downloadable items in this folder."
         );
+        settableFuture.set(null);
       }
+    } else {
+      settableFuture.set(null);
     }
-    return future;
+    return FluentFuture.from(settableFuture);
   }
 
   private void configureAddExternalDockerRepo() {
