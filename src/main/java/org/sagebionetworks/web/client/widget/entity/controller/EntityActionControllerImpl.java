@@ -13,7 +13,6 @@ import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.P
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.SettableFuture;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -40,7 +39,6 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
-import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.download.ActionRequiredList;
@@ -106,6 +104,7 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.FutureUtils;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.ShareThisPage;
@@ -114,7 +113,6 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.docker.modal.AddDockerCommitModal;
@@ -959,96 +957,79 @@ public class EntityActionControllerImpl
   }
 
   private FluentFuture<Void> configureContainerDownload() {
-    SettableFuture<Void> settableFuture = SettableFuture.create();
-
-    if (
+    boolean isContainer =
       (entity instanceof Project && EntityArea.FILES.equals(currentArea)) ||
-      entity instanceof Folder
-    ) {
-      actionMenu.setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
-      actionMenu.setActionListener(
-        Action.ADD_TO_DOWNLOAD_CART,
-        (action, e) -> getAddToDownloadListWidget().configure(entity.getId())
-      );
-      actionMenu.setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
-      actionMenu.setActionListener(
-        Action.SHOW_PROGRAMMATIC_OPTIONS,
-        (action, e) ->
-          getContainerClientsHelp().configureAndShow(entity.getId())
-      );
+      entity instanceof Folder;
 
-      if (Boolean.TRUE.equals(entityBundle.getHasChildren())) {
-        actionMenu.setDownloadMenuEnabled(true);
-        actionMenu.setDownloadMenuTooltipText(null);
-        // Check if the container has any accessible files (recursively)
-        AddToDownloadListRequest downloadRequest =
-          new AddToDownloadListRequest();
-        downloadRequest.setParentId(entity.getId());
-        downloadRequest.setRecursive(true);
-
-        AddToDownloadListStatsRequest statsRequest =
-          new AddToDownloadListStatsRequest();
-        statsRequest.setRequest(downloadRequest);
-
-        asyncJobTracker.startAndTrack(
-          AsynchType.AddToDownloadListStats,
-          statsRequest,
-          AsynchronousProgressWidget.WAIT_MS,
-          new UpdatingAsynchProgressHandler<AddToDownloadListStatsResponse>() {
-            @Override
-            public void onUpdate(AsynchronousJobStatus status) {}
-
-            @Override
-            public void onComplete(
-              AddToDownloadListStatsResponse statsResponse
-            ) {
-              if (
-                statsResponse.getFileCount() == null ||
-                statsResponse.getFileCount() == 0
-              ) {
-                actionMenu.setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, false);
-                actionMenu.setActionTooltipText(
-                  Action.ADD_TO_DOWNLOAD_CART,
-                  "This folder has no accessible files"
-                );
-              } else {
-                actionMenu.setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, true);
-                actionMenu.setActionTooltipText(
-                  Action.ADD_TO_DOWNLOAD_CART,
-                  null
-                );
-              }
-              settableFuture.set(null);
-            }
-
-            @Override
-            public void onFailure(Throwable failure) {
-              view.showErrorMessage(failure.getMessage());
-              settableFuture.set(null);
-            }
-
-            @Override
-            public void onCancel() {
-              settableFuture.set(null);
-            }
-
-            @Override
-            public boolean isAttached() {
-              return true;
-            }
-          }
-        );
-      } else {
-        actionMenu.setDownloadMenuEnabled(false);
-        actionMenu.setDownloadMenuTooltipText(
-          "There are no downloadable items in this folder."
-        );
-        settableFuture.set(null);
-      }
-    } else {
-      settableFuture.set(null);
+    if (!isContainer) {
+      return getDoneFuture(null);
     }
-    return FluentFuture.from(settableFuture);
+
+    actionMenu.setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+    actionMenu.setActionListener(
+      Action.ADD_TO_DOWNLOAD_CART,
+      (action, e) -> getAddToDownloadListWidget().configure(entity.getId())
+    );
+    actionMenu.setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+    actionMenu.setActionListener(
+      Action.SHOW_PROGRAMMATIC_OPTIONS,
+      (action, e) -> getContainerClientsHelp().configureAndShow(entity.getId())
+    );
+
+    if (!Boolean.TRUE.equals(entityBundle.getHasChildren())) {
+      actionMenu.setDownloadMenuEnabled(false);
+      actionMenu.setDownloadMenuTooltipText(
+        "There are no downloadable items in this folder."
+      );
+      return getDoneFuture(null);
+    }
+
+    actionMenu.setDownloadMenuEnabled(true);
+    actionMenu.setDownloadMenuTooltipText(null);
+
+    // Check if the container has any accessible files (recursively)
+    AddToDownloadListRequest downloadRequest = new AddToDownloadListRequest();
+    downloadRequest.setParentId(entity.getId());
+    downloadRequest.setRecursive(true);
+
+    AddToDownloadListStatsRequest statsRequest =
+      new AddToDownloadListStatsRequest();
+    statsRequest.setRequest(downloadRequest);
+
+    return FutureUtils
+      .<AddToDownloadListStatsResponse>getAsyncJobFuture(
+        asyncJobTracker,
+        AsynchType.AddToDownloadListStats,
+        statsRequest,
+        AsynchronousProgressWidget.WAIT_MS
+      )
+      .transform(
+        statsResponse -> {
+          if (
+            statsResponse.getFileCount() == null ||
+            statsResponse.getFileCount() == 0
+          ) {
+            actionMenu.setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, false);
+            actionMenu.setActionTooltipText(
+              Action.ADD_TO_DOWNLOAD_CART,
+              "This folder has no accessible files"
+            );
+          } else {
+            actionMenu.setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, true);
+            actionMenu.setActionTooltipText(Action.ADD_TO_DOWNLOAD_CART, null);
+          }
+          return (Void) null;
+        },
+        directExecutor()
+      )
+      .catching(
+        Throwable.class,
+        failure -> {
+          view.showErrorMessage(failure.getMessage());
+          return null;
+        },
+        directExecutor()
+      );
   }
 
   private void configureAddExternalDockerRepo() {
