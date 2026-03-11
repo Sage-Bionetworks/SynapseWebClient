@@ -34,8 +34,8 @@ public class SRC {
     > EvaluationEditorPage;
     public static ReactComponentType<DownloadCartPageProps> DownloadCartPage;
     public static ReactComponentType<
-      DownloadConfirmationProps
-    > DownloadConfirmation;
+      AddToDownloadListConfirmationAlertProps
+    > AddToDownloadListConfirmationAlert;
     public static ReactComponentType<FullWidthAlertProps> FullWidthAlert;
     public static ReactComponentType<OrientationBannerProps> OrientationBanner;
     public static ReactComponentType<SynapseNavDrawerProps> SynapseNavDrawer;
