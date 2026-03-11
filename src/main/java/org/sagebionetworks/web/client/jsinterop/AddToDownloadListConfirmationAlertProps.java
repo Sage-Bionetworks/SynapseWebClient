@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.jsinterop;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsonUtils;
+import elemental2.core.Global;
 import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsOverlay;
@@ -24,7 +23,7 @@ public class AddToDownloadListConfirmationAlertProps
     public String concreteType;
 
     @JsNullable
-    public JavaScriptObject query;
+    public Object query;
 
     @JsNullable
     public String parentId;
@@ -66,7 +65,7 @@ public class AddToDownloadListConfirmationAlertProps
     JsAddToDownloadListRequest request = new JsAddToDownloadListRequest();
     request.concreteType =
       "org.sagebionetworks.repo.model.download.AddToDownloadListRequest";
-    request.query = JsonUtils.safeEval(queryJson);
+    request.query = Global.JSON.parse(queryJson);
     props.addToDownloadListRequest = request;
     props.onClose = onClose;
     return props;
