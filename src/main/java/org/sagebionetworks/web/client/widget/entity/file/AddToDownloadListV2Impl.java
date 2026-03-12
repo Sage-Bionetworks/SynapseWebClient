@@ -3,10 +3,9 @@ package org.sagebionetworks.web.client.widget.entity.file;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.jsinterop.DownloadConfirmationProps;
+import org.sagebionetworks.web.client.jsinterop.AddToDownloadListConfirmationAlertProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -16,7 +15,7 @@ public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
 
   ReactComponent container = new ReactComponent();
 
-  String queryBundleRequestJson;
+  String queryJson;
   String folderId;
   JSONObjectAdapter adapter;
 
@@ -27,13 +26,11 @@ public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
 
   @Override
   public void configure(String entityId, Query query) {
+    this.folderId = null;
     try {
-      QueryBundleRequest queryBundleRequest = new QueryBundleRequest();
-      queryBundleRequest.setEntityId(entityId);
-      queryBundleRequest.setQuery(query);
       JSONObjectAdapter newAdapter = adapter.createNew();
-      queryBundleRequest.writeToJSONObject(newAdapter);
-      this.queryBundleRequestJson = newAdapter.toJSONString();
+      query.writeToJSONObject(newAdapter);
+      this.queryJson = newAdapter.toJSONString();
     } catch (JSONObjectAdapterException e) {
       e.printStackTrace();
     }
@@ -42,6 +39,7 @@ public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
 
   @Override
   public void configure(String folderId) {
+    this.queryJson = null;
     this.folderId = folderId;
     init();
   }
@@ -53,21 +51,25 @@ public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
 
   private void init() {
     container.setVisible(true);
-    DownloadConfirmationProps.Callback onClose =
-      new DownloadConfirmationProps.Callback() {
-        @Override
-        public void run() {
-          container.setVisible(false);
-        }
-      };
-    DownloadConfirmationProps editorProps = DownloadConfirmationProps.create(
-      queryBundleRequestJson,
-      folderId,
-      onClose
-    );
+    AddToDownloadListConfirmationAlertProps.Callback onClose = () ->
+      container.setVisible(false);
+    AddToDownloadListConfirmationAlertProps props;
+    if (folderId != null) {
+      props =
+        AddToDownloadListConfirmationAlertProps.createForContainer(
+          folderId,
+          onClose
+        );
+    } else {
+      props =
+        AddToDownloadListConfirmationAlertProps.createForQuery(
+          queryJson,
+          onClose
+        );
+    }
     ReactElement component = React.createElementWithSynapseContext(
-      SRC.SynapseComponents.DownloadConfirmation,
-      editorProps
+      SRC.SynapseComponents.AddToDownloadListConfirmationAlert,
+      props
     );
     container.render(component);
   }

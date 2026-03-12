@@ -11,6 +11,8 @@ import org.sagebionetworks.repo.model.doi.v2.DoiRequest;
 import org.sagebionetworks.repo.model.doi.v2.DoiResponse;
 import org.sagebionetworks.repo.model.download.AddToDownloadListRequest;
 import org.sagebionetworks.repo.model.download.AddToDownloadListResponse;
+import org.sagebionetworks.repo.model.download.AddToDownloadListStatsRequest;
+import org.sagebionetworks.repo.model.download.AddToDownloadListStatsResponse;
 import org.sagebionetworks.repo.model.download.DownloadListManifestRequest;
 import org.sagebionetworks.repo.model.download.DownloadListManifestResponse;
 import org.sagebionetworks.repo.model.download.DownloadListPackageRequest;
@@ -116,6 +118,11 @@ public enum AsynchType implements IsSerializable {
     DOWNLOAD_LIST_ADD_V2,
     AddToDownloadListRequest.class,
     AddToDownloadListResponse.class
+  ),
+  AddToDownloadListStats(
+    DOWNLOAD_LIST_ADD_STATS_V2,
+    AddToDownloadListStatsRequest.class,
+    AddToDownloadListStatsResponse.class
   ),
   DownloadPackageList(
     DOWNLOAD_LIST_PACKAGE_V2,

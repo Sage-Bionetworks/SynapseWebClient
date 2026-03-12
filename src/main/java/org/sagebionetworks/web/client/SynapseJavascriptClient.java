@@ -319,6 +319,8 @@ public class SynapseJavascriptClient {
     "/schema/type/validation/";
   public static final String DOWNLOAD_LIST_V2 = "/download/list/query/";
   public static final String DOWNLOAD_LIST_ADD_V2 = "/download/list/add/";
+  public static final String DOWNLOAD_LIST_ADD_STATS_V2 =
+    "/download/list/add/stats/";
   public static final String DOWNLOAD_LIST_PACKAGE_V2 =
     "/download/list/package/";
   public static final String DOWNLOAD_LIST_MANIFEST_V2 =
