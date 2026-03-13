@@ -6,14 +6,14 @@
 // CSS for SRC because it contains styles that are not in the distributed source SCSS. The missing styles were imported
 // in TypeScript/TSX files and loaded + compiled by Vite, so Sass never compiled them. The synapse-react-client bundle
 // step includes these styles in this minified CSS file.
-@use 'synapse-react-client/dist/index.css';
+@use 'synapse-react-client/synapse-react-client.css';
 
 // Include the source synapse-react-client SCSS files after the minified build so styles that include our variable
 // overrides take higher priority
-@use 'synapse-react-client/dist/style/main.scss' with (
+@use 'synapse-react-client/style/main.scss' with (
   $primary-action-color: swc.$synapse-blue,
   $secondary-action-color: swc.$synapse-green,
   $primary-color-palette: swc.$synapse-primary-color-palette,
   $secondary-color-palette: swc.$synapse-secondary-color-palette
 );
-@use 'synapse-react-client/dist/template_style/Index.scss';
+@use 'synapse-react-client/template_style/Index.scss';
