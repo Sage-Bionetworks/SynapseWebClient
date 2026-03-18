@@ -102,8 +102,6 @@ import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.ProfileViewImpl;
 import org.sagebionetworks.web.client.view.SearchV2View;
 import org.sagebionetworks.web.client.view.SearchV2ViewImpl;
-import org.sagebionetworks.web.client.view.SearchView;
-import org.sagebionetworks.web.client.view.SearchViewImpl;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.view.SignedTokenViewImpl;
 import org.sagebionetworks.web.client.view.SubscriptionView;
@@ -581,8 +579,6 @@ import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlertView;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlertViewImpl;
-import org.sagebionetworks.web.client.widget.search.SearchBoxView;
-import org.sagebionetworks.web.client.widget.search.SearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxView;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
@@ -877,8 +873,6 @@ public class PortalGinModule extends AbstractGinModule {
 
     // Help
     bind(HelpView.class).to(HelpViewImpl.class).in(Singleton.class);
-    // SearchView
-    bind(SearchView.class).to(SearchViewImpl.class).in(Singleton.class);
     bind(TrustCenterView.class)
       .to(TrustCenterViewImpl.class)
       .in(Singleton.class);
@@ -1004,8 +998,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(ProjectTitleBarView.class).to(ProjectTitleBarViewImpl.class);
     bind(BasicTitleBarView.class).to(BasicTitleBarViewImpl.class);
 
-    // Search Box
-    bind(SearchBoxView.class).to(SearchBoxViewImpl.class).in(Singleton.class);
     // Reject Data Access Request Dialog
     bind(RejectDataAccessRequestModalView.class)
       .to(RejectDataAccessRequestModalViewImpl.class);

@@ -4,7 +4,7 @@ import com.google.gwt.place.shared.Place;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.PeopleSearch;
-import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.place.SearchV2Place;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -15,18 +15,6 @@ import org.sagebionetworks.web.shared.WebConstants;
  *
  */
 public class SearchUtil {
-
-  /**
-   * If this returns a Synapse place then we should redirect to an entity page
-   *
-   * @param place
-   * @return
-   */
-  public static Place willRedirect(Search place) {
-    String queryTerm = place.getSearchTerm();
-    if (queryTerm == null) queryTerm = "";
-    return willRedirect(queryTerm);
-  }
 
   /**
    * If this returns a Synapse place then we should redirect to an entity page
@@ -55,7 +43,7 @@ public class SearchUtil {
     final GlobalApplicationState globalApplicationState
   ) {
     final Place place = willRedirect(queryTerm);
-    final Search searchPlace = new Search(queryTerm);
+    final SearchV2Place searchPlace = new SearchV2Place(queryTerm);
     if (place == null) {
       // no potential redirect, go directly to search!
       globalApplicationState.getPlaceChanger().goTo(searchPlace);

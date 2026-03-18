@@ -14,8 +14,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +50,6 @@ import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 import org.sagebionetworks.web.server.servlet.UserDataProvider;
 import org.sagebionetworks.web.server.servlet.ViteHTMLGenerator;
 import org.sagebionetworks.web.server.servlet.ViteManifestProvider;
-import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -404,35 +401,6 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
                   "Searching for: " + queryParamJson
                 );
               }
-            }
-          } else if (path.startsWith("/Search")) {
-            // index all projects
-            String searchQueryRawValue = uri.substring(uri.indexOf(":") + 1);
-            SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
-            try {
-              query =
-                EntityFactory.createEntityFromJSONString(
-                  URLDecoder.decode(searchQueryRawValue, "UTF-8"),
-                  SearchQuery.class
-                );
-            } catch (Exception e) {
-              query.setQueryTerm(
-                Collections.singletonList(searchQueryRawValue)
-              );
-            }
-            String queryTerm = query.getQueryTerm().get(0);
-            if (queryTerm != null && queryTerm.trim().length() > 0) {
-              dataModel.put(
-                PAGE_TITLE_KEY,
-                "Searching for: " + query.getQueryTerm().get(0)
-              );
-            }
-
-            if (includeBotHtml) {
-              dataModel.put(
-                BOT_BODY_HTML_KEY,
-                crawlFilter.getAllProjectsHtml(query)
-              );
             }
           } else if (path.startsWith("/TeamSearch")) {
             TeamSearch place = new TeamSearch(placeToken);

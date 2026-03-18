@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.place.PeopleSearch;
-import org.sagebionetworks.web.client.place.Search;
 
 public class PeopleSearchPlaceTest {
 
@@ -31,7 +30,7 @@ public class PeopleSearchPlaceTest {
   @Test
   public void testStartCase() {
     // with start
-    String testToken = searchTerm + Search.START_DELIMITER + start;
+    String testToken = searchTerm + PeopleSearch.START_DELIMITER + start;
     PeopleSearch place = tokenizer.getPlace(testToken);
     Assert.assertEquals(searchTerm, place.getSearchTerm());
     Assert.assertEquals(start, place.getStart());

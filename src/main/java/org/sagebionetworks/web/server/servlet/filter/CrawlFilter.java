@@ -145,7 +145,7 @@ public class CrawlFilter {
     String newJson = EntityFactory.createJSONStringForEntity(query);
 
     html.append(
-      "<h3><a href=\"https://www.synapse.org/Search:" +
+      "<h3><a href=\"https://www.synapse.org/SearchV2:default?query=" +
       URLEncoder.encode(newJson, "UTF-8") +
       "\">Projects</a></h3><br />"
     );
@@ -596,7 +596,7 @@ public class CrawlFilter {
     inputQuery.setStart(newStart);
     String newJson = EntityFactory.createJSONStringForEntity(inputQuery);
     html.append(
-      "<a href=\"https://www.synapse.org/Search:" +
+      "<a href=\"https://www.synapse.org/SearchV2:default?query=" +
       URLEncoder.encode(newJson, "UTF-8") +
       "\">Next Page</a><br />"
     );
