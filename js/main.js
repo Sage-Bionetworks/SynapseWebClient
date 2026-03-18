@@ -12,7 +12,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactDOMClient from 'react-dom/client'
 import * as ReactQuery from '@tanstack/react-query'
-import * as SRC from 'synapse-react-client'
+import * as SRC from 'synapse-react-client/SWC.index'
 import './mui.js'
 import './globalContext.js'
 // Import SWC styles. Vite will compile and handle SCSS now.
