@@ -33,7 +33,6 @@ import org.sagebionetworks.web.client.place.PersonalAccessTokenPlace;
 import org.sagebionetworks.web.client.place.PlansPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Quiz;
-import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.SearchV2Place;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
@@ -65,7 +64,6 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
     ComingSoon.Tokenizer.class,
     Synapse.Tokenizer.class,
     Wiki.Tokenizer.class,
-    Search.Tokenizer.class,
     Challenges.Tokenizer.class,
     Help.Tokenizer.class,
     Governance.Tokenizer.class,

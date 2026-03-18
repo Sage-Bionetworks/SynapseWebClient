@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.place.SearchV2Place;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.SearchUtil;
 
@@ -33,7 +33,7 @@ public class SearchUtilTest {
   public void testSearchForTerm() {
     // search for something that does not look like a Synapse ID
     SearchUtil.searchForTerm("not_an_id", mockGlobalAppState);
-    verify(mockPlaceChanger).goTo(isA(Search.class));
+    verify(mockPlaceChanger).goTo(isA(SearchV2Place.class));
   }
 
   @Test

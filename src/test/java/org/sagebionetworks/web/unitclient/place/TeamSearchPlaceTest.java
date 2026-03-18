@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient.place;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.TeamSearch;
 
 public class TeamSearchPlaceTest {
@@ -31,7 +30,7 @@ public class TeamSearchPlaceTest {
   @Test
   public void testStartCase() {
     // with start
-    String testToken = searchTerm + Search.START_DELIMITER + start;
+    String testToken = searchTerm + TeamSearch.START_DELIMITER + start;
     TeamSearch place = tokenizer.getPlace(testToken);
     Assert.assertEquals(searchTerm, place.getSearchTerm());
     Assert.assertEquals(start, place.getStart());

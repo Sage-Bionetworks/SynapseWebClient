@@ -41,7 +41,7 @@ import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.place.SearchV2Place;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.TeamSearch;
@@ -271,7 +271,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
     teamSearchButtonSmall.addClickHandler(teamSearchHandler);
 
     ClickHandler projectSearchHandler = event ->
-      presenter.goTo(new Search(projectSearchTextBox.getValue()));
+      presenter.goTo(new SearchV2Place(projectSearchTextBox.getValue()));
     projectSearchButton.addClickHandler(projectSearchHandler);
     projectSearchButtonSmall.addClickHandler(projectSearchHandler);
 
