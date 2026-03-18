@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import path from 'path'
 
 /**
  * Vite config to generate the ESM & CJS bundles for Synapse React Client.
@@ -35,6 +36,12 @@ const config = defineConfig({
     ],
   },
   resolve: {
+    alias: {
+      // jsdom is only used by synapse-react-client's SanitizeHtmlUtils in
+      // non-browser environments (guarded by typeof window === "undefined").
+      // This stub satisfies static resolution without including jsdom in the bundle.
+      jsdom: path.resolve(__dirname, 'js/stubs/jsdom.js'),
+    },
     dedupe: [
       '@emotion/react',
       '@emotion/styled',
