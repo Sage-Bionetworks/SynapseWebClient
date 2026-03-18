@@ -1,6 +1,9 @@
 import { atom, createStore, useAtomValue } from 'jotai'
 import { createElement } from 'react'
-import { SynapseContext, SynapseSessionManager } from 'synapse-react-client'
+import {
+  SynapseContext,
+  SynapseSessionManager,
+} from 'synapse-react-client/SWC.index'
 
 /* Singleton session manager */
 const sessionManager = new SynapseSessionManager()
