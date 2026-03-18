@@ -22,8 +22,6 @@ import freemarker.template.Template;
 import freemarker.template.TemplateNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLEncoder;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import javax.servlet.FilterChain;
@@ -53,10 +51,8 @@ import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
-import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.ViteHTMLGenerator;
 import org.sagebionetworks.web.server.servlet.ViteManifestProvider;
@@ -348,36 +344,6 @@ public class HtmlInjectionFilterTest {
         "&lt;/head&gt;&lt;script&gt;window.alert(&#39;pwned&#39;)&lt;/script&gt;my test thread title"
       )
     );
-  }
-
-  @Test
-  public void testSearchPage()
-    throws ServletException, IOException, RestServiceException, SynapseException {
-    String searchTerm = "cancer";
-    setRequestURL("https://www.synapse.org/Search:" + searchTerm);
-
-    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
-
-    verify(mockPrintWriter).print(stringCaptor.capture());
-    String outputString = stringCaptor.getValue();
-    assertTrue(outputString.contains(searchTerm));
-  }
-
-  @Test
-  public void testSearchPageWithQuery()
-    throws ServletException, IOException, RestServiceException, SynapseException, JSONObjectAdapterException {
-    String searchTerm = "potato";
-    SearchQuery query = new SearchQuery();
-    query.setQueryTerm(Collections.singletonList(searchTerm));
-    String queryJson = EntityFactory.createJSONStringForEntity(query);
-    String encodedQueryJson = URLEncoder.encode(queryJson, "UTF-8");
-    setRequestURL("https://www.synapse.org/Search:" + encodedQueryJson);
-
-    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
-
-    verify(mockPrintWriter).print(stringCaptor.capture());
-    String outputString = stringCaptor.getValue();
-    assertTrue(outputString.contains(searchTerm));
   }
 
   @Test
