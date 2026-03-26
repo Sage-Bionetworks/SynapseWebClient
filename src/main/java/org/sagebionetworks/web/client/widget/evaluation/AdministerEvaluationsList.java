@@ -28,7 +28,6 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter {
   private EvaluationAccessControlListModalWidget aclEditor;
   private SynapseAlert synAlert;
   private String entityId;
-  private EvaluationEditorModal evalEditor;
   private AuthenticationController authenticationController;
   private SubmitToEvaluationWidget submitToEvaluationWidget;
 
@@ -39,7 +38,6 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter {
     AdministerEvaluationsListView view,
     ChallengeClientAsync challengeClient,
     EvaluationAccessControlListModalWidget aclEditor,
-    EvaluationEditorModal evalEditor,
     SynapseAlert synAlert,
     GlobalApplicationState globalApplicationState,
     AuthenticationController authenticationController,
@@ -53,8 +51,6 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter {
     this.aclEditor = aclEditor;
     this.view = view;
     this.synAlert = synAlert;
-    this.evalEditor = evalEditor;
-    view.add(evalEditor);
     view.add(aclEditor);
     view.add(synAlert);
   }
@@ -134,37 +130,9 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter {
     configure(entityId, onEditEvaluation);
   }
 
-  public void onEditClicked(Evaluation evaluation) {
-    // configure and show modal for editing evaluation
-    evalEditor.configure(
-      evaluation,
-      () -> {
-        refresh();
-      }
-    );
-    evalEditor.show();
-  }
-
   public void onShareClicked(Evaluation evaluation) {
     aclEditor.configure(evaluation, null);
     aclEditor.show();
-  }
-
-  public void onDeleteClicked(Evaluation evaluation) {
-    challengeClient.deleteEvaluation(
-      evaluation.getId(),
-      new AsyncCallback<Void>() {
-        @Override
-        public void onSuccess(Void result) {
-          refresh();
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          synAlert.handleException(caught);
-        }
-      }
-    );
   }
 
   @Override

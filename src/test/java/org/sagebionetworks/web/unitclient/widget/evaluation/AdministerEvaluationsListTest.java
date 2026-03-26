@@ -13,19 +13,16 @@ import java.util.function.Consumer;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsListView;
-import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -41,9 +38,6 @@ public class AdministerEvaluationsListTest {
 
   @Mock
   EvaluationAccessControlListModalWidget mockAclEditor;
-
-  @Mock
-  EvaluationEditorModal mockEvalEditor;
 
   @Mock
   SynapseAlert mockSynAlert;
@@ -70,7 +64,6 @@ public class AdministerEvaluationsListTest {
         mockView,
         mockChallengeClient,
         mockAclEditor,
-        mockEvalEditor,
         mockSynAlert,
         mockGlobalApplicationState,
         mockAuthenticationController,
@@ -131,52 +124,9 @@ public class AdministerEvaluationsListTest {
   }
 
   @Test
-  public void testOnEditClicked() {
-    evalList.onEditClicked(e1);
-    ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(
-      Callback.class
-    );
-    verify(mockEvalEditor).configure(eq(e1), callbackCaptor.capture());
-    verify(mockEvalEditor).show();
-    callbackCaptor.getValue().invoke();
-    verify(mockChallengeClient)
-      .getSharableEvaluations(any(), any(AsyncCallback.class));
-  }
-
-  @Test
   public void testOnShareClicked() {
     evalList.onShareClicked(e1);
     verify(mockAclEditor).configure(eq(e1), any());
     verify(mockAclEditor).show();
-  }
-
-  @Test
-  public void testOnDeleteEvaluationClicked() {
-    AsyncMockStubber
-      .callSuccessWith(null)
-      .when(mockChallengeClient)
-      .deleteEvaluation(anyString(), any(AsyncCallback.class));
-    evalList.onDeleteClicked(e1);
-    verify(mockChallengeClient)
-      .deleteEvaluation(eq(e1.getId()), any(AsyncCallback.class));
-    // refresh
-    verify(mockChallengeClient)
-      .getSharableEvaluations(any(), any(AsyncCallback.class));
-  }
-
-  @Test
-  public void testOnDeleteEvaluationClickedFailure() {
-    Exception ex = new Exception("does not compute");
-    AsyncMockStubber
-      .callFailureWith(ex)
-      .when(mockChallengeClient)
-      .deleteEvaluation(anyString(), any(AsyncCallback.class));
-    evalList.onDeleteClicked(e1);
-    verify(mockChallengeClient)
-      .deleteEvaluation(eq(e1.getId()), any(AsyncCallback.class));
-    verify(mockSynAlert).handleException(ex);
-    // no refresh
-    verify(mockChallengeClient, never())
-      .getSharableEvaluations(anyString(), any(AsyncCallback.class));
   }
 }
