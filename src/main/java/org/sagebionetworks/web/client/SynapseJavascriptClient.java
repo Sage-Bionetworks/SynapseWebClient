@@ -3115,15 +3115,6 @@ public class SynapseJavascriptClient {
     doGet(url, OBJECT_TYPE.Evaluation, cb);
   }
 
-  public void migrateSubmissionQuotaToEvaluationRound(
-    String evaluationId,
-    AsyncCallback<Void> cb
-  ) {
-    String url =
-      getRepoServiceUrl() + EVALUATION + "/" + evaluationId + "/migratequota";
-    doPost(url, null, OBJECT_TYPE.None, false, cb);
-  }
-
   public void listApprovedSubmissionInfo(
     String requirementId,
     String nextPageToken,

@@ -203,7 +203,6 @@ import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsLis
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorReactComponentPage;
-import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -833,8 +832,6 @@ public interface PortalGinInjector extends Ginjector {
   SynapseProperties getSynapseProperties();
 
   QuizInfoDialog getQuizInfoDialog();
-
-  EvaluationRowWidget getEvaluationRowWidget();
 
   EvaluationEditorReactComponentPage createEvaluationEditorReactComponentPage();
 
