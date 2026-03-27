@@ -113,12 +113,6 @@ public interface ChallengeClientAsync {
     AsyncCallback<TeamSubmissionEligibility> callback
   );
 
-  void updateEvaluation(Evaluation evaluation, AsyncCallback<Void> callback);
-
-  void createEvaluation(Evaluation evaluation, AsyncCallback<Void> callback);
-
-  void deleteEvaluation(String evaluationId, AsyncCallback<Void> callback);
-
   void getProjectEvaluationIds(
     String projectId,
     AsyncCallback<Set<String>> callback
