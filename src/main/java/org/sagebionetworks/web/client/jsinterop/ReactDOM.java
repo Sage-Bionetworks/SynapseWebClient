@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.jsinterop;
 
-import com.google.gwt.dom.client.Element;
 import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
@@ -13,8 +12,6 @@ public class ReactDOM {
   public interface Callback {
     void run();
   }
-
-  public static native boolean unmountComponentAtNode(Element container);
 
   /**
    * flushSync lets you force React to flush any updates inside the provided callback synchronously. This ensures that the DOM is updated immediately.
