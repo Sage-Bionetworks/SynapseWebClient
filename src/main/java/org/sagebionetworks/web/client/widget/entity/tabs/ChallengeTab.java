@@ -4,7 +4,9 @@ import com.google.inject.Inject;
 import java.util.function.Consumer;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -25,6 +27,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
   PortalGinInjector ginInjector;
   AuthenticationController authenticationController;
   GlobalApplicationState globalApplicationState;
+  PopupUtilsView popupUtils;
   EntityActionMenu actionMenuWidget;
 
   String entityId;
@@ -35,12 +38,14 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
     Tab tab,
     PortalGinInjector ginInjector,
     AuthenticationController authenticationController,
-    GlobalApplicationState globalApplicationState
+    GlobalApplicationState globalApplicationState,
+    PopupUtilsView popupUtils
   ) {
     this.tab = tab;
     this.ginInjector = ginInjector;
     this.authenticationController = authenticationController;
     this.globalApplicationState = globalApplicationState;
+    this.popupUtils = popupUtils;
     tab.configure(
       "Challenge",
       "challenge",
@@ -107,7 +112,11 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
   private void showEvaluationEditor(String entityId, String evaluationId) {
     EvaluationEditorReactComponentPage evaluationEditor =
       ginInjector.createEvaluationEditorReactComponentPage();
-    globalApplicationState.setIsEditing(true);
+    Runnable doNavigateBack = () -> {
+      evaluationEditor.removeFromParent();
+      view.showAdminTabContents();
+      evaluationList.refresh();
+    };
     evaluationEditor.configure(
       evaluationId,
       entityId,
@@ -115,10 +124,18 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
       globalApplicationState.isShowingUTCTime(),
       // onPageBack() callback
       () -> {
-        evaluationEditor.removeFromParent();
-        view.showAdminTabContents();
-        evaluationList.refresh();
-        globalApplicationState.setIsEditing(false);
+        if (globalApplicationState.isEditing()) {
+          popupUtils.showConfirmDialog(
+            "",
+            DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE,
+            () -> {
+              globalApplicationState.setIsEditing(false);
+              doNavigateBack.run();
+            }
+          );
+        } else {
+          doNavigateBack.run();
+        }
       }
     );
     view.hideAdminTabContents();
