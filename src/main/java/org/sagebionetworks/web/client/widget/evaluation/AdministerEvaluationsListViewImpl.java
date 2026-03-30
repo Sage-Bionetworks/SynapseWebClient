@@ -7,13 +7,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.jsinterop.EvaluationCardProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
-import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget.EvaluationActionHandler;
 
 public class AdministerEvaluationsListViewImpl
   implements AdministerEvaluationsListView {
@@ -21,36 +19,17 @@ public class AdministerEvaluationsListViewImpl
   public interface Binder
     extends UiBinder<Widget, AdministerEvaluationsListViewImpl> {}
 
-  private EvaluationActionHandler presenter;
-
   @UiField
   Div rows;
 
   @UiField
   Div widgetsContainer;
 
-  PortalGinInjector ginInjector;
   Widget widget;
 
   @Inject
-  public AdministerEvaluationsListViewImpl(
-    Binder binder,
-    PortalGinInjector ginInjector
-  ) {
-    this.ginInjector = ginInjector;
+  public AdministerEvaluationsListViewImpl(Binder binder) {
     widget = binder.createAndBindUi(this);
-  }
-
-  @Override
-  public void addRow(Evaluation evaluation) {
-    EvaluationRowWidget newRow = ginInjector.getEvaluationRowWidget();
-    newRow.configure(evaluation, presenter);
-    rows.add(newRow.asWidget());
-  }
-
-  @Override
-  public void setPresenter(EvaluationActionHandler presenter) {
-    this.presenter = presenter;
   }
 
   @Override

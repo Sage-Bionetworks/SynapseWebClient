@@ -517,42 +517,6 @@ public class ChallengeClientImpl
   }
 
   @Override
-  public void updateEvaluation(Evaluation evaluation)
-    throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient =
-      createSynapseClient();
-    try {
-      synapseClient.updateEvaluation(evaluation);
-    } catch (SynapseException e) {
-      throw ExceptionUtil.convertSynapseException(e);
-    }
-  }
-
-  @Override
-  public void createEvaluation(Evaluation evaluation)
-    throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient =
-      createSynapseClient();
-    try {
-      synapseClient.createEvaluation(evaluation);
-    } catch (SynapseException e) {
-      throw ExceptionUtil.convertSynapseException(e);
-    }
-  }
-
-  @Override
-  public void deleteEvaluation(String evaluationId)
-    throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient =
-      createSynapseClient();
-    try {
-      synapseClient.deleteEvaluation(evaluationId);
-    } catch (SynapseException e) {
-      throw ExceptionUtil.convertSynapseException(e);
-    }
-  }
-
-  @Override
   public void requestToCancelSubmission(String submissionId)
     throws RestServiceException {
     org.sagebionetworks.client.SynapseClient synapseClient =

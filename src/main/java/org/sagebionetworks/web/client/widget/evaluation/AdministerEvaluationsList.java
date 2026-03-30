@@ -17,12 +17,10 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
-import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget.EvaluationActionHandler;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
-public class AdministerEvaluationsList
-  implements SynapseWidgetPresenter, EvaluationActionHandler {
+public class AdministerEvaluationsList implements SynapseWidgetPresenter {
 
   private ChallengeClientAsync challengeClient;
   private GlobalApplicationState globalApplicationState;
@@ -30,11 +28,9 @@ public class AdministerEvaluationsList
   private EvaluationAccessControlListModalWidget aclEditor;
   private SynapseAlert synAlert;
   private String entityId;
-  private EvaluationEditorModal evalEditor;
   private AuthenticationController authenticationController;
   private SubmitToEvaluationWidget submitToEvaluationWidget;
 
-  //This is currently only used in the "alpha" test mode for using React components to perform the Evaluation edit
   private Consumer<String> onEditEvaluation;
 
   @Inject
@@ -42,7 +38,6 @@ public class AdministerEvaluationsList
     AdministerEvaluationsListView view,
     ChallengeClientAsync challengeClient,
     EvaluationAccessControlListModalWidget aclEditor,
-    EvaluationEditorModal evalEditor,
     SynapseAlert synAlert,
     GlobalApplicationState globalApplicationState,
     AuthenticationController authenticationController,
@@ -56,18 +51,10 @@ public class AdministerEvaluationsList
     this.aclEditor = aclEditor;
     this.view = view;
     this.synAlert = synAlert;
-    this.evalEditor = evalEditor;
-    view.add(evalEditor);
     view.add(aclEditor);
-    view.setPresenter(this);
     view.add(synAlert);
   }
 
-  /**
-   *
-   * @param evaluations List of evaluations to display
-   * @param evaluationCallback call back with the evaluation if it is selected
-   */
   public void configure(String entityId, Consumer<String> onEditEvaluation) {
     this.entityId = entityId;
     this.onEditEvaluation = onEditEvaluation;
@@ -82,16 +69,12 @@ public class AdministerEvaluationsList
         @Override
         public void onSuccess(List<Evaluation> evaluations) {
           for (Evaluation evaluation : evaluations) {
-            if (evaluation.getQuota() == null) {
-              createEvaluationCardReactComponent(
-                evaluation,
-                timeInUtc,
-                accessToken,
-                onEditEvaluation
-              );
-            } else {
-              view.addRow(evaluation);
-            }
+            createEvaluationCardReactComponent(
+              evaluation,
+              timeInUtc,
+              accessToken,
+              onEditEvaluation
+            );
           }
         }
 
@@ -143,45 +126,13 @@ public class AdministerEvaluationsList
     view.addReactComponent(evaluation, props);
   }
 
-  @Override
   public void refresh() {
     configure(entityId, onEditEvaluation);
   }
 
-  @Override
-  public void onEditClicked(Evaluation evaluation) {
-    // configure and show modal for editing evaluation
-    evalEditor.configure(
-      evaluation,
-      () -> {
-        refresh();
-      }
-    );
-    evalEditor.show();
-  }
-
-  @Override
   public void onShareClicked(Evaluation evaluation) {
     aclEditor.configure(evaluation, null);
     aclEditor.show();
-  }
-
-  @Override
-  public void onDeleteClicked(Evaluation evaluation) {
-    challengeClient.deleteEvaluation(
-      evaluation.getId(),
-      new AsyncCallback<Void>() {
-        @Override
-        public void onSuccess(Void result) {
-          refresh();
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          synAlert.handleException(caught);
-        }
-      }
-    );
   }
 
   @Override

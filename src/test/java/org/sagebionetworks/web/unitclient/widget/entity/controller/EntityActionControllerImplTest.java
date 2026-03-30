@@ -177,7 +177,6 @@ import org.sagebionetworks.web.client.widget.entity.file.FileDownloadHandlerWidg
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
-import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
@@ -269,9 +268,6 @@ public class EntityActionControllerImplTest {
   StorageLocationWidget mockStorageLocationWidget;
 
   Reference selected;
-
-  @Mock
-  EvaluationEditorModal mockEvalEditor;
 
   @Mock
   CookieProvider mockCookies;
@@ -498,8 +494,6 @@ public class EntityActionControllerImplTest {
       .thenReturn(mockProvenanceEditorWidget);
     when(mockPortalGinInjector.getStorageLocationWidget())
       .thenReturn(mockStorageLocationWidget);
-    when(mockPortalGinInjector.getEvaluationEditorModal())
-      .thenReturn(mockEvalEditor);
     when(mockPortalGinInjector.getSelectTeamModal())
       .thenReturn(mockSelectTeamModal);
     when(mockPortalGinInjector.getApproveUserAccessModal())
