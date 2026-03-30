@@ -10,7 +10,6 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.sagebionetworks.web.client.jsinterop.EvaluationEditorPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
@@ -68,11 +67,7 @@ public class EvaluationEditorReactComponentPage extends Composite {
 
   @UiHandler(value = { "backToChallenge" })
   void onBackToChallengeClick(ClickEvent event) {
-    unmountReactComponents();
+    event.preventDefault();
     onPageBack.run();
-  }
-
-  private void unmountReactComponents() {
-    ReactDOM.unmountComponentAtNode(evaluationEditorContainer.getElement());
   }
 }

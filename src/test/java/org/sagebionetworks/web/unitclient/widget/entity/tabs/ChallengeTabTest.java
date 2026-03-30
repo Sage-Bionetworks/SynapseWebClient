@@ -4,13 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.junit.GWTMockUtilities;
-import com.google.gwt.user.client.ui.Widget;
 import java.util.function.Consumer;
 import org.junit.After;
 import org.junit.Before;
@@ -21,12 +20,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.EvaluationEditorPageProps;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
@@ -71,6 +71,9 @@ public class ChallengeTabTest {
   GlobalApplicationState mockGlobalApplicationState;
 
   @Mock
+  PopupUtilsView mockPopupUtils;
+
+  @Mock
   EvaluationEditorReactComponentPage mockEvaluationEditorReactComponentPage;
 
   @Captor
@@ -89,7 +92,8 @@ public class ChallengeTabTest {
         mockTab,
         mockPortalGinInjector,
         mockAuthenticationController,
-        mockGlobalApplicationState
+        mockGlobalApplicationState,
+        mockPopupUtils
       );
     when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
     when(mockPortalGinInjector.getChallengeTabView()).thenReturn(mockView);
@@ -141,7 +145,7 @@ public class ChallengeTabTest {
 
     consumerCaptor.getValue().accept(evaluationId);
 
-    verify(mockGlobalApplicationState).setIsEditing(true);
+    verify(mockGlobalApplicationState, never()).setIsEditing(true);
     verify(mockEvaluationEditorReactComponentPage)
       .configure(
         eq(evaluationId),
@@ -151,9 +155,45 @@ public class ChallengeTabTest {
         callbackCaptor.capture()
       );
 
+    when(mockGlobalApplicationState.isEditing()).thenReturn(false);
     callbackCaptor.getValue().run();
     verify(mockEvaluationEditorReactComponentPage).removeFromParent();
+    verify(mockGlobalApplicationState, never()).setIsEditing(false);
+  }
+
+  @Test
+  public void testConfigure_backWhileEditing() {
+    String entityId = "syn1";
+    String entityName = "challenge project test";
+    tab.configure(entityId, entityName, mockProjectEntityBundle);
+
+    verify(mockAdministerEvaluationsList)
+      .configure(eq(entityId), consumerCaptor.capture());
+
+    String evaluationId = "88288282";
+    consumerCaptor.getValue().accept(evaluationId);
+
+    verify(mockEvaluationEditorReactComponentPage)
+      .configure(
+        eq(evaluationId),
+        any(),
+        any(),
+        anyBoolean(),
+        callbackCaptor.capture()
+      );
+
+    when(mockGlobalApplicationState.isEditing()).thenReturn(true);
+    ArgumentCaptor<Callback> confirmCaptor = ArgumentCaptor.forClass(
+      Callback.class
+    );
+    callbackCaptor.getValue().run();
+    verify(mockPopupUtils)
+      .showConfirmDialog(any(), any(), confirmCaptor.capture());
+    verify(mockEvaluationEditorReactComponentPage, never()).removeFromParent();
+
+    confirmCaptor.getValue().invoke();
     verify(mockGlobalApplicationState).setIsEditing(false);
+    verify(mockEvaluationEditorReactComponentPage).removeFromParent();
   }
 
   @Test
