@@ -24,6 +24,7 @@ public class ShinySiteWidget implements WidgetRendererPresenter {
     "https://dce.seattlebiosoftware.com/",
     "https://olssol.shinyapps.io/rwebgenie/",
     "https://sagebio.shinyapps.io/",
+    "https://airtable.com/",
   };
   private IFrameView view;
   private Map<String, String> descriptor;
