@@ -166,7 +166,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     try {
       if (!isIgnoredErrorMessage(e.getMessage())) {
         GWT.debugger();
-        jsClient.logError(unwrap(e));
         synapseJSNIUtils.consoleError(e);
       } else {
         synapseJSNIUtils.consoleLog("Ignoring error: " + e.getMessage());
