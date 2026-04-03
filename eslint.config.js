@@ -1,5 +1,5 @@
-import { globalIgnores } from 'eslint/config'
 import eslint from '@eslint/js'
+import { globalIgnores } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 
 /** @type {import('tseslint').ConfigArray} */
@@ -9,7 +9,7 @@ const config = tseslint.config(
   {
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.json'],
+        project: ['./tsconfig.json', './.claude/skills/tsconfig.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },
