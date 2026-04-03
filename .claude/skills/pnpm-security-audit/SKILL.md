@@ -1,6 +1,6 @@
 ---
 name: pnpm-security-audit
-description: Systematically patches security vulnerabilities in this pnpm monorepo. Use this skill whenever the user wants to fix CVEs, address pnpm audit findings, update vulnerable dependencies, or patch security vulnerabilities. Trigger on phrases like "fix vulnerabilities", "patch CVEs", "address security audit", "update vulnerable deps", "investigate <package> dependency", or any mention of pnpm audit results or GHSA advisories.
+description: Systematically patches security vulnerabilities in pnpm projects. Use this skill whenever the user wants to fix CVEs, address pnpm audit findings, update vulnerable dependencies, or patch security vulnerabilities. Trigger on phrases like "fix vulnerabilities", "patch CVEs", "address security audit", "update vulnerable deps", "investigate <package> dependency", or any mention of pnpm audit results or GHSA advisories.
 ---
 
 # pnpm Security Audit & Patch Workflow
@@ -191,7 +191,7 @@ Fill in the analysis block you pre-created in Step 1 (below the CVE tables for t
 
 **Fix applied:** [Exact command or package.json change made]
 
-**Testing:** [Command to verify, e.g., `pnpm nx run synapse-react-client:test`]
+**Testing:** [Command run and result]
 ```
 
 Document:
@@ -203,15 +203,19 @@ Document:
 
 ## Step 7: Run tests
 
-Scope tests to the impact:
+Before choosing a test command, check what scripts are available in `package.json`. Don't assume commands exist — use only what's actually defined there. Scope tests to the impact:
 
-- **Production dep changed** → `pnpm nx run <affected-package>:test`
-- **Dev tooling dep** (eslint, vitest, rollup, storybook) → `pnpm lint` and/or a quick test run
-- **CLI tool dep** (openapi-generator-cli, etc.) → run the relevant generate/build command
+- **Production dep changed** → run the project's test script
+- **Dev tooling dep** (eslint, vitest, rollup, storybook) → run the relevant lint or build script
+- **CLI tool dep** → run the relevant generate/build command
+
+If no applicable test script exists, note that and move on.
 
 If tests fail, check: API breaking change in the updated package, accidentally too-broad override bumping a major version, or pre-existing failure on `main`.
 
 ## Step 8: Draft the commit message
+
+**Always present the commit message to the user before moving on.** This is a hard stop — do not proceed to the next group until you've shown the commit message and the user has had a chance to respond.
 
 ```
 fix(deps): <short description> (<GHSA IDs>)
@@ -228,9 +232,11 @@ All consumers had flexible ranges allowing 3.4.2, so a recursive lockfile
 update was sufficient — no package.json changes needed.
 ```
 
+After presenting the commit message, ask the user: "Ready to move on to the next group?" and wait for their reply.
+
 ## Step 9: Move to the next group
 
-After presenting the commit message, move to the next vulnerability group (next highest severity). Repeat from Step 2.
+Only after the user confirms, move to the next vulnerability group (next highest severity). Repeat from Step 2.
 
 ---
 
