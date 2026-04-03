@@ -244,8 +244,6 @@ public class SynapseJavascriptClient {
   public static final String TYPE_PARAMETER = "type=";
   public static final String VERSION_PARAMETER = "version=";
   public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
-  public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
-  private static final String LOG = "/log";
   AuthenticationController authController;
   JSONObjectAdapter jsonObjectAdapter;
   GWTWrapper gwt;
@@ -1925,28 +1923,6 @@ public class SynapseJavascriptClient {
   public FluentFuture<Void> deleteMembershipInvitation(String inviteId) {
     String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + inviteId;
     return getFuture(cb -> doDelete(url, cb));
-  }
-
-  private FluentFuture<Void> logError(LogEntry entry) {
-    String url = getRepoServiceUrl() + LOG;
-    return getFuture(cb -> doPost(url, entry, OBJECT_TYPE.None, true, cb));
-  }
-
-  public FluentFuture<Void> logError(Throwable ex) {
-    LogEntry entry = new LogEntry();
-    String exceptionString =
-      gwt.getCurrentHistoryToken().substring(1) + ":" + ex.getMessage();
-    String versionInfo = getSynapseVersionInfo();
-    if (versionInfo.contains("-")) {
-      versionInfo = versionInfo.substring(0, versionInfo.indexOf('-'));
-    }
-    String outputExceptionString = exceptionString.substring(
-      0,
-      Math.min(exceptionString.length(), MAX_LOG_ENTRY_LABEL_SIZE)
-    );
-    entry.setLabel(versionInfo + ":" + outputExceptionString);
-    entry.setMessage(gwt.getCurrentURL() + " : \n" + ex.getMessage());
-    return logError(entry);
   }
 
   public FluentFuture<PaginatedTeamIds> getUserTeams(

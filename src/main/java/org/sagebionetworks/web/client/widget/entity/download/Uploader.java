@@ -1105,7 +1105,6 @@ public class Uploader
   @Override
   public void uploadFailed(String string) {
     this.uploadError(string, new Exception(string));
-    jsClient.logError(new Exception(string));
   }
 
   /**
