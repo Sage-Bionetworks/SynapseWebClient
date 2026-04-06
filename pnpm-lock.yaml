@@ -9,6 +9,8 @@ overrides:
   '@types/react-dom': 19.1.6
   react: ^19.1.0
   react-dom: ^19.1.0
+  prettier-plugin-java@2.5.0>lodash: 4.18.1
+  java-parser@2.2.0>lodash: 4.18.1
 
 importers:
 
@@ -4026,8 +4028,8 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
-  lodash-es@4.17.23:
-    resolution: {integrity: sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==}
+  lodash-es@4.18.1:
+    resolution: {integrity: sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==}
 
   lodash.isobjectlike@4.0.0:
     resolution: {integrity: sha512-bbRt0Dief0yqjkTgpvzisSxnsmY3ZgVJvokHL30UE+ytsvnpNfiNaCJL4XBEWek8koQmrwZidBHb7coXC5vXlA==}
@@ -4038,8 +4040,8 @@ packages:
   lodash.throttle@4.1.1:
     resolution: {integrity: sha512-wIkUCfVKpVsWo3JSZlc+8MB5it+2AN5W8J7YVMST30UrvcQNZ1Okbj+rbVniijTWE6FGYy4XJq/rHkas8qJMLQ==}
 
-  lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+  lodash@4.18.1:
+    resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
   log-update@6.1.0:
     resolution: {integrity: sha512-9ie8ItPR6tjY5uYJh8K/Zrv/RMZ5VOlOWvtZdEHYSTFKZfIBPQa9tOAEeAWhd+AnIneLJ22w5fjOYtoutpWq5w==}
@@ -5203,8 +5205,8 @@ packages:
     resolution: {integrity: sha512-iOBWFgUX7caIZiuutICxVgX1SdxwAVFFKwt1EvMYYec/NWO5meOJ6K5uQxhrYBdQJne4KxiqZc+KptFOWFSI9w==}
     engines: {node: '>=18'}
 
-  slugify@1.6.8:
-    resolution: {integrity: sha512-HVk9X1E0gz3mSpoi60h/saazLKXKaZThMLU3u/aNwoYn8/xQyX2MGxL0ui2eaokkD7tF+Zo+cKTHUbe1mmmGzA==}
+  slugify@1.6.9:
+    resolution: {integrity: sha512-vZ7rfeehZui7wQs438JXBckYLkIIdfHOXsaVEUMyS5fHo1483l1bMdo0EDSWYclY0yZKFOipDy4KHuKs6ssvdg==}
     engines: {node: '>=8.0.0'}
 
   sonic-forest@1.2.1:
@@ -7398,8 +7400,8 @@ snapshots:
   '@rjsf/core@6.0.0-beta.10(@rjsf/utils@6.0.0-beta.10(react@19.2.3))(react@19.2.3)':
     dependencies:
       '@rjsf/utils': 6.0.0-beta.10(react@19.2.3)
-      lodash: 4.17.21
-      lodash-es: 4.17.23
+      lodash: 4.18.1
+      lodash-es: 4.18.1
       markdown-to-jsx: 7.7.17(react@19.2.3)
       nanoid: 5.1.7
       prop-types: 15.8.1
@@ -7420,8 +7422,8 @@ snapshots:
       fast-uri: 3.1.0
       json-schema-merge-allof: 0.8.1
       jsonpointer: 5.0.1
-      lodash: 4.17.21
-      lodash-es: 4.17.23
+      lodash: 4.18.1
+      lodash-es: 4.18.1
       nanoid: 5.1.7
       react: 19.2.3
       react-is: 18.3.1
@@ -7431,8 +7433,8 @@ snapshots:
       '@rjsf/utils': 6.0.0-beta.10(react@19.2.3)
       ajv: 8.18.0
       ajv-formats: 2.1.1(ajv@8.18.0)
-      lodash: 4.17.21
-      lodash-es: 4.17.23
+      lodash: 4.18.1
+      lodash-es: 4.18.1
 
   '@rollup/plugin-inject@5.0.5(rollup@4.60.1)':
     dependencies:
@@ -8773,7 +8775,7 @@ snapshots:
     dependencies:
       chalk: 4.1.2
       date-fns: 2.30.0
-      lodash: 4.17.21
+      lodash: 4.18.1
       rxjs: 7.8.2
       shell-quote: 1.8.3
       spawn-command: 0.0.2
@@ -9012,7 +9014,7 @@ snapshots:
   dagre@0.8.5:
     dependencies:
       graphlib: 2.1.8
-      lodash: 4.17.21
+      lodash: 4.18.1
 
   data-urls@7.0.0:
     dependencies:
@@ -9814,7 +9816,7 @@ snapshots:
 
   graphlib@2.1.8:
     dependencies:
-      lodash: 4.17.21
+      lodash: 4.18.1
 
   grid-index@1.1.0: {}
 
@@ -10140,7 +10142,7 @@ snapshots:
   java-parser@2.2.0:
     dependencies:
       chevrotain: 6.5.0
-      lodash: 4.17.21
+      lodash: 4.18.1
 
   joi@18.0.2:
     dependencies:
@@ -10242,13 +10244,13 @@ snapshots:
 
   json-schema-compare@0.2.2:
     dependencies:
-      lodash: 4.17.21
+      lodash: 4.18.1
 
   json-schema-merge-allof@0.8.1:
     dependencies:
       compute-lcm: 1.1.2
       json-schema-compare: 0.2.2
-      lodash: 4.17.21
+      lodash: 4.18.1
 
   json-schema-traverse@0.4.1: {}
 
@@ -10406,7 +10408,7 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
-  lodash-es@4.17.23: {}
+  lodash-es@4.18.1: {}
 
   lodash.isobjectlike@4.0.0: {}
 
@@ -10414,7 +10416,7 @@ snapshots:
 
   lodash.throttle@4.1.1: {}
 
-  lodash@4.17.21: {}
+  lodash@4.18.1: {}
 
   log-update@6.1.0:
     dependencies:
@@ -10693,7 +10695,7 @@ snapshots:
       react-use: 17.6.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       rx-use: 1.9.0(rxjs@7.8.2)
       rxjs: 7.8.2
-      slugify: 1.6.8
+      slugify: 1.6.9
       thingies: 2.6.0(tslib@2.8.1)
       tslib: 2.8.1
       use-t: 1.6.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -11119,7 +11121,7 @@ snapshots:
   prettier-plugin-java@2.5.0:
     dependencies:
       java-parser: 2.2.0
-      lodash: 4.17.21
+      lodash: 4.18.1
       prettier: 3.0.3
 
   prettier@3.0.3: {}
@@ -11350,7 +11352,7 @@ snapshots:
 
   react-resize-detector@10.0.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
-      lodash: 4.17.21
+      lodash: 4.18.1
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
 
@@ -11891,7 +11893,7 @@ snapshots:
       ansi-styles: 6.2.3
       is-fullwidth-code-point: 5.1.0
 
-  slugify@1.6.8: {}
+  slugify@1.6.9: {}
 
   sonic-forest@1.2.1(tslib@2.8.1):
     dependencies:
@@ -12144,7 +12146,7 @@ snapshots:
       json-rules-engine: 4.1.0
       jsonpath-plus: 10.4.0
       katex: 0.16.27
-      lodash-es: 4.17.23
+      lodash-es: 4.18.1
       markdown-it: 14.1.1
       markdown-it-br: 1.0.0
       markdown-it-center-text: 1.0.4
@@ -12546,7 +12548,7 @@ snapshots:
     dependencies:
       axios: 1.14.0
       joi: 18.0.2
-      lodash: 4.17.21
+      lodash: 4.18.1
       minimist: 1.2.8
       rxjs: 7.8.2
     transitivePeerDependencies:
