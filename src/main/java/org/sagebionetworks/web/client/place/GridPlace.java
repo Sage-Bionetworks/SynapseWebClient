@@ -33,7 +33,6 @@ public class GridPlace extends Place {
         return "default?" + PARAM_SESSION_ID + "=" + place.sessionId;
       }
 
-      // if no session id, return a default token
       return "default";
     }
 
