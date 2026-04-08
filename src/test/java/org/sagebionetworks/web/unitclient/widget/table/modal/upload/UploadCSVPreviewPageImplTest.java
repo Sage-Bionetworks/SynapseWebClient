@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
@@ -71,6 +72,7 @@ public class UploadCSVPreviewPageImplTest {
     tableId = "987654";
     column = new ColumnModel();
     column.setId("007");
+    column.setColumnType(ColumnType.STRING);
     previewRequest = new UploadToTablePreviewRequest();
     previewRequest.setUploadFileHandleId(fileHandleId);
     CsvTableDescriptor csvTableDescriptor = new CsvTableDescriptor();
@@ -105,6 +107,8 @@ public class UploadCSVPreviewPageImplTest {
 
     jsColumn.id = column.getId();
     jsColumn.name = column.getName();
+    jsColumn.columnType = column.getColumnType().name();
+
     data.suggestedColumns = new ColumnModelJsObject[] { jsColumn };
 
     // Simulate React sending preview results back into the presenter.
