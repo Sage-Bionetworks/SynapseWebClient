@@ -2,33 +2,26 @@ package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
-import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
-import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.shared.asynch.AsynchType;
+import org.sagebionetworks.web.client.jsinterop.ColumnModelJsObject;
+import org.sagebionetworks.web.client.jsinterop.UploadToTablePreviewResultJsObject;
+import org.sagebionetworks.web.client.widget.CsvPreview;
 
 public class UploadCSVPreviewPageImpl
   implements UploadCSVPreviewPage, UploadCSVPreviewPageView.Presenter {
 
-  public static final String CREATING_TABLE_COLUMNS =
-    "Creating table columns...";
-  public static final String CREATING_THE_TABLE = "Creating the table...";
-  public static final String ANALYZING_FILE = "Analyzing file...";
-  public static final String APPLYING_CSV_TO_THE_TABLE =
-    "Applying CSV to the Table...";
-  public static final String PREPARING_A_PREVIEW = "Preparing a preview...";
   public static final String NEXT = "Next";
   // Injected dependencies.
   UploadCSVPreviewPageView view;
-  UploadPreviewWidget uploadPreviewWidget;
+  CsvPreview csvPreview;
   CSVOptionsWidget csvOptionsWidget;
-  JobTrackingWidget jobTrackingWidget;
   UploadCSVFinishPage createNextPage;
   UploadCSVAppendPage appendNextPage;
 
@@ -44,21 +37,18 @@ public class UploadCSVPreviewPageImpl
   @Inject
   public UploadCSVPreviewPageImpl(
     UploadCSVPreviewPageView view,
-    UploadPreviewWidget uploadPreviewWidget,
     CSVOptionsWidget csvOptionsWidget,
-    JobTrackingWidget jobTrackingWidget,
+    CsvPreview csvPreview,
     UploadCSVFinishPage createNextPage,
     UploadCSVAppendPage appendNextPage
   ) {
     this.view = view;
-    this.uploadPreviewWidget = uploadPreviewWidget;
-    this.jobTrackingWidget = jobTrackingWidget;
+    this.csvPreview = csvPreview;
     this.csvOptionsWidget = csvOptionsWidget;
     this.createNextPage = createNextPage;
     this.appendNextPage = appendNextPage;
     view.setPresenter(this);
-    this.view.setPreviewWidget(this.uploadPreviewWidget);
-    this.view.setTrackingWidget(this.jobTrackingWidget);
+    this.view.setPreviewWidget(this.csvPreview);
     this.view.setCSVOptionsWidget(this.csvOptionsWidget);
   }
 
@@ -112,14 +102,13 @@ public class UploadCSVPreviewPageImpl
   @Override
   public void setModalPresenter(final ModalPresenter presenter) {
     this.presenter = presenter;
+    this.presenter.setInstructionMessage("");
     // Setup the CSV options using what we know about the file.
     this.csvOptionsWidget.configure(
         createDefaultPreviewRequest(),
-        () -> {
-          generatePreview();
-        }
+        this::refreshPreview
       );
-    generatePreview();
+    refreshPreview();
   }
 
   /**
@@ -138,53 +127,58 @@ public class UploadCSVPreviewPageImpl
     return previewRequest;
   }
 
-  /**
-   * Generate a new preview using the current options.
-   */
-  private void generatePreview() {
-    this.view.setPreviewVisible(false);
-    this.view.setTrackerVisible(true);
+  private void refreshPreview() {
     this.presenter.setPrimaryButtonText(NEXT);
-    this.presenter.setInstructionMessage(PREPARING_A_PREVIEW);
-    this.presenter.setLoading(true);
-    final UploadToTablePreviewRequest previewRequest =
+    UploadToTablePreviewRequest previewRequest =
       csvOptionsWidget.getCurrentOptions();
-    // Start the job
-    jobTrackingWidget.startAndTrackJob(
-      ANALYZING_FILE,
-      false,
-      AsynchType.TableCSVUploadPreview,
-      previewRequest,
-      new AsynchronousProgressHandler() {
-        @Override
-        public void onFailure(Throwable failure) {
-          presenter.setErrorMessage(failure.getMessage());
-        }
-
-        @Override
-        public void onComplete(AsynchronousResponseBody response) {
-          previewCreated((UploadToTablePreviewResult) response);
-        }
-
-        @Override
-        public void onCancel() {
-          presenter.onCancel();
-        }
-      }
-    );
+    // React owns the fetch lifecycle. We pass current CSV options and receive
+    // preview data/loading updates through callbacks.
+    this.csvPreview.configure(
+        fileHandleId,
+        previewRequest.getCsvTableDescriptor(),
+        // Called by React when preview data is ready
+        data -> this.suggestedSchema = toSuggestedSchema(data),
+        // Called by React when loading state changes
+        isLoading -> presenter.setLoading(isLoading)
+      );
   }
 
   /**
-   * Called after a preview is created.
-   *
-   * @param results
+   * Maps the suggested columns from the React CsvPreview callback into
+   * ColumnModel instances for use by the next wizard pages.
    */
-  private void previewCreated(UploadToTablePreviewResult results) {
-    this.suggestedSchema = results.getSuggestedColumns();
-    this.presenter.setInstructionMessage("");
-    this.view.setTrackerVisible(false);
-    this.uploadPreviewWidget.configure(results);
-    this.view.setPreviewVisible(true);
-    this.presenter.setLoading(false);
+  private List<ColumnModel> toSuggestedSchema(
+    UploadToTablePreviewResultJsObject data
+  ) {
+    if (data == null || data.suggestedColumns == null) {
+      return Collections.emptyList();
+    }
+
+    List<ColumnModel> result = new ArrayList<>(data.suggestedColumns.length);
+
+    for (ColumnModelJsObject jsColumn : data.suggestedColumns) {
+      if (jsColumn == null) {
+        continue;
+      }
+
+      ColumnModel column = new ColumnModel();
+
+      column.setId(jsColumn.id);
+      column.setName(jsColumn.name);
+
+      if (jsColumn.maximumSize != null) {
+        column.setMaximumSize(jsColumn.maximumSize.longValue());
+      }
+
+      if (jsColumn.columnType != null) {
+        try {
+          column.setColumnType(ColumnType.valueOf(jsColumn.columnType));
+        } catch (IllegalArgumentException e) {
+          // Unknown column type returned by React
+        }
+      }
+      result.add(column);
+    }
+    return result;
   }
 }

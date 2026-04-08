@@ -23,27 +23,6 @@ public interface UploadCSVPreviewPageView extends IsWidget {
   public void setPresenter(Presenter presenter);
 
   /**
-   * Add the tracking widget to the view.
-   *
-   * @param tracker
-   */
-  public void setTrackingWidget(IsWidget tracker);
-
-  /**
-   * Show or hide the tracker widget
-   *
-   * @param visible
-   */
-  public void setTrackerVisible(boolean visible);
-
-  /**
-   * Show or hide the preview table.
-   *
-   * @param b
-   */
-  public void setPreviewVisible(boolean visible);
-
-  /**
    * Add the preview widget to the view.
    *
    * @param uploadPreviewWidget
