@@ -146,7 +146,8 @@ public class UploadCSVPreviewPageImplTest {
       loadingCaptor.getValue();
 
     loadingCallback.onIsLoadingChange(true);
-    verify(mockPresenter).setLoading(true);
+    // Called twice: once by refreshPreview() directly, once via the callback
+    verify(mockPresenter, Mockito.times(2)).setLoading(true);
 
     loadingCallback.onIsLoadingChange(false);
     verify(mockPresenter).setLoading(false);
