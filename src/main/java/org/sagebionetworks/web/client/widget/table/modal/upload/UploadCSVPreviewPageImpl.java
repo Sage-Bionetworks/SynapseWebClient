@@ -173,13 +173,15 @@ public class UploadCSVPreviewPageImpl
         column.setMaximumSize(jsColumn.maximumSize.longValue());
       }
 
+      ColumnType columnType = ColumnType.STRING;
       if (jsColumn.columnType != null) {
         try {
-          column.setColumnType(ColumnType.valueOf(jsColumn.columnType));
+          columnType = ColumnType.valueOf(jsColumn.columnType);
         } catch (IllegalArgumentException e) {
-          // Unknown column type returned by React
+          // Unknown column type returned by React, fall back to STRING
         }
       }
+      column.setColumnType(columnType);
       result.add(column);
     }
     return result;
