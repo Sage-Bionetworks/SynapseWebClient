@@ -128,11 +128,14 @@ public class UploadCSVPreviewPageImpl
   }
 
   private void refreshPreview() {
+    this.suggestedSchema = Collections.emptyList();
+    this.presenter.setLoading(true);
     this.presenter.setPrimaryButtonText(NEXT);
     UploadToTablePreviewRequest previewRequest =
       csvOptionsWidget.getCurrentOptions();
     // React owns the fetch lifecycle. We pass current CSV options and receive
     // preview data/loading updates through callbacks.
+
     this.csvPreview.configure(
         fileHandleId,
         previewRequest.getCsvTableDescriptor(),
