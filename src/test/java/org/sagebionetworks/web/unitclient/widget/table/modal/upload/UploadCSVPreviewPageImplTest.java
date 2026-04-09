@@ -159,7 +159,7 @@ public class UploadCSVPreviewPageImplTest {
     tableId = null;
     page.configure(type, fileName, parentId, fileHandleId, tableId);
     page.setModalPresenter(mockPresenter);
-    // Seed suggestedSchema via callback before clicking Next.
+    // Simulate React sending preview data back before clicking Next.
     fireOnCsvPreviewDataChange(column);
     page.onPrimary();
     verify(mockCreateNextPage)
@@ -171,7 +171,6 @@ public class UploadCSVPreviewPageImplTest {
   public void testOnPrimaryAppend() {
     page.configure(type, fileName, parentId, fileHandleId, tableId);
     page.setModalPresenter(mockPresenter);
-    // Seed suggestedSchema via callback before clicking Next.
     fireOnCsvPreviewDataChange(column);
     page.onPrimary();
     this.uploadRequest.setTableId(tableId);
