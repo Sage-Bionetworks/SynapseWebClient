@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.web.client.jsinterop.CsvPreviewProps;
-import org.sagebionetworks.web.client.jsinterop.CsvTableDescriptorJsObject;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -22,7 +21,7 @@ public class CsvPreviewImpl extends ReactComponent implements CsvPreview {
   ) {
     CsvPreviewProps props = CsvPreviewProps.create(
       fileHandleId,
-      CsvTableDescriptorJsObject.create(csvTableDescriptor),
+      csvTableDescriptor,
       onCsvPreviewDataChange,
       onIsLoadingChange
     );

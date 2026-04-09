@@ -5,6 +5,7 @@ import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
+import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class CsvPreviewProps extends ReactComponentProps {
@@ -12,7 +13,7 @@ public class CsvPreviewProps extends ReactComponentProps {
   @JsFunction
   @FunctionalInterface
   public interface OnCsvPreviewDataChangeFunction {
-    void onCsvPreviewDataChange(UploadToTablePreviewResultJsObject data);
+    void onCsvPreviewDataChange(Object data);
   }
 
   @JsFunction
@@ -22,7 +23,7 @@ public class CsvPreviewProps extends ReactComponentProps {
   }
 
   public String fileHandleId;
-  public CsvTableDescriptorJsObject csvTableDescriptor;
+  public Object csvTableDescriptor;
 
   @JsNullable
   public OnCsvPreviewDataChangeFunction onCsvPreviewDataChange;
@@ -33,13 +34,14 @@ public class CsvPreviewProps extends ReactComponentProps {
   @JsOverlay
   public static CsvPreviewProps create(
     String fileHandleId,
-    CsvTableDescriptorJsObject csvTableDescriptor,
+    CsvTableDescriptor csvTableDescriptor,
     OnCsvPreviewDataChangeFunction onCsvPreviewDataChange,
     OnIsLoadingChangeFunction onIsLoadingChange
   ) {
     CsvPreviewProps props = new CsvPreviewProps();
     props.fileHandleId = fileHandleId;
-    props.csvTableDescriptor = csvTableDescriptor;
+    props.csvTableDescriptor =
+      JSONEntityUtils.toJsInteropCompatibleObject(csvTableDescriptor);
     props.onCsvPreviewDataChange = onCsvPreviewDataChange;
     props.onIsLoadingChange = onIsLoadingChange;
     return props;

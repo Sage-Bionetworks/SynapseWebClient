@@ -2,16 +2,15 @@ package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
+import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
-import org.sagebionetworks.web.client.jsinterop.ColumnModelJsObject;
-import org.sagebionetworks.web.client.jsinterop.UploadToTablePreviewResultJsObject;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.jsinterop.JSONEntityUtils;
 import org.sagebionetworks.web.client.widget.CsvPreview;
 
 public class UploadCSVPreviewPageImpl
@@ -147,43 +146,28 @@ public class UploadCSVPreviewPageImpl
   }
 
   /**
-   * Maps the suggested columns from the React CsvPreview callback into
-   * ColumnModel instances for use by the next wizard pages.
+   * Translates the React callback data into a list of suggested ColumnModels.
+   * @param data JS object from React CsvPreview's onCsvPreviewDataChange callback
+   * @return suggested columns
    */
-  private List<ColumnModel> toSuggestedSchema(
-    UploadToTablePreviewResultJsObject data
-  ) {
-    if (data == null || data.suggestedColumns == null) {
+  protected List<ColumnModel> toSuggestedSchema(Object data) {
+    if (data == null) {
       return Collections.emptyList();
     }
 
-    List<ColumnModel> result = new ArrayList<>(data.suggestedColumns.length);
+    try {
+      // Convert the js object to an UploadToTablePreviewResult
+      UploadToTablePreviewResult result =
+        JSONEntityUtils.fromJsInteropCompatibleObject(
+          data,
+          new UploadToTablePreviewResult()
+        );
 
-    for (ColumnModelJsObject jsColumn : data.suggestedColumns) {
-      if (jsColumn == null) {
-        continue;
-      }
+      List<ColumnModel> columns = result.getSuggestedColumns();
 
-      ColumnModel column = new ColumnModel();
-
-      column.setId(jsColumn.id);
-      column.setName(jsColumn.name);
-
-      if (jsColumn.maximumSize != null) {
-        column.setMaximumSize(jsColumn.maximumSize.longValue());
-      }
-
-      ColumnType columnType = ColumnType.STRING;
-      if (jsColumn.columnType != null) {
-        try {
-          columnType = ColumnType.valueOf(jsColumn.columnType);
-        } catch (IllegalArgumentException e) {
-          // Unknown column type returned by React, fall back to STRING
-        }
-      }
-      column.setColumnType(columnType);
-      result.add(column);
+      return columns != null ? columns : Collections.emptyList();
+    } catch (JSONObjectAdapterException e) {
+      return Collections.emptyList();
     }
-    return result;
   }
 }
