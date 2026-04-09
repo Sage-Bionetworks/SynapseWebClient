@@ -3,17 +3,25 @@ package org.sagebionetworks.web.client.place;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
-import com.google.gwt.user.client.Window;
 
 public class GridPlace extends Place {
 
-  public static final String SESSION_ID = "sessionId";
+  public static final String PARAM_SESSION_ID = "sessionId";
+
+  private final String sessionId;
 
   public GridPlace(String token) {
+    // If it's 'default', the ID is already in the URL parameters for React to find and use.
     if (token != null && !token.startsWith("default")) {
-      // Redirect /Grid:{sessionId} to /Grid:default?sessionId={sessionId}
-      Window.Location.assign("/Grid:default?" + SESSION_ID + "=" + token);
+      this.sessionId = token;
+    } else {
+      // token is "default", GWT only needs the path to route to GridPage.
+      this.sessionId = null;
     }
+  }
+
+  public String getSessionId() {
+    return sessionId;
   }
 
   @Prefix("Grid")
@@ -21,6 +29,10 @@ public class GridPlace extends Place {
 
     @Override
     public String getToken(GridPlace place) {
+      if (place.getSessionId() != null) {
+        return "default?" + PARAM_SESSION_ID + "=" + place.sessionId;
+      }
+
       return "default";
     }
 
