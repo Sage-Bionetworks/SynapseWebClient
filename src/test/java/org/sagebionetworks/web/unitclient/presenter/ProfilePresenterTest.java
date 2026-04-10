@@ -11,7 +11,6 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,6 @@ import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.*;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
@@ -146,9 +144,6 @@ public class ProfilePresenterTest {
   PaginatedTeamIds mockPaginatedTeamIdsPage2;
 
   @Mock
-  Project mockProject;
-
-  @Mock
   PrincipalAliasResponse mockPrincipalAliasResponse;
 
   @Mock
@@ -258,11 +253,6 @@ public class ProfilePresenterTest {
       .callSuccessWith(myFavorites)
       .when(mockSynapseJavascriptClient)
       .getFavorites(any());
-
-    // set up create project test
-    when(mockProject.getId()).thenReturn("syn88888888");
-    when(mockSynapseJavascriptClient.createEntity(any()))
-      .thenReturn(getDoneFuture(mockProject));
 
     // set up create team test
     when(mockTeam.getId()).thenReturn("new team id");
@@ -825,47 +815,8 @@ public class ProfilePresenterTest {
 
   @Test
   public void testCreateProject() {
-    profilePresenter.createProjectAfterPrompt("valid name");
-    verify(mockSynapseJavascriptClient).createEntity(any(Entity.class));
-    // inform user of success, and go to new project page
-    verify(mockView).showInfo(anyString());
-    verify(mockPlaceChanger).goTo(isA(Synapse.class));
-  }
-
-  @Test
-  public void testCreateProjectEmptyName() {
-    profilePresenter.createProjectAfterPrompt("");
-    verify(mockSynapseJavascriptClient, never())
-      .createEntity(any(Entity.class));
-    verify(mockPromptModalView).showError(anyString());
-    reset(mockPromptModalView);
-
-    profilePresenter.createProjectAfterPrompt(null);
-
-    verify(mockSynapseJavascriptClient, never())
-      .createEntity(any(Entity.class));
-    verify(mockPromptModalView).showError(anyString());
-  }
-
-  @Test
-  public void testCreateProjectError() {
-    String errorMessage = "unhandled";
-    when(mockSynapseJavascriptClient.createEntity(any(Entity.class)))
-      .thenReturn(getFailedFuture(new Exception(errorMessage)));
-
-    profilePresenter.createProjectAfterPrompt("valid name");
-    verify(mockPromptModalView).showError(errorMessage);
-  }
-
-  @Test
-  public void testCreateProjectNameConflictError() {
-    when(mockSynapseJavascriptClient.createEntity(any(Entity.class)))
-      .thenReturn(
-        getFailedFuture(new ConflictException("special handled exception type"))
-      );
-    profilePresenter.createProjectAfterPrompt("valid name");
-    verify(mockPromptModalView)
-      .showError(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));
+    profilePresenter.createProject();
+    verify(mockView).setCreateProjectModalVisible(true);
   }
 
   @Test
