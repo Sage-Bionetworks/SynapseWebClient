@@ -86,9 +86,7 @@ public class UploadCSVPreviewPageImplTest {
     when(mockCSVOptionsWidget.getCurrentOptions()).thenReturn(previewRequest);
   }
 
-  // Capture the data callback passed to CsvPreview.configure(...) and invoke it.
-  // toSuggestedSchema is overridden in the test subclass, so the raw JS object
-  // is not used — passing null is sufficient to trigger the schema assignment.
+  // Capture the data callback passed to CsvPreview.configure(...) and invoke it with a null (because of the override of toSuggestedSchema, the actual value doesn't matter)
   private void fireOnCsvPreviewDataChange() {
     ArgumentCaptor<CsvPreviewProps.OnCsvPreviewDataChangeFunction> dataCaptor =
       ArgumentCaptor.forClass(
