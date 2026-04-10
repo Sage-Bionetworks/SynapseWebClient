@@ -23,9 +23,6 @@ public class UploadCSVPreviewPageViewImpl implements UploadCSVPreviewPageView {
   SimplePanel previewPanel;
 
   @UiField
-  SimplePanel trackerPanel;
-
-  @UiField
   SimplePanel optionsPanel;
 
   @UiField
@@ -51,21 +48,6 @@ public class UploadCSVPreviewPageViewImpl implements UploadCSVPreviewPageView {
   @Override
   public void setPresenter(Presenter presenter) {
     this.presenter = presenter;
-  }
-
-  @Override
-  public void setTrackingWidget(IsWidget tracker) {
-    this.trackerPanel.add(tracker);
-  }
-
-  @Override
-  public void setTrackerVisible(boolean visible) {
-    trackerPanel.setVisible(visible);
-  }
-
-  @Override
-  public void setPreviewVisible(boolean visible) {
-    this.previewPanel.setVisible(visible);
   }
 
   @Override

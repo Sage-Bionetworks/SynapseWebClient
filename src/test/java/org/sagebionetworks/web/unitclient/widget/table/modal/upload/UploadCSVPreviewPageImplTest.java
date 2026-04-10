@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.upload;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -7,23 +9,22 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
-import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.jsinterop.CsvPreviewProps;
+import org.sagebionetworks.web.client.widget.CsvPreview;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPage;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPage;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageView;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadRequestUtils;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
-import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
 
 public class UploadCSVPreviewPageImplTest {
 
@@ -31,9 +32,7 @@ public class UploadCSVPreviewPageImplTest {
   UploadCSVFinishPage mockCreateNextPage;
   UploadCSVPreviewPageView mockView;
   CSVOptionsWidget mockCSVOptionsWidget;
-  SynapseClientAsync mockSynapseClient;
-  UploadPreviewWidget mockUploadPreviewWidget;
-  JobTrackingWidgetStub jobTrackingWidgetStub;
+  CsvPreview mockCsvPreview;
   ModalPresenter mockPresenter;
   ContentTypeDelimiter type;
   String fileName;
@@ -42,7 +41,6 @@ public class UploadCSVPreviewPageImplTest {
   String tableId;
   UploadToTablePreviewRequest previewRequest;
   UploadToTableRequest uploadRequest;
-  UploadToTablePreviewResult uploadPreviewResults;
   ColumnModel column;
   List<ColumnModel> schema;
   UploadCSVPreviewPageImpl page;
@@ -50,92 +48,107 @@ public class UploadCSVPreviewPageImplTest {
   @Before
   public void before() {
     mockView = Mockito.mock(UploadCSVPreviewPageView.class);
-    mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-    mockUploadPreviewWidget = Mockito.mock(UploadPreviewWidget.class);
     mockCreateNextPage = Mockito.mock(UploadCSVFinishPage.class);
     mockAppendNextPage = Mockito.mock(UploadCSVAppendPage.class);
     mockCSVOptionsWidget = Mockito.mock(CSVOptionsWidget.class);
-
-    jobTrackingWidgetStub = new JobTrackingWidgetStub();
+    mockCsvPreview = Mockito.mock(CsvPreview.class);
     mockPresenter = Mockito.mock(ModalPresenter.class);
+
+    column = new ColumnModel();
+    column.setId("007");
+    schema = Arrays.asList(column);
+
     page =
       new UploadCSVPreviewPageImpl(
         mockView,
-        mockUploadPreviewWidget,
         mockCSVOptionsWidget,
-        jobTrackingWidgetStub,
+        mockCsvPreview,
         mockCreateNextPage,
         mockAppendNextPage
-      );
+      ) {
+        @Override
+        protected List<ColumnModel> toSuggestedSchema(Object data) { // Override to bypass Global.JSON.stringify which requires a browser environment
+          return schema;
+        }
+      };
+
     type = ContentTypeDelimiter.CSV;
     fileName = "testing.csv";
     parentId = "syn123";
     fileHandleId = "456";
     tableId = "987654";
-    column = new ColumnModel();
-    column.setId("007");
     previewRequest = new UploadToTablePreviewRequest();
     previewRequest.setUploadFileHandleId(fileHandleId);
+    CsvTableDescriptor csvTableDescriptor = new CsvTableDescriptor();
+    csvTableDescriptor.setSeparator(type.getDelimiter());
+    previewRequest.setCsvTableDescriptor(csvTableDescriptor);
     uploadRequest = UploadRequestUtils.createFromPreview(previewRequest);
-    uploadPreviewResults = new UploadToTablePreviewResult();
-    schema = Arrays.asList(column);
-    uploadPreviewResults.setSuggestedColumns(schema);
     when(mockCSVOptionsWidget.getCurrentOptions()).thenReturn(previewRequest);
   }
 
+  // Capture the data callback passed to CsvPreview.configure(...) and invoke it with a null (because of the override of toSuggestedSchema, the actual value doesn't matter)
+  private void fireOnCsvPreviewDataChange() {
+    ArgumentCaptor<CsvPreviewProps.OnCsvPreviewDataChangeFunction> dataCaptor =
+      ArgumentCaptor.forClass(
+        CsvPreviewProps.OnCsvPreviewDataChangeFunction.class
+      );
+
+    verify(mockCsvPreview)
+      .configure(
+        eq(fileHandleId),
+        any(CsvTableDescriptor.class),
+        dataCaptor.capture(),
+        any()
+      );
+    dataCaptor.getValue().onCsvPreviewDataChange(null);
+  }
+
   @Test
-  public void setSetModalPresenterSuccess() {
+  public void testSetModalPresenter_configuresCsvPreview() {
     page.configure(type, fileName, parentId, fileHandleId, null);
-    UploadToTablePreviewResult results = new UploadToTablePreviewResult();
-    jobTrackingWidgetStub.setResponse(new UploadToTablePreviewResult());
     page.setModalPresenter(mockPresenter);
-    verify(mockView).setPreviewVisible(false);
-    verify(mockView).setTrackerVisible(true);
+
     verify(mockPresenter).setPrimaryButtonText(UploadCSVPreviewPageImpl.NEXT);
-    verify(mockPresenter)
-      .setInstructionMessage(UploadCSVPreviewPageImpl.PREPARING_A_PREVIEW);
-    verify(mockPresenter).setLoading(true);
-    // We expect this to be the first request.
-    UploadToTablePreviewRequest expectedRequst =
-      new UploadToTablePreviewRequest();
-    CsvTableDescriptor expectedDescriptor = new CsvTableDescriptor();
-    expectedDescriptor.setSeparator(type.getDelimiter());
-    // expect full scan the first time.
-    expectedRequst.setDoFullFileScan(true);
-    expectedRequst.setUploadFileHandleId(fileHandleId);
-    expectedRequst.setCsvTableDescriptor(expectedDescriptor);
-    verify(mockUploadPreviewWidget).configure(results);
-    verify(mockPresenter).setInstructionMessage("");
+    verify(mockCsvPreview)
+      .configure(eq(fileHandleId), any(CsvTableDescriptor.class), any(), any());
+  }
+
+  // Verify the onIsLoadingChange callback passed to the React component correctly
+  // forwards loading state changes to the GWT presenter
+  @Test
+  public void testSetModalPresenter_isLoadingCallback_updatesPresenter() {
+    page.configure(type, fileName, parentId, fileHandleId, null);
+    page.setModalPresenter(mockPresenter);
+
+    ArgumentCaptor<CsvPreviewProps.OnIsLoadingChangeFunction> loadingCaptor =
+      ArgumentCaptor.forClass(CsvPreviewProps.OnIsLoadingChangeFunction.class);
+    verify(mockCsvPreview)
+      .configure(
+        eq(fileHandleId),
+        any(CsvTableDescriptor.class),
+        any(),
+        loadingCaptor.capture()
+      );
+
+    CsvPreviewProps.OnIsLoadingChangeFunction loadingCallback =
+      loadingCaptor.getValue();
+
+    loadingCallback.onIsLoadingChange(true);
+    // Called twice: once by refreshPreview() directly, once via the callback
+    verify(mockPresenter, Mockito.times(2)).setLoading(true);
+
+    loadingCallback.onIsLoadingChange(false);
     verify(mockPresenter).setLoading(false);
-    verify(mockView).setTrackerVisible(false);
-    verify(mockView).setPreviewVisible(true);
-  }
-
-  @Test
-  public void setSetModalPresenterFailed() {
-    page.configure(type, fileName, parentId, fileHandleId, null);
-    // setup the stub to fail
-    String error = "error";
-    jobTrackingWidgetStub.setError(new Throwable(error));
-    page.setModalPresenter(mockPresenter);
-    verify(mockPresenter).setErrorMessage(error);
-  }
-
-  @Test
-  public void setSetModalPresenterCanceled() {
-    page.configure(type, fileName, parentId, fileHandleId, null);
-    jobTrackingWidgetStub.setOnCancel(true);
-    page.setModalPresenter(mockPresenter);
-    verify(mockPresenter).onCancel();
   }
 
   @Test
   public void testOnPrimaryCreate() {
     // A null tableId indicates a create.
     tableId = null;
-    jobTrackingWidgetStub.setResponse(uploadPreviewResults);
     page.configure(type, fileName, parentId, fileHandleId, tableId);
     page.setModalPresenter(mockPresenter);
+    // Simulate React sending preview data back before clicking Next.
+    fireOnCsvPreviewDataChange();
     page.onPrimary();
     verify(mockCreateNextPage)
       .configure(this.fileName, this.parentId, this.uploadRequest, schema);
@@ -144,10 +157,9 @@ public class UploadCSVPreviewPageImplTest {
 
   @Test
   public void testOnPrimaryAppend() {
-    // a non-null tableId indicates an append
-    jobTrackingWidgetStub.setResponse(uploadPreviewResults);
     page.configure(type, fileName, parentId, fileHandleId, tableId);
     page.setModalPresenter(mockPresenter);
+    fireOnCsvPreviewDataChange();
     page.onPrimary();
     this.uploadRequest.setTableId(tableId);
     verify(mockAppendNextPage).configure(this.uploadRequest, schema);

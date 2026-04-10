@@ -132,6 +132,8 @@ import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CopyTextModalImpl;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialogImpl;
+import org.sagebionetworks.web.client.widget.CsvPreview;
+import org.sagebionetworks.web.client.widget.CsvPreviewImpl;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTesterImpl;
 import org.sagebionetworks.web.client.widget.EntityCitation;
@@ -636,10 +638,6 @@ import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreview
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewView;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidget;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardView;
@@ -1169,8 +1167,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(UploadCSVPreviewPage.class).to(UploadCSVPreviewPageImpl.class);
     bind(CSVOptionsView.class).to(CSVOptionsViewImpl.class);
     bind(UploadCSVPreviewPageView.class).to(UploadCSVPreviewPageViewImpl.class);
-    bind(UploadPreviewView.class).to(UploadPreviewViewImpl.class);
-    bind(UploadPreviewWidget.class).to(UploadPreviewWidgetImpl.class);
     bind(UploadCSVFilePage.class).to(UploadCSVFilePageImpl.class);
     bind(UploadCSVFinishPage.class).to(UploadCSVFinishPageImpl.class);
     bind(UploadCSVFinishPageView.class).to(UploadCSVFinishPageViewImpl.class);
@@ -1599,6 +1595,7 @@ public class PortalGinModule extends AbstractGinModule {
     bind(SearchV2View.class).to(SearchV2ViewImpl.class).in(Singleton.class);
     bind(CreateGridSessionDialog.class).to(CreateGridSessionDialogImpl.class);
     bind(EntityCitation.class).to(EntityCitationImpl.class);
+    bind(CsvPreview.class).to(CsvPreviewImpl.class);
     bind(ShareThisPage.class).to(ShareThisPageImpl.class);
     bind(MetadataTabView.class).to(MetadataTabViewImpl.class);
   }

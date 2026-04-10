@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.jsinterop;
 
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
 import elemental2.core.Global;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -22,5 +24,28 @@ public interface JSONEntityUtils {
     // This is a quick-and-dirty implementation--serialize the object to a string and use JSON.parse to deserialize it
     // It would be more efficient to update the JSONObjectGwt instance to directly create and return a native object.
     return Global.JSON.parse(adapter.toJSONString());
+  }
+
+  /**
+   * Converts a JsInterop compatible js object back into a JSONEntity.
+   * @param jsObject
+   * @param instance a new instance of the target entity type to populate
+   * @return the populated instance
+   */
+  public static <T extends JSONEntity> T fromJsInteropCompatibleObject(
+    Object jsObject,
+    T instance
+  ) throws JSONObjectAdapterException {
+    if (jsObject == null) {
+      return null;
+    }
+
+    String jsonString = Global.JSON.stringify(jsObject);
+    JSONObject jsonObject = JSONParser.parseStrict(jsonString).isObject();
+
+    JSONObjectGwt adapter = new JSONObjectGwt(jsonObject);
+    instance.initializeFromJSONObject(adapter);
+
+    return instance;
   }
 }
