@@ -271,5 +271,6 @@
         </div>
       </div>
     </g:HTMLPanel>
+    <w:ReactComponent ui:field="createProjectModalContainer" />
   </g:HTMLPanel>
 </ui:UiBinder>

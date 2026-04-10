@@ -146,6 +146,9 @@ public class SRC {
     public static ReactComponentType<MetadataTasksPageProps> MetadataTasksPage;
     public static ReactComponentType GridPage;
     public static ReactComponentType SynapseSearchPage;
+    public static ReactComponentType<
+      CreateProjectModalProps
+    > CreateProjectModal;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.

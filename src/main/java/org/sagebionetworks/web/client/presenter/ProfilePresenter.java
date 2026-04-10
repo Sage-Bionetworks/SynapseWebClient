@@ -14,7 +14,6 @@ import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import org.sagebionetworks.repo.model.Challenge;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.Project;
@@ -36,7 +35,6 @@ import org.sagebionetworks.web.client.OneSageUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -712,51 +710,7 @@ public class ProfilePresenter
 
   @Override
   public void createProject() {
-    // prompt for project name
-    getPromptDialog()
-      .configureAndShow(
-        "Create a New Project",
-        "Project Name",
-        null,
-        projectName -> {
-          createProjectAfterPrompt(projectName);
-        }
-      );
-  }
-
-  public void createProjectAfterPrompt(String name) {
-    // validate project name
-    if (!DisplayUtils.isDefined(name)) {
-      getPromptDialog().showError(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
-      return;
-    }
-    Project project = new Project();
-    project.setName(name);
-    jsClient
-      .createEntity(project)
-      .addCallback(
-        new FutureCallback<Entity>() {
-          @Override
-          public void onSuccess(Entity entity) {
-            getPromptDialog().hide();
-            view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED + name);
-            globalApplicationState
-              .getPlaceChanger()
-              .goTo(new Synapse(entity.getId()));
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            if (caught instanceof ConflictException) {
-              getPromptDialog()
-                .showError(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
-            } else {
-              getPromptDialog().showError(caught.getMessage());
-            }
-          }
-        },
-        directExecutor()
-      );
+    view.setCreateProjectModalVisible(true);
   }
 
   @Override
