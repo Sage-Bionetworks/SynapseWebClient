@@ -103,4 +103,6 @@ public interface ProfileView extends IsWidget, SynapseView {
   void setLastActivityOnColumnVisible(boolean visible);
 
   void showLoginAlert();
+
+  void setCreateProjectModalVisible(boolean isVisible);
 }

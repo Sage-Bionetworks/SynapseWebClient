@@ -36,7 +36,9 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.CreateProjectModalProps;
 import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -96,6 +98,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
   @UiField
   ReactComponent favoritesTabContainer;
+
+  @UiField
+  ReactComponent createProjectModalContainer;
 
   @UiField
   Heading pageHeaderTitle;
@@ -232,6 +237,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
   CookieProvider cookies;
   JSONObjectAdapter jsonObjectAdapter;
+  GlobalApplicationState globalAppState;
 
   @Inject
   public ProfileViewImpl(
@@ -239,13 +245,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
     Header headerWidget,
     CookieProvider cookies,
     OrientationBanner orientationBanner,
-    JSONObjectAdapter jsonObjectAdapter
+    JSONObjectAdapter jsonObjectAdapter,
+    GlobalApplicationState globalAppState
   ) {
     initWidget(binder.createAndBindUi(this));
     this.headerWidget = headerWidget;
     this.cookies = cookies;
     this.orientationBanner = orientationBanner;
     this.jsonObjectAdapter = jsonObjectAdapter;
+    this.globalAppState = globalAppState;
     headerWidget.configure();
     projectSearchTextBox
       .getElement()
@@ -718,5 +726,19 @@ public class ProfileViewImpl extends Composite implements ProfileView {
   @Override
   public void showLoginAlert() {
     loginAlert.setVisible(true);
+  }
+
+  @Override
+  public void setCreateProjectModalVisible(boolean isVisible) {
+    CreateProjectModalProps props = CreateProjectModalProps.create(
+      isVisible,
+      () -> setCreateProjectModalVisible(false),
+      href -> globalAppState.handleRelativePathClick(href)
+    );
+    ReactElement component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.CreateProjectModal,
+      props
+    );
+    createProjectModalContainer.render(component);
   }
 }
