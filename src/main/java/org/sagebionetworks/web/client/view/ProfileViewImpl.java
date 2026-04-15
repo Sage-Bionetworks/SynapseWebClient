@@ -325,7 +325,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
       projectsOnly.setValue("project");
       query.getBooleanQuery().add(projectsOnly);
 
-      query.setQueryTerm(Arrays.asList(projectSearchTextBox.getValue()));
+      query.setQueryTerm(
+        Arrays.asList(projectSearchTextBox.getValue().split("\\s+"))
+      );
       query.writeToJSONObject(adapter);
       searchJSON = adapter.toJSONString();
     } catch (JSONObjectAdapterException e) {
