@@ -279,7 +279,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
     teamSearchButtonSmall.addClickHandler(teamSearchHandler);
 
     ClickHandler projectSearchHandler = event ->
-      presenter.goTo(new SearchV2Place(projectSearchTextBox.getValue()));
+      presenter.goTo(
+        new SearchV2Place(
+          "default?" + SearchV2Place.QUERY + "=" + getCurrentProjectSearchJSON()
+        )
+      );
     projectSearchButton.addClickHandler(projectSearchHandler);
     projectSearchButtonSmall.addClickHandler(projectSearchHandler);
 
@@ -321,9 +325,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
       projectsOnly.setValue("project");
       query.getBooleanQuery().add(projectsOnly);
 
-      query.setQueryTerm(
-        Arrays.asList(projectSearchTextBox.getValue().split("\\s+"))
-      );
+      query.setQueryTerm(Arrays.asList(projectSearchTextBox.getValue()));
       query.writeToJSONObject(adapter);
       searchJSON = adapter.toJSONString();
     } catch (JSONObjectAdapterException e) {
