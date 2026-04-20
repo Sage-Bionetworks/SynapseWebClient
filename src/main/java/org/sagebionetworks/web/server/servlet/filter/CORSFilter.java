@@ -64,6 +64,8 @@ public class CORSFilter extends OncePerRequestFilter {
     "staging.htan",
     "nf",
     "staging.nf",
+    "namshub",
+    "staging.namshub",
     "psychencode",
     "staging.psychencode",
     "shiny",
