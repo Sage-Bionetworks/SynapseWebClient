@@ -93,7 +93,7 @@ public class UserProfileClientImpl
       createSynapseClient();
     try {
       return synapseClient.getMyOwnUserBundle(mask);
-    } catch (SynapseException e) {
+    } catch (Throwable e) {
       throw ExceptionUtil.convertSynapseException(e);
     }
   }
