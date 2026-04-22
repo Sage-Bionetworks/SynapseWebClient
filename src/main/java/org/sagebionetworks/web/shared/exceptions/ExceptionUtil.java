@@ -30,6 +30,7 @@ public class ExceptionUtil {
    * @return
    */
   public static RestServiceException convertSynapseException(Throwable ex) {
+    ex.printStackTrace();
     log.error(ex);
     if (ex instanceof SynapseClientException && ex.getCause() != null) {
       ex = ex.getCause();
