@@ -17,7 +17,7 @@ const config = defineConfig({
   build: {
     manifest: true,
     outDir: './src/main/webapp/generated/vite',
-    rollupOptions: {
+    rolldownOptions: {
       input: 'js/main.js',
       onwarn(warning, warn) {
         // Suppress "Module level directives cause errors when bundled" warnings

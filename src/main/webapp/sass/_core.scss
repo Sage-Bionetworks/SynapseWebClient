@@ -1648,7 +1648,6 @@ h6 {
 .previewtable {
   border: 1px solid #dddddd;
   border-collapse: separate;
-  *border-collapse: collapsed;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
@@ -1662,7 +1661,6 @@ h6 {
 .markdowntable {
   border: 1px solid #dddddd;
   border-collapse: separate;
-  *border-collapse: collapsed;
   border-left: 0;
   @include border-radius(4px);
   margin: 10px 0 10px 0;
