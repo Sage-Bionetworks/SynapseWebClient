@@ -15,16 +15,18 @@ public class SynapseProviderImpl implements SynapseProvider {
 
   @Override
   public SynapseClient createNewClient() {
-    return SynapseRetryProxy.createProxy(
-      SynapseProfileProxy.createProfileProxy(new SynapseClientImpl())
-    );
+    // return SynapseRetryProxy.createProxy(
+    //   SynapseProfileProxy.createProfileProxy(new SynapseClientImpl())
+    // );
+    return new SynapseClientImpl();
   }
 
   @Override
   public SynapseClient createNewClient(String portalRequestHost) {
-    SynapseClient client = SynapseRetryProxy.createProxy(
-      SynapseProfileProxy.createProfileProxy(new SynapseClientImpl())
-    );
+    // SynapseClient client = SynapseRetryProxy.createProxy(
+    //   SynapseProfileProxy.createProfileProxy(new SynapseClientImpl())
+    // );
+    SynapseClient client = new SynapseClientImpl();
     client.setAuthEndpoint(
       StackEndpoints.getAuthenticationServicePublicEndpoint(portalRequestHost)
     );
