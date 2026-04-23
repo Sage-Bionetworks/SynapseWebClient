@@ -2121,7 +2121,6 @@ public class SynapseClientImpl
         ACCESS_TYPE.UPDATE
       );
     } catch (Exception e) {
-      e.printStackTrace();
       return (
         ChallengeClientImpl
           .getShareableEvaluations(projectId, synapseClient)
