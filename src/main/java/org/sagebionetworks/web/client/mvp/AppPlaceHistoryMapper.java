@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ChatPlace;
 import org.sagebionetworks.web.client.place.ComingSoon;
+import org.sagebionetworks.web.client.place.CuratorDashboardPlace;
 import org.sagebionetworks.web.client.place.DataAccessApprovalTokenPlace;
 import org.sagebionetworks.web.client.place.DataAccessManagementPlace;
 import org.sagebionetworks.web.client.place.DataCatalogPagePlace;
@@ -102,6 +103,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
     DataCatalogPagePlace.Tokenizer.class,
     GridPlace.Tokenizer.class,
     SearchV2Place.Tokenizer.class,
+    CuratorDashboardPlace.Tokenizer.class,
   }
 )
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {}
