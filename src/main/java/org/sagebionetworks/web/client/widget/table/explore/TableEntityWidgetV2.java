@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
+import org.sagebionetworks.web.client.widget.CsvPreviewDialog;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
@@ -52,8 +53,6 @@ import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModa
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
-import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
@@ -125,7 +124,7 @@ public class TableEntityWidgetV2
   }
 
   DownloadTableQueryModalWidget downloadTableQueryModalWidget;
-  UploadTableModalWidget uploadTableModalWidget;
+  CsvPreviewDialog csvPreviewDialog;
   TableEntityWidgetView view;
   EntityActionMenu actionMenu;
   PreflightController preflightController;
@@ -187,12 +186,12 @@ public class TableEntityWidgetV2
     view.addModalWidget(createGridSessionDialog);
   }
 
-  public UploadTableModalWidget getUploadTableModalWidget() {
-    if (uploadTableModalWidget == null) {
-      uploadTableModalWidget = ginInjector.getUploadTableModalWidget();
-      view.addModalWidget(uploadTableModalWidget);
+  public CsvPreviewDialog getCsvPreviewDialog() {
+    if (csvPreviewDialog == null) {
+      csvPreviewDialog = ginInjector.getCsvPreviewDialog();
+      view.addModalWidget(csvPreviewDialog);
     }
-    return uploadTableModalWidget;
+    return csvPreviewDialog;
   }
 
   public CopyTextModal getCopyTextModal() {
@@ -615,20 +614,13 @@ public class TableEntityWidgetV2
    */
   private void postCheckonUploadTableData() {
     Table table = (Table) entityBundle.getEntity();
-    getUploadTableModalWidget().configure(table.getParentId(), tableId);
-    getUploadTableModalWidget()
-      .showModal(
-        new WizardCallback() {
-          @Override
-          public void onFinished() {
-            // SWC-3488: successfully uploaded data to table/view. The current query may be invalid, so rerun
-            // with default query.
-            setQuery(getDefaultQuery(), false);
-          }
-
-          @Override
-          public void onCanceled() {}
-        }
+    // non-null tableId = append rows to existing table
+    getCsvPreviewDialog()
+      .configure(
+        table.getParentId(),
+        tableId,
+        () -> setQuery(getDefaultQuery(), false),
+        () -> {}
       );
   }
 

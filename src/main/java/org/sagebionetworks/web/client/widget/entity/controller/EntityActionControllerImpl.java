@@ -106,6 +106,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.FutureUtils;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
+import org.sagebionetworks.web.client.widget.CsvPreviewDialog;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.ShareThisPage;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
@@ -141,7 +142,6 @@ import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModa
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
@@ -299,7 +299,7 @@ public class EntityActionControllerImpl
   SqlDefinedEditorModalWidget sqlDefinedEditorModalWidget;
   boolean isShowingVersion = false;
   WizardCallback entityUpdatedWizardCallback;
-  UploadTableModalWidget uploadTableModalWidget;
+  CsvPreviewDialog csvPreviewDialog;
   AddExternalRepoModal addExternalRepoModal;
   AddDockerCommitModal addDockerCommitModal;
   String currentChallengeId;
@@ -496,12 +496,12 @@ public class EntityActionControllerImpl
     return createDatasetOrCollection;
   }
 
-  private UploadTableModalWidget getUploadTableModalWidget() {
-    if (uploadTableModalWidget == null) {
-      uploadTableModalWidget = ginInjector.getUploadTableModalWidget();
-      view.addWidget(uploadTableModalWidget);
+  private CsvPreviewDialog getCsvPreviewDialog() {
+    if (csvPreviewDialog == null) {
+      csvPreviewDialog = ginInjector.getCsvPreviewDialog();
+      view.addWidget(csvPreviewDialog);
     }
-    return uploadTableModalWidget;
+    return csvPreviewDialog;
   }
 
   private SqlDefinedEditorModalWidget getSqlDefinedEditorModalWidget() {
@@ -2085,9 +2085,14 @@ public class EntityActionControllerImpl
   }
 
   private void postCheckUploadTable() {
-    getUploadTableModalWidget()
-      .configure(entityBundle.getEntity().getId(), null);
-    getUploadTableModalWidget().showModal(entityUpdatedWizardCallback);
+    // null tableId = create new table from csv
+    getCsvPreviewDialog()
+      .configure(
+        entityBundle.getEntity().getId(),
+        null,
+        () -> entityUpdatedWizardCallback.onFinished(),
+        () -> {}
+      );
   }
 
   public void onAddDataset() {
