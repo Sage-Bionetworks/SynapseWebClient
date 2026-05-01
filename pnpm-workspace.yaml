@@ -2,3 +2,4 @@ minimumReleaseAge: 4320 # 3 days
 minimumReleaseAgeExclude:
   - '@sage-bionetworks/*'
   - 'synapse-react-client'
+  - 'markdown-it-synapse'
