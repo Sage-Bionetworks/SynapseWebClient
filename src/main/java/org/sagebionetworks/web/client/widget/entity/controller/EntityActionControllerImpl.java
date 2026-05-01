@@ -984,6 +984,14 @@ public class EntityActionControllerImpl
       return getDoneFuture(null);
     }
 
+    if (!isUserAuthenticated) {
+      actionMenu.setDownloadMenuEnabled(false);
+      actionMenu.setDownloadMenuTooltipText(
+        "You must be logged in to download folder contents."
+      );
+      return getDoneFuture(null);
+    }
+
     actionMenu.setDownloadMenuEnabled(true);
     actionMenu.setDownloadMenuTooltipText(null);
 
