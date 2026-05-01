@@ -5300,6 +5300,36 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
+  public void testConfigureContainerDownloadNotLoggedIn() {
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+
+    entityBundle.setEntity(new Project());
+    entityBundle.getEntity().setId(entityId);
+    entityBundle.setHasChildren(true);
+    currentEntityArea = EntityArea.FILES;
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setDownloadMenuEnabled(false);
+    verify(mockActionMenu)
+      .setDownloadMenuTooltipText(
+        "You must be logged in to download folder contents."
+      );
+
+    // The async job must not be called for anonymous users
+    verify(mockAsynchronousJobTracker, never())
+      .startAndTrack(any(), any(), anyInt(), any());
+  }
+
+  @Test
   public void testReportViolation() {
     String url = "https://www.synapse.org/Synapse:syn123";
     String ownerId = "4958725";
