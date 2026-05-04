@@ -335,6 +335,7 @@ public class SynapseJavascriptClient {
   public static final String GRID_DOWNLOAD_CSV = GRID + "/download/csv";
   public static final String GRID_EXPORT_RECORDSET = GRID + "/export/recordset";
   public static final String GRID_QUERY = GRID_SESSION + "/query";
+  public static final String GRID_UPDATE = GRID_SESSION + "/update";
 
   public static final String ASYNC_START = "/async/start";
   public static final String ASYNC_GET = "/async/get/";
