@@ -8,10 +8,14 @@ import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.dataaccess.AccessRequirementPermissions;
+import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.AccessRequirementPlace;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
+import org.sagebionetworks.web.client.place.DataAccessManagementPlace;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
@@ -27,6 +31,7 @@ public class AccessRequirementPresenter
   private String requirementId;
   private SynapseJavascriptClient jsClient;
   private SynapseAlert synAlert;
+  private GlobalApplicationState globalApplicationState;
 
   @Inject
   public AccessRequirementPresenter(
@@ -34,12 +39,14 @@ public class AccessRequirementPresenter
     AccessRequirementWidget arWidget,
     DivView arDiv,
     SynapseJavascriptClient jsClient,
-    SynapseAlert synAlert
+    SynapseAlert synAlert,
+    GlobalApplicationState globalApplicationState
   ) {
     this.view = view;
     this.arWidget = arWidget;
     this.jsClient = jsClient;
     this.synAlert = synAlert;
+    this.globalApplicationState = globalApplicationState;
     arDiv.addStyleName("markdown");
     arDiv.add(arWidget.asWidget());
     view.add(arDiv.asWidget());
@@ -60,6 +67,55 @@ public class AccessRequirementPresenter
     String id = place.getParam(AccessRequirementsPlace.ID_PARAM);
     String typeString = place.getParam(AccessRequirementsPlace.TYPE_PARAM);
 
+    String threadId = place.getParam(AccessRequirementPlace.THREAD_ID_PARAM);
+
+    // If threadId is present and the user can review submissions, redirect to the related submission.
+    if (threadId != null) {
+      jsClient.getAccessRequirementPermissions(
+        requirementId,
+        new AsyncCallback<AccessRequirementPermissions>() {
+          @Override
+          public void onSuccess(AccessRequirementPermissions permissions) {
+            if (permissions.getCanReviewSubmissions()) {
+              jsClient.getSubmissionForThread(
+                threadId,
+                new AsyncCallback<Submission>() {
+                  @Override
+                  public void onSuccess(Submission submission) {
+                    if (submission != null) {
+                      globalApplicationState
+                        .getPlaceChanger()
+                        .goTo(
+                          new DataAccessManagementPlace(
+                            "default/Submissions/" + submission.getId()
+                          )
+                        );
+                    }
+                  }
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    synAlert.handleException(caught);
+                  }
+                }
+              );
+            } else {
+              loadAccessRequirement(id, typeString);
+            }
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            synAlert.handleException(caught);
+          }
+        }
+      );
+    } else {
+      loadAccessRequirement(id, typeString);
+    }
+  }
+
+  private void loadAccessRequirement(String id, String typeString) {
     jsClient.getAccessRequirement(
       requirementId,
       new AsyncCallback<AccessRequirement>() {

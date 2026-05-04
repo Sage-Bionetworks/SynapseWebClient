@@ -42,6 +42,8 @@ import org.sagebionetworks.repo.model.auth.TwoFactorAuthStatus;
 import org.sagebionetworks.repo.model.curation.ListCurationTaskResponse;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationResponse;
+import org.sagebionetworks.repo.model.dataaccess.AccessRequirementPermissions;
+import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
@@ -133,6 +135,8 @@ public class SynapseJavascriptFactory {
     SubmissionPage,
     Entity, // used for services where we don't know what type of entity is returned (but object has concreteType set)
     AccessRequirement,
+    AccessRequirementPermissions,
+    Submission,
     EntityId,
     Forum,
     DiscussionThreadBundle,
@@ -335,6 +339,10 @@ public class SynapseJavascriptFactory {
         return new SnapshotResponse(json);
       case AccessControlList:
         return new AccessControlList(json);
+      case AccessRequirementPermissions:
+        return new AccessRequirementPermissions(json);
+      case Submission:
+        return new Submission(json);
       case PaginatedColumnModelsResults:
         return new PaginatedColumnModels(json).getResults();
       case JSON:

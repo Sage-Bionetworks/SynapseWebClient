@@ -6,6 +6,7 @@ import com.google.gwt.place.shared.Prefix;
 public class AccessRequirementPlace extends ParameterizedPlace {
 
   public static final String AR_ID_PARAM = "AR_ID";
+  public static final String THREAD_ID_PARAM = "threadId";
 
   public AccessRequirementPlace(String token) {
     super(token);
