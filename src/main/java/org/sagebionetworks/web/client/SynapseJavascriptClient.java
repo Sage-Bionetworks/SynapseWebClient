@@ -87,6 +87,8 @@ import org.sagebionetworks.repo.model.curation.ListCurationTaskRequest;
 import org.sagebionetworks.repo.model.curation.ListCurationTaskResponse;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationResponse;
+import org.sagebionetworks.repo.model.dataaccess.AccessRequirementPermissions;
+import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPageRequest;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
@@ -346,6 +348,9 @@ public class SynapseJavascriptClient {
   public static final String ACL = "/acl";
   public static final String ACCESS_APPROVAL = "/accessApproval";
   public static final String SUBMISSIONS = "/submissions";
+  public static final String SUBMISSION = "/submission";
+  public static final String DATA_ACCESS_SUBMISSION = "/dataAccessSubmission";
+  public static final String PERMISSIONS = "/permissions";
   public static final String DOWNLOAD_ORDER = DOWNLOAD + "/order";
   public static final String DOWNLOAD_ORDER_HISTORY =
     DOWNLOAD_ORDER + "/history";
@@ -1559,6 +1564,35 @@ public class SynapseJavascriptClient {
       "?filter=" +
       filter;
     doGet(url, OBJECT_TYPE.ThreadCount, callback);
+  }
+
+  // https://repo-prod.prod.sagebase.org/repo/v1/thread/submission/{submissionId}/
+  public void getThreadForSubmission(
+    String submissionId,
+    AsyncCallback<DiscussionThreadBundle> callback
+  ) {
+    String url = getRepoServiceUrl() + THREAD + SUBMISSION + "/" + submissionId;
+    doGet(url, OBJECT_TYPE.DiscussionThreadBundle, callback);
+  }
+
+  // https://repo-prod.prod.sagebase.org/repo/v1/dataAccessSubmission/thread/{threadId}/
+  public void getSubmissionForThread(
+    String threadId,
+    AsyncCallback<Submission> callback
+  ) {
+    String url =
+      getRepoServiceUrl() + DATA_ACCESS_SUBMISSION + THREAD + "/" + threadId;
+    doGet(url, OBJECT_TYPE.Submission, callback);
+  }
+
+  // https://repo-prod.prod.sagebase.org/repo/v1/accessRequirement/{requirementId}/permissions
+  public void getAccessRequirementPermissions(
+    String requirementId,
+    AsyncCallback<AccessRequirementPermissions> callback
+  ) {
+    String url =
+      getRepoServiceUrl() + ACCESS_REQUIREMENT + requirementId + PERMISSIONS;
+    doGet(url, OBJECT_TYPE.AccessRequirementPermissions, callback);
   }
 
   public void getModerators(
