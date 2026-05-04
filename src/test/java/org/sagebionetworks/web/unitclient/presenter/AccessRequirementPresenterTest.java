@@ -164,7 +164,10 @@ public class AccessRequirementPresenterTest {
       .getSubmissionForThread(anyString(), any(AsyncCallback.class));
     presenter.setPlace(mockPlace);
 
-    verify(mockPlaceChanger).goTo(any(DataAccessManagementPlace.class));
+    ArgumentCaptor<DataAccessManagementPlace> placeCaptor =
+      ArgumentCaptor.forClass(DataAccessManagementPlace.class);
+    verify(mockPlaceChanger).goTo(placeCaptor.capture());
+    assertEquals("default/Submissions/12345", placeCaptor.getValue().toToken());
   }
 
   @Test
@@ -242,6 +245,9 @@ public class AccessRequirementPresenterTest {
 
     presenter.setPlace(mockPlace);
 
-    verify(mockPlaceChanger).goTo(any(DataAccessManagementPlace.class));
+    ArgumentCaptor<DataAccessManagementPlace> placeCaptor =
+      ArgumentCaptor.forClass(DataAccessManagementPlace.class);
+    verify(mockPlaceChanger).goTo(placeCaptor.capture());
+    assertEquals("default/Submissions/123", placeCaptor.getValue().toToken());
   }
 }
