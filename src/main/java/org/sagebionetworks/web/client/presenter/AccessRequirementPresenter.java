@@ -99,6 +99,8 @@ public class AccessRequirementPresenter
                   }
                 }
               );
+            } else {
+              loadAccessRequirement(id, typeString);
             }
           }
 
@@ -109,45 +111,49 @@ public class AccessRequirementPresenter
         }
       );
     } else {
-      jsClient.getAccessRequirement(
-        requirementId,
-        new AsyncCallback<AccessRequirement>() {
-          @Override
-          public void onSuccess(AccessRequirement result) {
-            String titleInfo = DisplayUtils.isDefined(result.getName())
-              ? ": " + result.getName()
-              : "";
-            view.addTitle("Access Requirement" + titleInfo);
+      loadAccessRequirement(id, typeString);
+    }
+  }
 
-            // Note: configuring the Access Requirement widget without a target subject will result in notifications sent to the user will not have the context (Project/Folder/File associated with the restriction).
-            if (id != null && typeString != null) {
-              RestrictableObjectDescriptor targetSubject =
-                new RestrictableObjectDescriptor();
-              RestrictableObjectType type = RestrictableObjectType.valueOf(
-                typeString.toUpperCase()
-              );
-              targetSubject.setType(type);
-              targetSubject.setId(id);
+  private void loadAccessRequirement(String id, String typeString) {
+    jsClient.getAccessRequirement(
+      requirementId,
+      new AsyncCallback<AccessRequirement>() {
+        @Override
+        public void onSuccess(AccessRequirement result) {
+          String titleInfo = DisplayUtils.isDefined(result.getName())
+            ? ": " + result.getName()
+            : "";
+          view.addTitle("Access Requirement" + titleInfo);
 
-              arWidget.configure(requirementId, targetSubject);
-            } else {
-              // SWC-6700: No subject specified, pick a random one since some code assumes a subject has been specified.
-              // configure using the first subject, if available
-              RestrictableObjectDescriptor firstSubject = null;
-              if (result.getSubjectIds().size() > 0) {
-                firstSubject = result.getSubjectIds().get(0);
-              }
-              arWidget.configure(requirementId, firstSubject);
+          // Note: configuring the Access Requirement widget without a target subject will result in notifications sent to the user will not have the context (Project/Folder/File associated with the restriction).
+          if (id != null && typeString != null) {
+            RestrictableObjectDescriptor targetSubject =
+              new RestrictableObjectDescriptor();
+            RestrictableObjectType type = RestrictableObjectType.valueOf(
+              typeString.toUpperCase()
+            );
+            targetSubject.setType(type);
+            targetSubject.setId(id);
+
+            arWidget.configure(requirementId, targetSubject);
+          } else {
+            // SWC-6700: No subject specified, pick a random one since some code assumes a subject has been specified.
+            // configure using the first subject, if available
+            RestrictableObjectDescriptor firstSubject = null;
+            if (result.getSubjectIds().size() > 0) {
+              firstSubject = result.getSubjectIds().get(0);
             }
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            synAlert.handleException(caught);
+            arWidget.configure(requirementId, firstSubject);
           }
         }
-      );
-    }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          synAlert.handleException(caught);
+        }
+      }
+    );
   }
 
   public AccessRequirementPlace getPlace() {
