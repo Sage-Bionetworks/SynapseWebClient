@@ -69,7 +69,7 @@ public class AccessRequirementPresenter
 
     String threadId = place.getParam(AccessRequirementPlace.THREAD_ID_PARAM);
 
-    // if a threadId is given, check if the user has permissions to review data access submissions, and if so, redirect them to the DataAccessManagementPlace for the submission associated with the given threadId
+    // If threadId is present and the user can review submissions, redirect to the related submission.
     if (threadId != null) {
       jsClient.getAccessRequirementPermissions(
         requirementId,
