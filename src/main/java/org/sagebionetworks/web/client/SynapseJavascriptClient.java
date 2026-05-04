@@ -358,6 +358,7 @@ public class SynapseJavascriptClient {
     DOWNLOAD_ORDER + "/history";
   public static final String STORAGE_REPORT = "/storageReport";
   public static final String SEARCH = "/search";
+  public static final String SEARCH_INDEX_QUERY = SEARCH + "/query";
   public static final String TEAM_MEMBERS = "/teamMembers/";
   public static final String NAME_FRAGMENT_FILTER = "fragment=";
   public static final String NAME_MEMBERTYPE_FILTER = "memberType=";

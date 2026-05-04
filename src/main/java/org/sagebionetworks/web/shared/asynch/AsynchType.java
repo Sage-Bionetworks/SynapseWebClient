@@ -41,6 +41,8 @@ import org.sagebionetworks.repo.model.schema.CreateSchemaRequest;
 import org.sagebionetworks.repo.model.schema.CreateSchemaResponse;
 import org.sagebionetworks.repo.model.schema.GetValidationSchemaRequest;
 import org.sagebionetworks.repo.model.schema.GetValidationSchemaResponse;
+import org.sagebionetworks.repo.model.search.SearchQueryResults;
+import org.sagebionetworks.repo.model.search.table.SearchIndexQuery;
 import org.sagebionetworks.repo.model.table.*;
 
 /**
@@ -165,6 +167,11 @@ public enum AsynchType implements IsSerializable {
     GRID_UPDATE,
     GridUpdateJobRequest.class,
     GridUpdateJobResponse.class
+  ),
+  SearchIndexQuery(
+    SEARCH_INDEX_QUERY,
+    SearchIndexQuery.class,
+    SearchQueryResults.class
   );
 
   String prefix;
