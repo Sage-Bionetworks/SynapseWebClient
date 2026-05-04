@@ -69,22 +69,19 @@ public class AccessRequirementPresenter
 
     String threadId = place.getParam(AccessRequirementPlace.THREAD_ID_PARAM);
 
-    // AccessRequirementPresenter (which already injects the SynapseJavascriptClient) should look for the new threadId param.
-    // If found, it should use https://repo-prod.prod.sagebase.org/repo/v1/accessRequirement/{requirementId}/permissions to get the permission.
+    // if a threadId is given, check if the user has permissions to review data access submissions, and if so, redirect them to the DataAccessManagementPlace for the submission associated with the given threadId
     if (threadId != null) {
       jsClient.getAccessRequirementPermissions(
         requirementId,
         new AsyncCallback<AccessRequirementPermissions>() {
           @Override
           public void onSuccess(AccessRequirementPermissions permissions) {
-            // If the user can review data access submissions, it should get the associated Submission to the given threadId given in as a param
             if (permissions.getCanReviewSubmissions()) {
               jsClient.getSubmissionForThread(
                 threadId,
                 new AsyncCallback<Submission>() {
                   @Override
                   public void onSuccess(Submission submission) {
-                    // If a Submission is returned, it should redirect the user to the DataAccessManagement place. /DataAccessManagement:default/Submissions/<submissionId>
                     if (submission != null) {
                       globalApplicationState
                         .getPlaceChanger()
