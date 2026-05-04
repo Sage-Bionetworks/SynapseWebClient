@@ -1566,7 +1566,6 @@ public class SynapseJavascriptClient {
     doGet(url, OBJECT_TYPE.ThreadCount, callback);
   }
 
-  // https://repo-prod.prod.sagebase.org/repo/v1/thread/submission/{submissionId}/
   public void getThreadForSubmission(
     String submissionId,
     AsyncCallback<DiscussionThreadBundle> callback
@@ -1575,7 +1574,6 @@ public class SynapseJavascriptClient {
     doGet(url, OBJECT_TYPE.DiscussionThreadBundle, callback);
   }
 
-  // https://repo-prod.prod.sagebase.org/repo/v1/dataAccessSubmission/thread/{threadId}/
   public void getSubmissionForThread(
     String threadId,
     AsyncCallback<Submission> callback
@@ -1585,7 +1583,6 @@ public class SynapseJavascriptClient {
     doGet(url, OBJECT_TYPE.Submission, callback);
   }
 
-  // https://repo-prod.prod.sagebase.org/repo/v1/accessRequirement/{requirementId}/permissions
   public void getAccessRequirementPermissions(
     String requirementId,
     AsyncCallback<AccessRequirementPermissions> callback
