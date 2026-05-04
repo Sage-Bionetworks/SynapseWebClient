@@ -29,6 +29,8 @@ import org.sagebionetworks.repo.model.grid.CreateGridRequest;
 import org.sagebionetworks.repo.model.grid.CreateGridResponse;
 import org.sagebionetworks.repo.model.grid.DownloadFromGridRequest;
 import org.sagebionetworks.repo.model.grid.DownloadFromGridResult;
+import org.sagebionetworks.repo.model.grid.GridQueryJobRequest;
+import org.sagebionetworks.repo.model.grid.GridQueryJobResponse;
 import org.sagebionetworks.repo.model.grid.GridRecordSetExportRequest;
 import org.sagebionetworks.repo.model.grid.GridRecordSetExportResponse;
 import org.sagebionetworks.repo.model.report.DownloadStorageReportRequest;
@@ -155,7 +157,8 @@ public enum AsynchType implements IsSerializable {
     GRID_EXPORT_RECORDSET,
     GridRecordSetExportRequest.class,
     GridRecordSetExportResponse.class
-  );
+  ),
+  GridQuery(GRID_QUERY, GridQueryJobRequest.class, GridQueryJobResponse.class);
 
   String prefix;
   Class<? extends AsynchronousRequestBody> requestClass;
