@@ -182,6 +182,8 @@ public class AccessRequirementPresenterTest {
     verify(mockJsClient, never())
       .getSubmissionForThread(anyString(), any(AsyncCallback.class));
     verify(mockArWidget).configure(AR_ID, mockSubject);
+    verify(mockPlaceChanger, never())
+      .goTo(any(DataAccessManagementPlace.class));
   }
 
   @Test
