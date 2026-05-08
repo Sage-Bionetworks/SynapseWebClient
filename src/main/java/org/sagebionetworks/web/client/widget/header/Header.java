@@ -4,11 +4,9 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 
 public class Header implements HeaderView.Presenter, IsWidget {
 
@@ -17,7 +15,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
   private HeaderView view;
   private SynapseJSNIUtils synapseJSNIUtils;
   CookieProvider cookies;
-  private ClientCache localStorage;
 
   @Inject
   public Header(
@@ -29,18 +26,12 @@ public class Header implements HeaderView.Presenter, IsWidget {
   ) {
     this.view = view;
     this.cookies = cookies;
-    this.localStorage = localStorage;
     this.synapseJSNIUtils = synapseJSNIUtils;
     view.clear();
 
     view.setPresenter(this);
     initStagingAlert();
     view.getEventBinder().bindEventHandlers(this, eventBus);
-    view.setNIHAlertVisible(
-      !localStorage.contains(
-        AuthenticationControllerImpl.NIH_NOTIFICATION_DISMISSED
-      )
-    );
   }
 
   public void initStagingAlert() {
@@ -60,15 +51,5 @@ public class Header implements HeaderView.Presenter, IsWidget {
 
   public void refresh() {
     view.refresh();
-  }
-
-  @Override
-  public void onNIHNotificationDismissed() {
-    view.setNIHAlertVisible(false);
-    localStorage.put(
-      AuthenticationControllerImpl.NIH_NOTIFICATION_DISMISSED,
-      Boolean.TRUE.toString(),
-      DateTimeUtilsImpl.getYearFromNow().getTime()
-    );
   }
 }

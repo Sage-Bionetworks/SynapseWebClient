@@ -16,13 +16,9 @@ public interface HeaderView extends IsWidget {
   /**
    * Presenter interface
    */
-  public interface Presenter {
-    void onNIHNotificationDismissed();
-  }
+  public interface Presenter {}
 
   void setStagingAlertVisible(boolean visible);
-  void setNIHAlertVisible(boolean visible);
-
   void openNewWindow(String url);
 
   void clear();
