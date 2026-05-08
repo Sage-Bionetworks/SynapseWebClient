@@ -2499,15 +2499,15 @@ packages:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
     engines: {node: '>=6'}
 
-  code-colors-react@3.4.0:
-    resolution: {integrity: sha512-yabfKa9x+7pmYBcrtRSz1HpUEMxf2wFBP/wV6fnfFhRL4vLX1/PMKWpJq9HrF38bZH0/PrDf3pDLFuZz87qdNg==}
+  code-colors-react@3.5.0:
+    resolution: {integrity: sha512-bVp0+8PtAyimlHR1AN8xjXw37oipZDSGE/KJzcRJEJfESwXmudo0oKN7SOyWi76Rab9zxWRrDq9uuj9cUpf+SQ==}
     peerDependencies:
       nano-theme: '*'
       react: ^19.2.5
       react-dom: ^19.2.5
 
-  code-colors@2.4.0:
-    resolution: {integrity: sha512-6FhZx+bFu0iMwwwVsAfuY9SSmHhMze53Ybjd+sd20v2ocRZzRd2+Uo1dH2Rh9x86qc9wbLCOq6cPXYAi9KVMKw==}
+  code-colors@2.5.0:
+    resolution: {integrity: sha512-61KEODKoBlS9yWvLTVQjnoFv4HjNSQ41qoJ44K+dz4P7fivwaYJ3GrNi50k6tygi2gVCPkda9CvCC7qVEyLOEw==}
     peerDependencies:
       tslib: '*'
 
@@ -3502,8 +3502,8 @@ packages:
   hyphenate-style-name@1.1.0:
     resolution: {integrity: sha512-WDC/ui2VVRrz3jOVi+XtjqkDjiVjTtFaAGiW37k6b+ohyQ5wYDOGkvCZa8+H0nx3gyvv0+BST9xuOgIyGQ00gw==}
 
-  iconista@2.23.0:
-    resolution: {integrity: sha512-NPh2pKQtZmj99+Ne4awFusyE6raC4RySgOo7NM90O2+fYoLcX6Gz7XUSQ1NgF/Kfnd2TSyfX1FkqT6iTswA4NQ==}
+  iconista@2.25.1:
+    resolution: {integrity: sha512-nKt/lF6sQ1z4iGjGaa8nOeeB+q9xUIwkc553XNjp3a30tNd85CIJPZbWmh/xtX4JLjlNPgrhEPpF76seGXkXRA==}
     peerDependencies:
       react: ^19.2.5
       react-dom: ^19.2.5
@@ -4762,6 +4762,9 @@ packages:
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
+  react-is@17.0.2:
+    resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
+
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
 
@@ -5670,6 +5673,7 @@ packages:
 
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   validate-npm-package-license@3.0.4:
@@ -5692,6 +5696,9 @@ packages:
 
   very-small-parser@1.14.0:
     resolution: {integrity: sha512-+0/uA9aGygbu83G/NRVCTNX3WpCTIXC1oXTriXCI26zniP/AhtMso+25YZJAaB6HcaXjmJxLemvRK1IK4gTKKA==}
+
+  very-small-parser@1.15.0:
+    resolution: {integrity: sha512-KGmFbbVlMLKVLt0cnyNrTwt2WCNzSntTXK1y9yxvxxJm9hA64EJEtmke3xw1PAH70OeHJN7Os7DDz5Fxl75ehQ==}
 
   vite-plugin-node-polyfills@0.26.0:
     resolution: {integrity: sha512-BAe5YzJf368XGev02hDvioidx4uVH8dqEJlG73bjQSxM26/AQnGcKFomq9n3vGq5yqpSHKN4h1XQNxx9l98mBg==}
@@ -6929,7 +6936,7 @@ snapshots:
       prop-types: 15.8.1
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
-      react-is: 16.13.1
+      react-is: 17.0.2
       react-transition-group: 4.4.5(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
     optionalDependencies:
       '@types/react': 19.2.14
@@ -6978,7 +6985,7 @@ snapshots:
       prop-types: 15.8.1
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
-      react-is: 16.13.1
+      react-is: 17.0.2
 
   '@mui/core-downloads-tracker@7.3.7': {}
 
@@ -8606,16 +8613,16 @@ snapshots:
 
   clsx@2.1.1: {}
 
-  code-colors-react@3.4.0(nano-theme@1.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tslib@2.8.1))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tslib@2.8.1):
+  code-colors-react@3.5.0(nano-theme@1.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tslib@2.8.1))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tslib@2.8.1):
     dependencies:
-      code-colors: 2.4.0(tslib@2.8.1)
+      code-colors: 2.5.0(tslib@2.8.1)
       nano-theme: 1.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tslib@2.8.1)
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
     transitivePeerDependencies:
       - tslib
 
-  code-colors@2.4.0(tslib@2.8.1):
+  code-colors@2.5.0(tslib@2.8.1):
     dependencies:
       prismjs: 1.30.0
       thingies: 2.6.0(tslib@2.8.1)
@@ -9831,7 +9838,7 @@ snapshots:
 
   hyphenate-style-name@1.1.0: {}
 
-  iconista@2.23.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
+  iconista@2.25.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
     dependencies:
       bootstrap-icons: 1.13.1
       react: 19.2.5
@@ -10502,7 +10509,7 @@ snapshots:
   mdast-flat@1.7.0(tslib@2.8.1):
     dependencies:
       tslib: 2.8.1
-      very-small-parser: 1.14.0
+      very-small-parser: 1.15.0
 
   mdn-data@2.0.14: {}
 
@@ -10652,10 +10659,10 @@ snapshots:
     dependencies:
       '@material-ui/core': 4.12.4(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       clipboard-copy: 4.0.1
-      code-colors-react: 3.4.0(nano-theme@1.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tslib@2.8.1))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tslib@2.8.1)
+      code-colors-react: 3.5.0(nano-theme@1.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tslib@2.8.1))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tslib@2.8.1)
       codemirror: 5.65.21
       emoji-js: 3.9.0
-      iconista: 2.23.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      iconista: 2.25.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       libreact: 2.13.3(prop-types@15.8.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tslib@2.8.1)
       load-script: 2.0.0
       mdast-flat: 1.7.0(tslib@2.8.1)
@@ -10676,7 +10683,7 @@ snapshots:
       thingies: 2.6.0(tslib@2.8.1)
       tslib: 2.8.1
       use-t: 1.6.4(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      very-small-parser: 1.14.0
+      very-small-parser: 1.15.0
     transitivePeerDependencies:
       - '@types/react'
       - csstype
@@ -11275,6 +11282,8 @@ snapshots:
       react-dom: 19.2.5(react@19.2.5)
 
   react-is@16.13.1: {}
+
+  react-is@17.0.2: {}
 
   react-is@18.3.1: {}
 
@@ -12505,6 +12514,8 @@ snapshots:
   validate.io-number@1.0.3: {}
 
   very-small-parser@1.14.0: {}
+
+  very-small-parser@1.15.0: {}
 
   vite-plugin-node-polyfills@0.26.0(rollup@4.60.1)(vite@8.0.8(@types/node@22.19.5)(esbuild@0.27.4)(sass@1.97.2)(tsx@4.21.0)(yaml@2.5.1)):
     dependencies:
