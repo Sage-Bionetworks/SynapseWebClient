@@ -23,7 +23,6 @@ import org.sagebionetworks.web.client.jsinterop.SynapseNavDrawerProps;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.PlansPlace;
-import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class HeaderViewImpl extends Composite implements HeaderView {
@@ -38,9 +37,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
   @UiField
   ReactComponent googleAnalyticsContainer;
-
-  @UiField
-  FullWidthAlert nihNotificationAlert;
 
   @UiField
   ReactComponent synapseNavDrawerContainer;
@@ -58,9 +54,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   public HeaderViewImpl(Binder binder, PortalGinInjector ginInjector) {
     this.initWidget(binder.createAndBindUi(this));
     this.ginInjector = ginInjector;
-    nihNotificationAlert.setOnClose(() -> {
-      presenter.onNIHNotificationDismissed();
-    });
     initClickHandlers();
     clear();
     rerenderNavBar();
@@ -167,10 +160,5 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   @Override
   public EventBinder<Header> getEventBinder() {
     return eventBinder;
-  }
-
-  @Override
-  public void setNIHAlertVisible(boolean visible) {
-    nihNotificationAlert.setVisible(visible);
   }
 }

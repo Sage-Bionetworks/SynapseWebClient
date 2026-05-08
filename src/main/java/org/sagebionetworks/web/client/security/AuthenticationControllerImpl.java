@@ -5,9 +5,7 @@ import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import java.util.ArrayList;
@@ -42,8 +40,6 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
 
-  public static final String NIH_NOTIFICATION_DISMISSED =
-    "nih_notification_dismissed";
   public static String FORCE_DISPLAY_ORIGINAL_COLUMN_NAMES =
     "force-display-original-column-names";
 
@@ -338,7 +334,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
   private void setPersistentLocalStorageKeys() {
     String[] swcPersistentLocalStorageKeys = new String[] {
-      NIH_NOTIFICATION_DISMISSED,
       FORCE_DISPLAY_ORIGINAL_COLUMN_NAMES,
     };
     String[] srcPersistentLocalStorageKeys =

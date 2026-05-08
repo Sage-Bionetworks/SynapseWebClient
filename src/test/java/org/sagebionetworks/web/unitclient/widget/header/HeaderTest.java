@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.header;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,7 +16,6 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 
@@ -106,40 +102,5 @@ public class HeaderTest {
     header.refresh();
 
     verify(mockView).refresh();
-  }
-
-  @Test
-  public void testInitWithNIHNotificationDismissed() {
-    when(
-      mockLocalStorage.contains(
-        AuthenticationControllerImpl.NIH_NOTIFICATION_DISMISSED
-      )
-    )
-      .thenReturn(true);
-    reset(mockView);
-    when(mockView.getEventBinder()).thenReturn(mockEventBinder);
-
-    header =
-      new Header(
-        mockView,
-        mockSynapseJSNIUtils,
-        mockEventBus,
-        mockCookies,
-        mockLocalStorage
-      );
-
-    verify(mockView).setNIHAlertVisible(false);
-  }
-
-  @Test
-  public void testOnNIHNotificationDismissed() {
-    header.onNIHNotificationDismissed();
-
-    verify(mockLocalStorage)
-      .put(
-        eq(AuthenticationControllerImpl.NIH_NOTIFICATION_DISMISSED),
-        eq(Boolean.TRUE.toString()),
-        any(Long.class)
-      );
   }
 }
