@@ -106,7 +106,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.FutureUtils;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
-import org.sagebionetworks.web.client.widget.CsvPreviewDialog;
+import org.sagebionetworks.web.client.widget.CreateTableFromCsvDialog;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.ShareThisPage;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
@@ -299,7 +299,7 @@ public class EntityActionControllerImpl
   SqlDefinedEditorModalWidget sqlDefinedEditorModalWidget;
   boolean isShowingVersion = false;
   WizardCallback entityUpdatedWizardCallback;
-  CsvPreviewDialog csvPreviewDialog;
+  CreateTableFromCsvDialog createTableFromCsvDialog;
   AddExternalRepoModal addExternalRepoModal;
   AddDockerCommitModal addDockerCommitModal;
   String currentChallengeId;
@@ -496,12 +496,12 @@ public class EntityActionControllerImpl
     return createDatasetOrCollection;
   }
 
-  private CsvPreviewDialog getCsvPreviewDialog() {
-    if (csvPreviewDialog == null) {
-      csvPreviewDialog = ginInjector.getCsvPreviewDialog();
-      view.addWidget(csvPreviewDialog);
+  private CreateTableFromCsvDialog getCreateTableFromCsvDialog() {
+    if (createTableFromCsvDialog == null) {
+      createTableFromCsvDialog = ginInjector.getCreateTableFromCsvDialog();
+      view.addWidget(createTableFromCsvDialog);
     }
-    return csvPreviewDialog;
+    return createTableFromCsvDialog;
   }
 
   private SqlDefinedEditorModalWidget getSqlDefinedEditorModalWidget() {
@@ -2085,11 +2085,9 @@ public class EntityActionControllerImpl
   }
 
   private void postCheckUploadTable() {
-    // null tableId = create new table from csv
-    getCsvPreviewDialog()
+    getCreateTableFromCsvDialog()
       .configure(
         entityBundle.getEntity().getId(),
-        null,
         () -> entityUpdatedWizardCallback.onFinished(),
         () -> {}
       );

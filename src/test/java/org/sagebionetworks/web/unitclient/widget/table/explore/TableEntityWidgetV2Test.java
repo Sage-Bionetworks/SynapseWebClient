@@ -51,15 +51,15 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.jsinterop.CsvPreviewDialogProps;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
+import org.sagebionetworks.web.client.jsinterop.UpdateTableWithCsvDialogProps;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
-import org.sagebionetworks.web.client.widget.CsvPreviewDialog;
+import org.sagebionetworks.web.client.widget.UpdateTableWithCsvDialog;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
@@ -97,7 +97,7 @@ public class TableEntityWidgetV2Test {
   DownloadTableQueryModalWidget mockDownloadTableQueryModalWidget;
 
   @Mock
-  CsvPreviewDialog mockCsvPreviewDialog;
+  UpdateTableWithCsvDialog mockUpdateTableWithCsvDialog;
 
   @Mock
   PreflightController mockPreflightController;
@@ -201,8 +201,8 @@ public class TableEntityWidgetV2Test {
       .thenReturn(mockGlobalState);
     when(mockPortalGinInjector.getDownloadTableQueryModalWidget())
       .thenReturn(mockDownloadTableQueryModalWidget);
-    when(mockPortalGinInjector.getCsvPreviewDialog())
-      .thenReturn(mockCsvPreviewDialog);
+    when(mockPortalGinInjector.getUpdateTableWithCsvDialog())
+      .thenReturn(mockUpdateTableWithCsvDialog);
     when(mockPortalGinInjector.getCopyTextModal())
       .thenReturn(mockCopyTextModal);
     when(mockPortalGinInjector.getAuthenticationController())
@@ -657,7 +657,8 @@ public class TableEntityWidgetV2Test {
     );
     widget.onUploadTableData();
     // should not proceed to upload.
-    verify(mockCsvPreviewDialog, never()).configure(any(), any(), any(), any());
+    verify(mockUpdateTableWithCsvDialog, never())
+      .configure(any(), any(), any());
   }
 
   @Test
@@ -677,12 +678,11 @@ public class TableEntityWidgetV2Test {
     );
     widget.onUploadTableData();
     // proceed to upload
-    verify(mockCsvPreviewDialog)
+    verify(mockUpdateTableWithCsvDialog)
       .configure(
         any(),
-        any(),
-        any(CsvPreviewDialogProps.OnSuccessFunction.class),
-        any(CsvPreviewDialogProps.OnCloseFunction.class)
+        any(UpdateTableWithCsvDialogProps.OnSuccessFunction.class),
+        any(UpdateTableWithCsvDialogProps.OnCloseFunction.class)
       );
   }
 

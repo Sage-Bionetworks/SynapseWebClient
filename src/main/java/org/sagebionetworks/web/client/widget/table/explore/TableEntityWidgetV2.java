@@ -23,7 +23,6 @@ import org.sagebionetworks.repo.model.table.QueryFilter;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.SubmissionView;
-import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.View;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -43,7 +42,7 @@ import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
-import org.sagebionetworks.web.client.widget.CsvPreviewDialog;
+import org.sagebionetworks.web.client.widget.UpdateTableWithCsvDialog;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
@@ -124,7 +123,7 @@ public class TableEntityWidgetV2
   }
 
   DownloadTableQueryModalWidget downloadTableQueryModalWidget;
-  CsvPreviewDialog csvPreviewDialog;
+  UpdateTableWithCsvDialog updateTableWithCsvDialog;
   TableEntityWidgetView view;
   EntityActionMenu actionMenu;
   PreflightController preflightController;
@@ -186,12 +185,12 @@ public class TableEntityWidgetV2
     view.addModalWidget(createGridSessionDialog);
   }
 
-  public CsvPreviewDialog getCsvPreviewDialog() {
-    if (csvPreviewDialog == null) {
-      csvPreviewDialog = ginInjector.getCsvPreviewDialog();
-      view.addModalWidget(csvPreviewDialog);
+  public UpdateTableWithCsvDialog getUpdateTableWithCsvDialog() {
+    if (updateTableWithCsvDialog == null) {
+      updateTableWithCsvDialog = ginInjector.getUpdateTableWithCsvDialog();
+      view.addModalWidget(updateTableWithCsvDialog);
     }
-    return csvPreviewDialog;
+    return updateTableWithCsvDialog;
   }
 
   public CopyTextModal getCopyTextModal() {
@@ -613,15 +612,8 @@ public class TableEntityWidgetV2
    * Called after all pre-flight checks for upload has passed.
    */
   private void postCheckonUploadTableData() {
-    Table table = (Table) entityBundle.getEntity();
-    // non-null tableId = append rows to existing table
-    getCsvPreviewDialog()
-      .configure(
-        table.getParentId(),
-        tableId,
-        () -> setQuery(getDefaultQuery(), false),
-        () -> {}
-      );
+    getUpdateTableWithCsvDialog()
+      .configure(tableId, () -> setQuery(getDefaultQuery(), false), () -> {});
   }
 
   @Override

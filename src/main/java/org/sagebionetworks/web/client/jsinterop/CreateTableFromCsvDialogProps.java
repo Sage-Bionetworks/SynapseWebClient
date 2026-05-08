@@ -7,13 +7,10 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
-public class CsvPreviewDialogProps extends ReactComponentProps {
+public class CreateTableFromCsvDialogProps extends ReactComponentProps {
 
   public boolean open;
   public String parentId;
-
-  @JsNullable
-  public String tableId;
 
   @JsNullable
   public OnSuccessFunction onSuccess;
@@ -33,17 +30,15 @@ public class CsvPreviewDialogProps extends ReactComponentProps {
   }
 
   @JsOverlay
-  public static CsvPreviewDialogProps create(
+  public static CreateTableFromCsvDialogProps create(
     boolean open,
     String parentId,
-    String tableId,
     OnSuccessFunction onSuccess,
     OnCloseFunction onClose
   ) {
-    CsvPreviewDialogProps props = new CsvPreviewDialogProps();
+    CreateTableFromCsvDialogProps props = new CreateTableFromCsvDialogProps();
     props.open = open;
     props.parentId = parentId;
-    props.tableId = tableId;
     props.onSuccess = onSuccess;
     props.onClose = onClose;
     return props;
