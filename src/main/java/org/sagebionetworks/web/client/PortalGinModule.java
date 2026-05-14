@@ -622,22 +622,6 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScop
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
-import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
-import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPage;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPageImpl;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPageView;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPageViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePage;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePageImpl;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPage;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPageImpl;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPageView;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPageViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPage;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageImpl;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageView;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardView;
@@ -1164,14 +1148,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(QueryInputView.class).to(QueryInputViewImpl.class);
     bind(JobTrackingWidget.class).to(AsynchronousProgressWidget.class);
     bind(UploadTableModalWidget.class).to(UploadTableModalWidgetImpl.class);
-    bind(UploadCSVPreviewPage.class).to(UploadCSVPreviewPageImpl.class);
-    bind(CSVOptionsView.class).to(CSVOptionsViewImpl.class);
-    bind(UploadCSVPreviewPageView.class).to(UploadCSVPreviewPageViewImpl.class);
-    bind(UploadCSVFilePage.class).to(UploadCSVFilePageImpl.class);
-    bind(UploadCSVFinishPage.class).to(UploadCSVFinishPageImpl.class);
-    bind(UploadCSVFinishPageView.class).to(UploadCSVFinishPageViewImpl.class);
-    bind(UploadCSVAppendPage.class).to(UploadCSVAppendPageImpl.class);
-    bind(UploadCSVAppendPageView.class).to(UploadCSVAppendPageViewImpl.class);
     bind(SortableTableHeader.class).to(SortableTableHeaderImpl.class);
     bind(StaticTableHeader.class).to(StaticTableHeaderImpl.class);
     bind(TotalVisibleResultsWidgetView.class)
