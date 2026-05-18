@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
@@ -53,11 +52,7 @@ public class FileCellEditorImplTest {
       .thenReturn(mockFileInputWidget);
     fileMetadata =
       new FileMetadata[] {
-        new FileMetadata(
-          testFileName,
-          ContentTypeDelimiter.TEXT.getContentType(),
-          fileSize
-        ),
+        new FileMetadata(testFileName, "text/plain", fileSize),
       };
     when(mockFileInputWidget.getSelectedFileMetadata())
       .thenReturn(fileMetadata);

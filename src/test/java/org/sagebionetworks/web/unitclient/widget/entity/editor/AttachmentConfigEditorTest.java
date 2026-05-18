@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigView;
-import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
@@ -64,11 +63,7 @@ public class AttachmentConfigEditorTest {
       );
     mockMetadata =
       new FileMetadata[] {
-        new FileMetadata(
-          testFileName,
-          ContentTypeDelimiter.TEXT.getContentType(),
-          fileSize
-        ),
+        new FileMetadata(testFileName, "text/plain", fileSize),
       };
     when(mockFileInputWidget.getSelectedFileMetadata())
       .thenReturn(mockMetadata);
