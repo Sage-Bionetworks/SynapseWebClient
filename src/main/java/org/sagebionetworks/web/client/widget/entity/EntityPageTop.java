@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.curation.ListCurationTaskResponse;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
+import org.sagebionetworks.repo.model.search.table.SearchIndex;
 import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -853,6 +854,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       area = getDefaultProjectArea();
     } else if (entity instanceof EntityRefCollectionView) {
       area = EntityArea.DATASETS;
+    } else if (entity instanceof SearchIndex) {
+      area = EntityArea.TABLES;
     } else if (entity instanceof Table) {
       area = EntityArea.TABLES;
     } else if (entity instanceof DockerRepository) {

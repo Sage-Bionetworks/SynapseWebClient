@@ -8,6 +8,7 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.search.table.SearchIndex;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
@@ -47,6 +49,7 @@ import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.explore.SearchIndexWidget;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
@@ -132,6 +135,13 @@ public abstract class AbstractTablesTab
     this.ginInjector = ginInjector;
     this.featureFlagConfig = featureFlagConfig;
     this.jsniUtils = jsniUtils;
+  }
+
+  protected IsWidget createSearchIndexWidget(
+    String entityId,
+    String entityName
+  ) {
+    return new SearchIndexWidget(entityId, entityName);
   }
 
   public void configure(
@@ -369,6 +379,37 @@ public abstract class AbstractTablesTab
   public void setTargetBundle(EntityBundle bundle, Long versionNumber) {
     this.entityBundle = bundle;
     Entity entity = bundle.getEntity();
+
+    if (entity instanceof SearchIndex) {
+      version = null;
+      view.setTitle(getTabDisplayName());
+      view.setEntityMetadataVisible(true);
+      view.setBreadcrumbVisible(true);
+      view.setTableListVisible(false);
+      view.setTitlebarVisible(true);
+      view.clearTableEntityWidget();
+      modifiedCreatedBy.setVisible(false);
+      view.setTableUIVisible(true);
+      view.setActionMenu(tab.getEntityActionMenu());
+      tab.configureEntityActionController(bundle, true, null, null);
+      view.setProjectLevelUIVisible(false);
+      breadcrumb.configure(bundle.getPath(), getTabArea());
+      titleBar.configure(bundle, tab.getEntityActionMenu());
+      modifiedCreatedBy.configure(entity.getId(), null);
+      updateVersionAndAreaToken(entity.getId(), null, areaToken);
+      view.setTableEntityWidget(null);
+      IsWidget searchWidget = createSearchIndexWidget(
+        entity.getId(),
+        entity.getName()
+      );
+      if (searchWidget != null) {
+        view.setTableEntityWidget(searchWidget.asWidget());
+      }
+      view.setWikiPageVisible(false);
+      view.setVersionAlertVisible(false);
+      return;
+    }
+
     boolean isShownInTab = isEntityShownInTab(entity);
     boolean isProject = entity instanceof Project;
     boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(
