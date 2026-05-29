@@ -446,7 +446,6 @@ public class TablesTabTest {
     verify(mockTitleBar)
       .configure(mockSearchIndexEntityBundle, mockActionMenuWidget);
     verify(mockModifiedCreatedBy).configure(searchIndexEntityId, null);
-    verify(mockView).setTableEntityWidget(null);
     verify(mockView).setWikiPageVisible(false);
     verify(mockView).setVersionAlertVisible(false);
     // TableEntityWidgetV2 should NOT be used for SearchIndex

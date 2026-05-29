@@ -380,36 +380,6 @@ public abstract class AbstractTablesTab
     this.entityBundle = bundle;
     Entity entity = bundle.getEntity();
 
-    if (entity instanceof SearchIndex) {
-      version = null;
-      view.setTitle(getTabDisplayName());
-      view.setEntityMetadataVisible(true);
-      view.setBreadcrumbVisible(true);
-      view.setTableListVisible(false);
-      view.setTitlebarVisible(true);
-      view.clearTableEntityWidget();
-      modifiedCreatedBy.setVisible(false);
-      view.setTableUIVisible(true);
-      view.setActionMenu(tab.getEntityActionMenu());
-      tab.configureEntityActionController(bundle, true, null, null);
-      view.setProjectLevelUIVisible(false);
-      breadcrumb.configure(bundle.getPath(), getTabArea());
-      titleBar.configure(bundle, tab.getEntityActionMenu());
-      modifiedCreatedBy.configure(entity.getId(), null);
-      updateVersionAndAreaToken(entity.getId(), null, areaToken);
-      view.setTableEntityWidget(null);
-      IsWidget searchWidget = createSearchIndexWidget(
-        entity.getId(),
-        entity.getName()
-      );
-      if (searchWidget != null) {
-        view.setTableEntityWidget(searchWidget.asWidget());
-      }
-      view.setWikiPageVisible(false);
-      view.setVersionAlertVisible(false);
-      return;
-    }
-
     boolean isShownInTab = isEntityShownInTab(entity);
     boolean isProject = entity instanceof Project;
     boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(
@@ -426,7 +396,8 @@ public abstract class AbstractTablesTab
     view.setTableUIVisible(isShownInTab);
     view.setActionMenu(tab.getEntityActionMenu());
     boolean isCurrentVersion =
-      !isProject && ((Table) entity).getIsLatestVersion();
+      !isProject &&
+      (!(entity instanceof Table) || ((Table) entity).getIsLatestVersion());
 
     tab.configureEntityActionController(bundle, isCurrentVersion, null, null);
     if (isShownInTab) {
@@ -438,75 +409,87 @@ public abstract class AbstractTablesTab
       breadcrumb.configure(bundle.getPath(), getTabArea());
       titleBar.configure(bundle, tab.getEntityActionMenu());
       modifiedCreatedBy.configure(entity.getId(), version);
-      tableEntityWidget = ginInjector.createNewTableEntityWidgetV2();
-      view.setTableEntityWidget(tableEntityWidget.asWidget());
-      boolean isShowTableOnly = false;
-      tableEntityWidget.configure(
-        bundle,
-        version,
-        canEdit,
-        isShowTableOnly,
-        this,
-        tab.getEntityActionMenu()
-      );
-      // Configure wiki
-      view.setWikiPageVisible(true);
-      final WikiPageWidget.Callback wikiCallback =
-        new WikiPageWidget.Callback() {
-          @Override
-          public void pageUpdated() {
-            ginInjector
-              .getEventBus()
-              .fireEvent(new EntityUpdatedEvent(entity.getId()));
-          }
+      if (entity instanceof SearchIndex) {
+        IsWidget searchWidget = createSearchIndexWidget(
+          entity.getId(),
+          entity.getName()
+        );
+        if (searchWidget != null) {
+          view.setTableEntityWidget(searchWidget.asWidget());
+        }
+        view.setWikiPageVisible(false);
+        view.setVersionAlertVisible(false);
+      } else {
+        tableEntityWidget = ginInjector.createNewTableEntityWidgetV2();
+        view.setTableEntityWidget(tableEntityWidget.asWidget());
+        boolean isShowTableOnly = false;
+        tableEntityWidget.configure(
+          bundle,
+          version,
+          canEdit,
+          isShowTableOnly,
+          this,
+          tab.getEntityActionMenu()
+        );
+        // Configure wiki
+        view.setWikiPageVisible(true);
+        final WikiPageWidget.Callback wikiCallback =
+          new WikiPageWidget.Callback() {
+            @Override
+            public void pageUpdated() {
+              ginInjector
+                .getEventBus()
+                .fireEvent(new EntityUpdatedEvent(entity.getId()));
+            }
 
+            @Override
+            public void noWikiFound() {
+              view.setWikiPageVisible(false);
+            }
+          };
+        wikiPageWidget.configure(
+          new WikiPageKey(
+            entity.getId(),
+            ObjectType.ENTITY.toString(),
+            bundle.getRootWikiId(),
+            versionNumber
+          ),
+          canEdit,
+          wikiCallback
+        );
+        CallbackP<String> wikiReloadHandler = new CallbackP<String>() {
           @Override
-          public void noWikiFound() {
-            view.setWikiPageVisible(false);
+          public void invoke(String wikiPageId) {
+            wikiPageWidget.configure(
+              new WikiPageKey(
+                entity.getId(),
+                ObjectType.ENTITY.toString(),
+                wikiPageId,
+                versionNumber
+              ),
+              canEdit,
+              wikiCallback
+            );
           }
         };
-      wikiPageWidget.configure(
-        new WikiPageKey(
-          entity.getId(),
-          ObjectType.ENTITY.toString(),
-          bundle.getRootWikiId(),
-          versionNumber
-        ),
-        canEdit,
-        wikiCallback
-      );
-      CallbackP<String> wikiReloadHandler = new CallbackP<String>() {
-        @Override
-        public void invoke(String wikiPageId) {
-          wikiPageWidget.configure(
-            new WikiPageKey(
-              entity.getId(),
-              ObjectType.ENTITY.toString(),
-              wikiPageId,
-              versionNumber
-            ),
-            canEdit,
-            wikiCallback
-          );
-        }
-      };
-      wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
-      getLatestSnapshotVersionNumber()
-        .addCallback(
-          new FutureCallback<Long>() {
-            @Override
-            public void onSuccess(@Nullable Long result) {
-              latestSnapshotVersionNumber = result;
-              configureVersionAlert();
-            }
+        wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
+        getLatestSnapshotVersionNumber()
+          .addCallback(
+            new FutureCallback<Long>() {
+              @Override
+              public void onSuccess(@Nullable Long result) {
+                latestSnapshotVersionNumber = result;
+                configureVersionAlert();
+              }
 
-            @Override
-            public void onFailure(Throwable t) {
-              synAlert.showError(t.getMessage());
-            }
-          },
-          directExecutor()
-        );
+              @Override
+              public void onFailure(Throwable t) {
+                synAlert.showError(t.getMessage());
+              }
+            },
+            directExecutor()
+          );
+      }
     } else if (isProject) {
       view.setProjectLevelUIVisible(true);
       areaToken = null;
