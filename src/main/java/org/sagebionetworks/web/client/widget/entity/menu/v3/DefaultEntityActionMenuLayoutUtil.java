@@ -538,6 +538,43 @@ public class DefaultEntityActionMenuLayoutUtil {
           )
         );
         break;
+      case searchindex:
+        layout.setPrimaryMenuText(
+          EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
+        );
+        layout.setButtonActions(
+          Arrays.asList(
+            ActionViewProps.create(Action.EDIT_DEFINING_SQL, "edit"),
+            ActionViewProps.create(Action.VIEW_DEFINING_SQL, "article"),
+            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
+            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
+          )
+        );
+        layout.setPrimaryMenuActions(
+          Arrays.asList(
+            Arrays.asList(
+              ActionViewProps.create(Action.VIEW_SHARING_SETTINGS),
+              ActionViewProps.create(Action.EDIT_PROVENANCE)
+            ),
+            Arrays.asList(
+              ActionViewProps.create(Action.CREATE_OR_UPDATE_DOI),
+              ActionViewProps.create(Action.CREATE_LINK)
+            ),
+            Arrays.asList(
+              ActionViewProps.create(Action.MOVE_ENTITY),
+              ActionViewProps.create(Action.CHANGE_ENTITY_NAME),
+              ActionViewProps.create(
+                Action.DELETE_ENTITY,
+                null,
+                deleteTextStyle,
+                null
+              )
+            ),
+            reportViolationMenuGroup,
+            actMenuGroup
+          )
+        );
+        break;
     }
     return layout;
   }

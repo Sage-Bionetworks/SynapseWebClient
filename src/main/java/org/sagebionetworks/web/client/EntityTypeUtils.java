@@ -118,6 +118,12 @@ public class EntityTypeUtils {
       type = EntityType.dataset;
     } else if (DatasetCollection.class.getName().equals(className)) {
       type = EntityType.datasetcollection;
+    } else if (
+      org.sagebionetworks.repo.model.search.table
+        .SearchIndex.class.getName()
+        .equals(className)
+    ) {
+      type = EntityType.searchindex;
     }
     return type;
   }

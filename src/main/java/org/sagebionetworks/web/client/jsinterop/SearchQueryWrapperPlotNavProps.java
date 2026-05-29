@@ -22,6 +22,9 @@ public class SearchQueryWrapperPlotNavProps extends ReactComponentProps {
   @JsNullable
   boolean hideCopyToClipboard;
 
+  @JsNullable
+  SynapseTableProps tableConfiguration;
+
   @JsOverlay
   public static SearchQueryWrapperPlotNavProps create(
     String searchIndexId,
@@ -32,6 +35,9 @@ public class SearchQueryWrapperPlotNavProps extends ReactComponentProps {
     props.name = name;
     props.defaultShowPlots = false;
     props.defaultShowSearchBar = true;
+    SynapseTableProps tableConfig = SynapseTableProps.create();
+    tableConfig.showDownloadColumn = false;
+    props.tableConfiguration = tableConfig;
     return props;
   }
 }
