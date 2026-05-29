@@ -1802,10 +1802,6 @@ public class EntityActionControllerImpl
     );
   }
 
-  public static boolean isDefinedBySql(Entity entity) {
-    return entity instanceof HasDefiningSql;
-  }
-
   public static boolean isEditCellValuesSupported(Entity entity) {
     // EntityRefCollectionView results are not editable, even if the user has permissions, because rows may reference immutable versions (SWC-5870, SWC-5903)
     return QueryResultEditorWidget.isTableTypeQueryResultEditable(
