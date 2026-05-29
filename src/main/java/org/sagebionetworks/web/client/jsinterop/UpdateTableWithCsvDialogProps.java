@@ -41,6 +41,10 @@ public class UpdateTableWithCsvDialogProps extends ReactComponentProps {
     props.tableId = tableId;
     props.onSuccess = onSuccess;
     props.onClose = onClose;
+
+    // Reset modal state by remounting when open changes.
+    props.key = Boolean.toString(open);
+
     return props;
   }
 }

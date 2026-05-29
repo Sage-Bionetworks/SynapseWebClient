@@ -41,6 +41,10 @@ public class CreateTableFromCsvDialogProps extends ReactComponentProps {
     props.parentId = parentId;
     props.onSuccess = onSuccess;
     props.onClose = onClose;
+
+    // Reset modal state by remounting when open changes.
+    props.key = Boolean.toString(open);
+
     return props;
   }
 }
