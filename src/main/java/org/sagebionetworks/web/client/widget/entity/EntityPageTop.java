@@ -648,6 +648,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
         fileChanged(bundle, currentTargetVersionNumber);
       } else if (entity instanceof EntityRefCollectionView) {
         datasetChanged(bundle, currentTargetVersionNumber);
+      } else if (entity instanceof SearchIndex) {
+        tableChanged(bundle, currentTargetVersionNumber);
       } else if (entity instanceof Table) {
         tableChanged(bundle, currentTargetVersionNumber);
       } else if (entity instanceof DockerRepository) {
