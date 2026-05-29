@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.search.table.SearchIndex;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -81,11 +82,15 @@ public class TablesTab extends AbstractTablesTab {
     types.add(EntityType.submissionview);
     types.add(EntityType.materializedview);
     types.add(EntityType.virtualtable);
+    types.add(EntityType.searchindex);
     return types;
   }
 
   @Override
   protected boolean isEntityShownInTab(Entity entity) {
-    return entity instanceof Table && !(entity instanceof Dataset);
+    return (
+      (entity instanceof Table || entity instanceof SearchIndex) &&
+      !(entity instanceof Dataset)
+    );
   }
 }

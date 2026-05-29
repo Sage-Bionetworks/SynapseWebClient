@@ -8,6 +8,7 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.search.table.SearchIndex;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
@@ -47,6 +49,7 @@ import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.explore.SearchIndexWidget;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
@@ -132,6 +135,13 @@ public abstract class AbstractTablesTab
     this.ginInjector = ginInjector;
     this.featureFlagConfig = featureFlagConfig;
     this.jsniUtils = jsniUtils;
+  }
+
+  protected IsWidget createSearchIndexWidget(
+    String entityId,
+    String entityName
+  ) {
+    return new SearchIndexWidget(entityId, entityName);
   }
 
   public void configure(
@@ -369,6 +379,7 @@ public abstract class AbstractTablesTab
   public void setTargetBundle(EntityBundle bundle, Long versionNumber) {
     this.entityBundle = bundle;
     Entity entity = bundle.getEntity();
+
     boolean isShownInTab = isEntityShownInTab(entity);
     boolean isProject = entity instanceof Project;
     boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(
@@ -385,7 +396,8 @@ public abstract class AbstractTablesTab
     view.setTableUIVisible(isShownInTab);
     view.setActionMenu(tab.getEntityActionMenu());
     boolean isCurrentVersion =
-      !isProject && ((Table) entity).getIsLatestVersion();
+      !isProject &&
+      (!(entity instanceof Table) || ((Table) entity).getIsLatestVersion());
 
     tab.configureEntityActionController(bundle, isCurrentVersion, null, null);
     if (isShownInTab) {
@@ -397,75 +409,87 @@ public abstract class AbstractTablesTab
       breadcrumb.configure(bundle.getPath(), getTabArea());
       titleBar.configure(bundle, tab.getEntityActionMenu());
       modifiedCreatedBy.configure(entity.getId(), version);
-      tableEntityWidget = ginInjector.createNewTableEntityWidgetV2();
-      view.setTableEntityWidget(tableEntityWidget.asWidget());
-      boolean isShowTableOnly = false;
-      tableEntityWidget.configure(
-        bundle,
-        version,
-        canEdit,
-        isShowTableOnly,
-        this,
-        tab.getEntityActionMenu()
-      );
-      // Configure wiki
-      view.setWikiPageVisible(true);
-      final WikiPageWidget.Callback wikiCallback =
-        new WikiPageWidget.Callback() {
-          @Override
-          public void pageUpdated() {
-            ginInjector
-              .getEventBus()
-              .fireEvent(new EntityUpdatedEvent(entity.getId()));
-          }
+      if (entity instanceof SearchIndex) {
+        IsWidget searchWidget = createSearchIndexWidget(
+          entity.getId(),
+          entity.getName()
+        );
+        if (searchWidget != null) {
+          view.setTableEntityWidget(searchWidget.asWidget());
+        }
+        view.setWikiPageVisible(false);
+        view.setVersionAlertVisible(false);
+      } else {
+        tableEntityWidget = ginInjector.createNewTableEntityWidgetV2();
+        view.setTableEntityWidget(tableEntityWidget.asWidget());
+        boolean isShowTableOnly = false;
+        tableEntityWidget.configure(
+          bundle,
+          version,
+          canEdit,
+          isShowTableOnly,
+          this,
+          tab.getEntityActionMenu()
+        );
+        // Configure wiki
+        view.setWikiPageVisible(true);
+        final WikiPageWidget.Callback wikiCallback =
+          new WikiPageWidget.Callback() {
+            @Override
+            public void pageUpdated() {
+              ginInjector
+                .getEventBus()
+                .fireEvent(new EntityUpdatedEvent(entity.getId()));
+            }
 
+            @Override
+            public void noWikiFound() {
+              view.setWikiPageVisible(false);
+            }
+          };
+        wikiPageWidget.configure(
+          new WikiPageKey(
+            entity.getId(),
+            ObjectType.ENTITY.toString(),
+            bundle.getRootWikiId(),
+            versionNumber
+          ),
+          canEdit,
+          wikiCallback
+        );
+        CallbackP<String> wikiReloadHandler = new CallbackP<String>() {
           @Override
-          public void noWikiFound() {
-            view.setWikiPageVisible(false);
+          public void invoke(String wikiPageId) {
+            wikiPageWidget.configure(
+              new WikiPageKey(
+                entity.getId(),
+                ObjectType.ENTITY.toString(),
+                wikiPageId,
+                versionNumber
+              ),
+              canEdit,
+              wikiCallback
+            );
           }
         };
-      wikiPageWidget.configure(
-        new WikiPageKey(
-          entity.getId(),
-          ObjectType.ENTITY.toString(),
-          bundle.getRootWikiId(),
-          versionNumber
-        ),
-        canEdit,
-        wikiCallback
-      );
-      CallbackP<String> wikiReloadHandler = new CallbackP<String>() {
-        @Override
-        public void invoke(String wikiPageId) {
-          wikiPageWidget.configure(
-            new WikiPageKey(
-              entity.getId(),
-              ObjectType.ENTITY.toString(),
-              wikiPageId,
-              versionNumber
-            ),
-            canEdit,
-            wikiCallback
-          );
-        }
-      };
-      wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
-      getLatestSnapshotVersionNumber()
-        .addCallback(
-          new FutureCallback<Long>() {
-            @Override
-            public void onSuccess(@Nullable Long result) {
-              latestSnapshotVersionNumber = result;
-              configureVersionAlert();
-            }
+        wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
+        getLatestSnapshotVersionNumber()
+          .addCallback(
+            new FutureCallback<Long>() {
+              @Override
+              public void onSuccess(@Nullable Long result) {
+                latestSnapshotVersionNumber = result;
+                configureVersionAlert();
+              }
 
-            @Override
-            public void onFailure(Throwable t) {
-              synAlert.showError(t.getMessage());
-            }
-          },
-          directExecutor()
-        );
+              @Override
+              public void onFailure(Throwable t) {
+                synAlert.showError(t.getMessage());
+              }
+            },
+            directExecutor()
+          );
+      }
     } else if (isProject) {
       view.setProjectLevelUIVisible(true);
       areaToken = null;

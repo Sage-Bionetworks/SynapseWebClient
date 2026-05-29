@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RecordSet;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.search.table.SearchIndex;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -33,6 +34,7 @@ public class EntityTypeUtils {
   public static final String DATASET_COLLECTION_DISPLAY_NAME =
     "Dataset Collection";
   public static final String TABLE_ENTITY_DISPLAY_NAME = "Table";
+  public static final String SEARCH_INDEX_DISPLAY_NAME = "Search Index";
   public static final String UNKNOWN_TABLE_TYPE = "Unknown Table Type";
 
   public static String getEntityClassNameForEntityType(String entityType) {
@@ -116,6 +118,12 @@ public class EntityTypeUtils {
       type = EntityType.dataset;
     } else if (DatasetCollection.class.getName().equals(className)) {
       type = EntityType.datasetcollection;
+    } else if (
+      org.sagebionetworks.repo.model.search.table
+        .SearchIndex.class.getName()
+        .equals(className)
+    ) {
+      type = EntityType.searchindex;
     }
     return type;
   }
@@ -193,6 +201,8 @@ public class EntityTypeUtils {
       friendlyName = SUBMISSION_VIEW_DISPLAY_NAME;
     } else if (DatasetCollection.class.getName().equals(className)) {
       friendlyName = DATASET_COLLECTION_DISPLAY_NAME;
+    } else if (SearchIndex.class.getName().equals(className)) {
+      friendlyName = SEARCH_INDEX_DISPLAY_NAME;
     }
     return friendlyName;
   }

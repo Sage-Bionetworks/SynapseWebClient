@@ -1451,7 +1451,8 @@ public class SynapseJavascriptClient {
       EntityType.entityview,
       EntityType.materializedview,
       EntityType.submissionview,
-      EntityType.virtualtable
+      EntityType.virtualtable,
+      EntityType.searchindex
     );
     getEntityChildren(request, getEntityChildrenExistCallback(callback));
   }

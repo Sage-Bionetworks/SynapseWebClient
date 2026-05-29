@@ -19,7 +19,6 @@ import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.ui.Widget;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,13 +32,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.search.table.SearchIndex;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.SortDirection;
@@ -117,10 +116,16 @@ public class TablesTabTest {
   EntityBundle mockTableEntityBundle;
 
   @Mock
+  EntityBundle mockSearchIndexEntityBundle;
+
+  @Mock
   TableEntity mockTableEntity;
 
   @Mock
   EntityView mockFileViewEntity;
+
+  @Mock
+  SearchIndex mockSearchIndexEntity;
 
   @Mock
   Project mockProjectEntity;
@@ -196,7 +201,15 @@ public class TablesTabTest {
         mockPortalGinInjector,
         mockFeatureFlagConfig,
         mockJsniUtils
-      );
+      ) {
+        @Override
+        protected com.google.gwt.user.client.ui.IsWidget createSearchIndexWidget(
+          String entityId,
+          String entityName
+        ) {
+          return null;
+        }
+      };
     when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
     when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
     when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);
@@ -237,6 +250,15 @@ public class TablesTabTest {
 
     when(mockFileViewEntity.getId()).thenReturn(tableEntityId);
     when(mockFileViewEntity.getName()).thenReturn(tableName);
+
+    String searchIndexEntityId = "syn99";
+    String searchIndexEntityName = "test search index";
+    when(mockSearchIndexEntityBundle.getEntity())
+      .thenReturn(mockSearchIndexEntity);
+    when(mockSearchIndexEntityBundle.getPermissions())
+      .thenReturn(mockPermissions);
+    when(mockSearchIndexEntity.getId()).thenReturn(searchIndexEntityId);
+    when(mockSearchIndexEntity.getName()).thenReturn(searchIndexEntityName);
 
     VersionInfo latestSnapshot = new VersionInfo();
     latestSnapshot.setVersionNumber(latestSnapshotVersionNumber);
@@ -391,7 +413,8 @@ public class TablesTabTest {
           EntityType.entityview,
           EntityType.submissionview,
           EntityType.materializedview,
-          EntityType.virtualtable
+          EntityType.virtualtable,
+          EntityType.searchindex
         )
       );
 
@@ -400,6 +423,33 @@ public class TablesTabTest {
     assertNull(place.getVersionNumber());
     assertEquals(EntityArea.TABLES, place.getArea());
     assertNull(place.getAreaToken());
+  }
+
+  @Test
+  public void testConfigureUsingSearchIndex() {
+    tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+    tab.configure(mockSearchIndexEntityBundle, null, null);
+
+    String searchIndexEntityId = mockSearchIndexEntity.getId();
+    String searchIndexEntityName = mockSearchIndexEntity.getName();
+
+    verify(mockView, atLeastOnce()).setTitle(any());
+    verify(mockView).setEntityMetadataVisible(true);
+    verify(mockView).setBreadcrumbVisible(true);
+    verify(mockView).setTableListVisible(false);
+    verify(mockView).setTitlebarVisible(true);
+    verify(mockView).clearTableEntityWidget();
+    verify(mockModifiedCreatedBy).setVisible(false);
+    verify(mockView).setTableUIVisible(true);
+    verify(mockView).setProjectLevelUIVisible(false);
+    verify(mockBreadcrumb).configure(any(), eq(EntityArea.TABLES));
+    verify(mockTitleBar)
+      .configure(mockSearchIndexEntityBundle, mockActionMenuWidget);
+    verify(mockModifiedCreatedBy).configure(searchIndexEntityId, null);
+    verify(mockView).setWikiPageVisible(false);
+    verify(mockView).setVersionAlertVisible(false);
+    // TableEntityWidgetV2 should NOT be used for SearchIndex
+    verify(mockPortalGinInjector, never()).createNewTableEntityWidgetV2();
   }
 
   @Test

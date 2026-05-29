@@ -50,6 +50,9 @@ public class SRC {
       QueryWrapperPlotNavProps
     > QueryWrapperPlotNav;
     public static ReactComponentType<
+      SearchQueryWrapperPlotNavProps
+    > SearchQueryWrapperPlotNav;
+    public static ReactComponentType<
       StandaloneQueryWrapperProps
     > StandaloneQueryWrapper;
     public static ReactComponentType<ForumSearchProps> ForumSearch;

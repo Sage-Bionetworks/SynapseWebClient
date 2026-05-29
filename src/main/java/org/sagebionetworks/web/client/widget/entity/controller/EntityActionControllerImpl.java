@@ -1365,6 +1365,22 @@ public class EntityActionControllerImpl
   }
 
   private void configureTableCommands() {
+    if (entityBundle.getEntity() instanceof HasDefiningSql) {
+      actionMenu.setActionVisible(
+        Action.EDIT_DEFINING_SQL,
+        permissions.getCanCertifiedUserEdit() && isCurrentVersion
+      );
+      actionMenu.setActionListener(Action.EDIT_DEFINING_SQL, this);
+      actionMenu.setActionVisible(
+        Action.VIEW_DEFINING_SQL,
+        !permissions.getCanCertifiedUserEdit() && isCurrentVersion
+      );
+      actionMenu.setActionListener(Action.VIEW_DEFINING_SQL, this);
+    } else {
+      actionMenu.setActionVisible(Action.VIEW_DEFINING_SQL, false);
+      actionMenu.setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    }
+
     if (entityBundle.getEntity() instanceof Table) {
       boolean isEntityRefCollectionView = entityBundle.getEntity() instanceof
       EntityRefCollectionView;
@@ -1389,21 +1405,6 @@ public class EntityActionControllerImpl
         isEntityRefCollectionView &&
         isCurrentVersion
       );
-      actionMenu.setActionVisible(
-        Action.EDIT_DEFINING_SQL,
-        permissions.getCanCertifiedUserEdit() &&
-        isDefinedBySql(entityBundle.getEntity()) &&
-        isCurrentVersion
-      );
-      actionMenu.setActionListener(Action.EDIT_DEFINING_SQL, this);
-
-      actionMenu.setActionVisible(
-        Action.VIEW_DEFINING_SQL,
-        !permissions.getCanCertifiedUserEdit() &&
-        isDefinedBySql(entityBundle.getEntity()) &&
-        isCurrentVersion
-      );
-      actionMenu.setActionListener(Action.VIEW_DEFINING_SQL, this);
     } else {
       actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
       actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
@@ -1413,7 +1414,6 @@ public class EntityActionControllerImpl
         Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
         false
       );
-      actionMenu.setActionVisible(Action.EDIT_DEFINING_SQL, false);
     }
   }
 
@@ -1800,10 +1800,6 @@ public class EntityActionControllerImpl
       entity instanceof EntityView ||
       entity instanceof RecordSet
     );
-  }
-
-  public static boolean isDefinedBySql(Entity entity) {
-    return entity instanceof HasDefiningSql;
   }
 
   public static boolean isEditCellValuesSupported(Entity entity) {
