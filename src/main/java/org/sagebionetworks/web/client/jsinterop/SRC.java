@@ -96,6 +96,7 @@ public class SRC {
     public static ReactComponentType<
       TableColumnSchemaEditorProps
     > TableColumnSchemaEditor;
+    public static ReactComponentType<UploadCsvWizardProps> UploadCsvWizard;
     public static ReactComponentType<EntityHeaderTableProps> EntityHeaderTable;
     public static ReactComponentType<
       AvailableEvaluationQueueListProps
