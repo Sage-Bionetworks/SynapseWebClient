@@ -5,12 +5,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -129,6 +129,7 @@ import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.jsinterop.CreateTableFromCsvDialogProps;
 import org.sagebionetworks.web.client.jsinterop.CreateTableViewWizardProps;
 import org.sagebionetworks.web.client.jsinterop.EntityUploadModalProps;
 import org.sagebionetworks.web.client.jsinterop.KeyFactory;
@@ -147,6 +148,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
+import org.sagebionetworks.web.client.widget.CreateTableFromCsvDialog;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -180,8 +182,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
-import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.FormParams;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -324,7 +324,7 @@ public class EntityActionControllerImplTest {
   CreateTableViewWizard mockCreateTableViewWizard;
 
   @Mock
-  UploadTableModalWidget mockUploadTableModalWidget;
+  CreateTableFromCsvDialog mockCreateTableFromCsvDialog;
 
   @Mock
   AddExternalRepoModal mockAddExternalRepoModal;
@@ -513,8 +513,8 @@ public class EntityActionControllerImplTest {
     when(mockPortalGinInjector.getSynapseJSNIUtils()).thenReturn(mockJsniUtils);
     when(mockPortalGinInjector.getCreateTableViewWizard())
       .thenReturn(mockCreateTableViewWizard);
-    when(mockPortalGinInjector.getUploadTableModalWidget())
-      .thenReturn(mockUploadTableModalWidget);
+    when(mockPortalGinInjector.getCreateTableFromCsvDialog())
+      .thenReturn(mockCreateTableFromCsvDialog);
     when(mockPortalGinInjector.getAddExternalRepoModal())
       .thenReturn(mockAddExternalRepoModal);
     when(mockPortalGinInjector.getAddFolderDialogWidget())
@@ -4553,8 +4553,12 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.UPLOAD_TABLE, null);
-    verify(mockUploadTableModalWidget).configure(entityId, null);
-    verify(mockUploadTableModalWidget).showModal(any(WizardCallback.class));
+    verify(mockCreateTableFromCsvDialog)
+      .configure(
+        eq(entityId),
+        any(CreateTableFromCsvDialogProps.OnSuccessFunction.class),
+        any(CreateTableFromCsvDialogProps.OnCloseFunction.class)
+      );
   }
 
   @Test

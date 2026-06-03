@@ -60,12 +60,14 @@ import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
+import org.sagebionetworks.web.client.widget.CreateTableFromCsvDialog;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.ShareThisPage;
+import org.sagebionetworks.web.client.widget.UpdateTableWithCsvDialog;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
@@ -227,7 +229,6 @@ import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TotalVisibleResultsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
@@ -781,7 +782,9 @@ public interface PortalGinInjector extends Ginjector {
 
   CreateDatasetOrCollection getCreateDatasetOrCollection();
 
-  UploadTableModalWidget getUploadTableModalWidget();
+  CreateTableFromCsvDialog getCreateTableFromCsvDialog();
+
+  UpdateTableWithCsvDialog getUpdateTableWithCsvDialog();
 
   SqlDefinedEditorModalWidget getSqlDefinedEditorModalWidget();
 

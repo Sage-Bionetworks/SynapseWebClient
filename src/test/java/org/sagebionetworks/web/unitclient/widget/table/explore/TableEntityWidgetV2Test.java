@@ -54,10 +54,12 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
+import org.sagebionetworks.web.client.jsinterop.UpdateTableWithCsvDialogProps;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
+import org.sagebionetworks.web.client.widget.UpdateTableWithCsvDialog;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
@@ -69,8 +71,6 @@ import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
-import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.TotalVisibleResultsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
@@ -97,7 +97,7 @@ public class TableEntityWidgetV2Test {
   DownloadTableQueryModalWidget mockDownloadTableQueryModalWidget;
 
   @Mock
-  UploadTableModalWidget mockUploadTableModalWidget;
+  UpdateTableWithCsvDialog mockUpdateTableWithCsvDialog;
 
   @Mock
   PreflightController mockPreflightController;
@@ -201,8 +201,8 @@ public class TableEntityWidgetV2Test {
       .thenReturn(mockGlobalState);
     when(mockPortalGinInjector.getDownloadTableQueryModalWidget())
       .thenReturn(mockDownloadTableQueryModalWidget);
-    when(mockPortalGinInjector.getUploadTableModalWidget())
-      .thenReturn(mockUploadTableModalWidget);
+    when(mockPortalGinInjector.getUpdateTableWithCsvDialog())
+      .thenReturn(mockUpdateTableWithCsvDialog);
     when(mockPortalGinInjector.getCopyTextModal())
       .thenReturn(mockCopyTextModal);
     when(mockPortalGinInjector.getAuthenticationController())
@@ -657,8 +657,8 @@ public class TableEntityWidgetV2Test {
     );
     widget.onUploadTableData();
     // should not proceed to upload.
-    verify(mockUploadTableModalWidget, never())
-      .showModal(any(WizardCallback.class));
+    verify(mockUpdateTableWithCsvDialog, never())
+      .configure(any(), any(), any());
   }
 
   @Test
@@ -678,7 +678,12 @@ public class TableEntityWidgetV2Test {
     );
     widget.onUploadTableData();
     // proceed to upload
-    verify(mockUploadTableModalWidget).showModal(any(WizardCallback.class));
+    verify(mockUpdateTableWithCsvDialog)
+      .configure(
+        any(),
+        any(UpdateTableWithCsvDialogProps.OnSuccessFunction.class),
+        any(UpdateTableWithCsvDialogProps.OnCloseFunction.class)
+      );
   }
 
   @Test

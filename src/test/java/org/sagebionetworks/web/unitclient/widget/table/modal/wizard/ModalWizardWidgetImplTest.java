@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePage;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardView;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
@@ -25,7 +24,7 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidge
 public class ModalWizardWidgetImplTest {
 
   @Mock
-  UploadCSVFilePage mockUploadCSVFileWidget;
+  ModalPage mockUploadCSVFileWidget;
 
   @Mock
   ModalWizardView mockView;

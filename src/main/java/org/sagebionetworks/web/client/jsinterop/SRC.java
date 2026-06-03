@@ -25,6 +25,12 @@ public class SRC {
     public static ReactComponentType<ShareThisPageProps> ShareThisPage;
     public static ReactComponentType<EntityCitationProps> EntityCitation;
     public static ReactComponentType<CsvPreviewProps> CsvPreview;
+    public static ReactComponentType<
+      CreateTableFromCsvDialogProps
+    > CreateTableFromCsvDialog;
+    public static ReactComponentType<
+      UpdateTableWithCsvDialogProps
+    > UpdateTableWithCsvDialog;
     public static ReactComponentType<EntityBadgeIconsProps> EntityBadgeIcons;
     public static ReactComponentType<DatasetEditorProps> DatasetItemsEditor;
     public static ReactComponentType<EntityFinderProps> EntityFinder;
