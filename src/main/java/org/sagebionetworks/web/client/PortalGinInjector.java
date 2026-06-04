@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.presenter.FollowingPagePresenter;
 import org.sagebionetworks.web.client.presenter.GridPagePresenter;
 import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
+import org.sagebionetworks.web.client.presenter.LegacySearchPresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.MapPresenter;
 import org.sagebionetworks.web.client.presenter.OAuthClientEditorPresenter;
@@ -323,6 +324,8 @@ public interface PortalGinInjector extends Ginjector {
   ChallengeOverviewPresenter getChallengeOverviewPresenter();
 
   HelpPresenter getHelpPresenter();
+
+  LegacySearchPresenter getLegacySearchPresenter();
 
   SearchV2Presenter getSearchV2Presenter();
 
