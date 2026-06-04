@@ -41,6 +41,7 @@ import org.sagebionetworks.web.client.place.FollowingPlace;
 import org.sagebionetworks.web.client.place.GridPlace;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LegacySearchPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.OAuthClientEditorPlace;
@@ -267,6 +268,24 @@ public class BulkPresenterProxy extends AbstractActivity {
           public void onSuccess() {
             HelpPresenter presenter = ginjector.getHelpPresenter();
             presenter.setPlace((Help) place);
+            presenter.start(panel, eventBus);
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            loadError(caught);
+          }
+        }
+      );
+    } else if (place instanceof LegacySearchPlace) {
+      GWT.runAsync(
+        LegacySearchPlace.class,
+        new RunAsyncCallback() {
+          @Override
+          public void onSuccess() {
+            LegacySearchPresenter presenter =
+              ginjector.getLegacySearchPresenter();
+            presenter.setPlace((LegacySearchPlace) place);
             presenter.start(panel, eventBus);
           }
 

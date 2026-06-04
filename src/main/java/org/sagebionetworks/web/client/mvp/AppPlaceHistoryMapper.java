@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.GridPlace;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LegacySearchPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.OAuthClientEditorPlace;
@@ -103,6 +104,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
     DataCatalogPagePlace.Tokenizer.class,
     GridPlace.Tokenizer.class,
     SearchV2Place.Tokenizer.class,
+    LegacySearchPlace.Tokenizer.class,
     CuratorDashboardPlace.Tokenizer.class,
   }
 )
