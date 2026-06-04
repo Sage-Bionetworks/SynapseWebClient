@@ -176,4 +176,41 @@ public class GWTStub implements GWTWrapper {
   public JSONValue parseJSONStrict(String json) {
     return null;
   }
+
+  @Override
+  public String escapeJsonString(String value) {
+    if (value == null) {
+      return "null";
+    }
+    // Produce a valid JSON string literal: escape backslash, double-quote, and control characters
+    StringBuilder sb = new StringBuilder("\"");
+    for (int i = 0; i < value.length(); i++) {
+      char c = value.charAt(i);
+      switch (c) {
+        case '"':
+          sb.append("\\\"");
+          break;
+        case '\\':
+          sb.append("\\\\");
+          break;
+        case '\n':
+          sb.append("\\n");
+          break;
+        case '\r':
+          sb.append("\\r");
+          break;
+        case '\t':
+          sb.append("\\t");
+          break;
+        default:
+          if (c < 0x20) {
+            sb.append(String.format("\\u%04x", (int) c));
+          } else {
+            sb.append(c);
+          }
+      }
+    }
+    sb.append('"');
+    return sb.toString();
+  }
 }
