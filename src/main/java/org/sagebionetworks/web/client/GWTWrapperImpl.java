@@ -273,4 +273,9 @@ public class GWTWrapperImpl implements GWTWrapper {
   public JSONValue parseJSONStrict(String json) {
     return JSONParser.parseStrict(json);
   }
+
+  @Override
+  public String escapeJsonString(String value) {
+    return new com.google.gwt.json.client.JSONString(value).toString();
+  }
 }

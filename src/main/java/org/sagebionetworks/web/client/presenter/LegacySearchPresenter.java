@@ -42,7 +42,8 @@ public class LegacySearchPresenter
     if (normalizedToken.matches(WebConstants.SYNAPSE_ENTITY_ID_REGEX)) {
       redirect = new Synapse(normalizedToken);
     } else {
-      String queryJson = "{\"queryTerm\":[\"" + token + "\"]}";
+      String queryJson =
+        "{\"queryTerm\":[" + gwt.escapeJsonString(token) + "]}";
       String searchToken =
         "default?" +
         SearchV2Place.QUERY +

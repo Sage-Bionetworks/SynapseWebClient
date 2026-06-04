@@ -49,6 +49,9 @@ public class LegacySearchPresenterTest {
     // Return the input unchanged so tests can assert on the raw JSON string
     when(mockGwt.encodeQueryString(anyString()))
       .thenAnswer(invocation -> invocation.getArgument(0));
+    // Simulate JSONString.toString(): wrap in double quotes (no actual escaping needed for most test cases)
+    when(mockGwt.escapeJsonString(anyString()))
+      .thenAnswer(invocation -> "\"" + invocation.getArgument(0) + "\"");
     presenter = new LegacySearchPresenter(mockGlobalApplicationState, mockGwt);
   }
 
@@ -134,6 +137,28 @@ public class LegacySearchPresenterTest {
     startWithToken("test");
 
     verify(mockGwt).encodeQueryString(anyString());
+  }
+
+  @Test
+  public void testTokenWithSpecialCharactersIsEscaped() {
+    // Simulate what GWTWrapperImpl.escapeJsonString would do for a token with double quotes
+    String token = "he said \"hello\"";
+    String escapedToken = "\"he said \\\"hello\\\"\"";
+    when(mockGwt.escapeJsonString(token)).thenReturn(escapedToken);
+
+    startWithToken(token);
+
+    verify(mockGwt).escapeJsonString(token);
+    ArgumentCaptor<SearchV2Place> captor = ArgumentCaptor.forClass(
+      SearchV2Place.class
+    );
+    verify(mockPlaceChanger).goTo(captor.capture());
+    String placeToken = new SearchV2Place.Tokenizer()
+      .getToken(captor.getValue());
+    org.junit.Assert.assertTrue(
+      "Token should contain the escaped JSON value",
+      placeToken.contains(escapedToken)
+    );
   }
 
   @Test
