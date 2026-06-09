@@ -15,7 +15,6 @@ import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONException;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
-import com.google.gwtmockito.GwtMockitoTestRunner;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -25,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -35,7 +35,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EditJSONListModal;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EditJSONListModalView;
 
-@RunWith(GwtMockitoTestRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class EditJSONListModalTest {
 
   @Mock
@@ -200,7 +200,7 @@ public class EditJSONListModalTest {
   public void testConfigure_notJSONArray() {
     jsonString = "{\"actually\":\"a dictonary\"}";
     when(mockGWTWrapper.parseJSONStrict(jsonString))
-      .thenReturn(new JSONObject());
+      .thenReturn(mock(JSONObject.class));
 
     modal.configure(jsonString, mockOnSaveCallback, inputColumnModel);
 

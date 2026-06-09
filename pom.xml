@@ -867,18 +867,6 @@
       <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>com.google.gwt.gwtmockito</groupId>
-      <artifactId>gwtmockito</artifactId>
-      <version>1.1.9</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.gwt</groupId>
-          <artifactId>gwt-user</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
 
     <!-- Scribe library, imported for OAuth for LinkedIn -->
     <dependency>

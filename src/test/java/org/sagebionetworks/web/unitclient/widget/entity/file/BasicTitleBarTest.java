@@ -7,15 +7,18 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.gwt.junit.GWTMockUtilities;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwtmockito.GwtMockitoTestRunner;
 import java.util.function.Consumer;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
@@ -30,8 +33,18 @@ import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenuProps;
 
-@RunWith(GwtMockitoTestRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class BasicTitleBarTest {
+
+  @BeforeClass
+  public static void disarmGwt() {
+    GWTMockUtilities.disarm();
+  }
+
+  @AfterClass
+  public static void restoreGwt() {
+    GWTMockUtilities.restore();
+  }
 
   BasicTitleBar titleBar;
 
@@ -150,7 +163,6 @@ public class BasicTitleBarTest {
     EntityActionMenuPropsJsInterop newJsInteropPropsAfterUpdate = mock(
       EntityActionMenuPropsJsInterop.class
     );
-    when(mockActionMenu.getProps()).thenReturn(newPropsAfterUpdate);
     when(newPropsAfterUpdate.toJsInterop())
       .thenReturn(newJsInteropPropsAfterUpdate);
 

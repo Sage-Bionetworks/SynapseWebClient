@@ -17,6 +17,8 @@ public interface GWTWrapper {
 
   void assignThisWindowWith(String url);
 
+  void replaceCurrentWindowWith(String url);
+
   String encode(String decodedURL);
 
   String encodeQueryString(String queryString);

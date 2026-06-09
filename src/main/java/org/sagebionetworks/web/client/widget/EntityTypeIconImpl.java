@@ -4,6 +4,7 @@ import com.google.gwt.dom.client.SpanElement;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.jsinterop.EntityTypeIconProps;
 import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 
@@ -52,5 +53,12 @@ public class EntityTypeIconImpl
       enumValue = EntityType.valueOf(type);
     } catch (IllegalArgumentException e) {}
     setType(enumValue);
+  }
+
+  @Override
+  public String getIconHTML() {
+    // Force React to flush pending updates before reading the DOM
+    ReactDOM.flushSync();
+    return getElement().getInnerHTML();
   }
 }

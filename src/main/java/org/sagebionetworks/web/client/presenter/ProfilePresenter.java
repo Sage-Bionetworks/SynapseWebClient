@@ -6,7 +6,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -814,7 +813,7 @@ public class ProfilePresenter
       updateProfileView(place.getUserId());
     } else {
       if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
-        Window.Location.replace(oneSageUtils.getAccountSettingsURL());
+        gwt.replaceCurrentWindowWith(oneSageUtils.getAccountSettingsURL());
       } else {
         // if this is a number, then treat it as a a user id
         try {
@@ -913,7 +912,7 @@ public class ProfilePresenter
         refreshTeams();
         break;
       case SETTINGS:
-        Window.Location.replace(oneSageUtils.getAccountSettingsURL());
+        gwt.replaceCurrentWindowWith(oneSageUtils.getAccountSettingsURL());
         break;
       case CHALLENGES:
         refreshChallenges();

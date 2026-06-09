@@ -31,6 +31,9 @@ public class GWTStub implements GWTWrapper {
   public void assignThisWindowWith(String url) {}
 
   @Override
+  public void replaceCurrentWindowWith(String url) {}
+
+  @Override
   public String encodeQueryString(String queryString) {
     return URLEncoder.encode(queryString);
   }

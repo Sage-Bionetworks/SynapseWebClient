@@ -45,9 +45,7 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwtmockito.GwtMockitoTestRunner;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,6 +62,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -173,7 +172,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.PreflightControll
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidget;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
-import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetV2;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadHandlerWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
@@ -192,10 +191,9 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import org.sagebionetworks.web.test.helper.CallbackMockStubber;
 import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
 
-@RunWith(GwtMockitoTestRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class EntityActionControllerImplTest {
 
   @Mock
@@ -237,7 +235,7 @@ public class EntityActionControllerImplTest {
   EvaluationSubmitter mockSubmitter;
 
   @Mock
-  UploadDialogWidgetV2 mockUploader;
+  UploadDialogWidget mockUploader;
 
   @Mock
   EntityActionMenu mockActionMenu;
@@ -414,9 +412,6 @@ public class EntityActionControllerImplTest {
   EntityTypeIcon mockEntityTypeIcon;
 
   @Mock
-  Element mockIconElement;
-
-  @Mock
   EntityAccessControlListModalWidget mockEntityAclModalWidget;
 
   @Captor
@@ -472,8 +467,6 @@ public class EntityActionControllerImplTest {
     when(mockKeyFactoryProvider.getKeyFactory(any()))
       .thenReturn(mockKeyFactory);
 
-    when(mockPortalGinInjector.getSynapseProperties())
-      .thenReturn(mockSynapseProperties);
     when(mockPortalGinInjector.getRenameEntityModalWidget())
       .thenReturn(mockRenameEntityModalWidget);
     when(mockPortalGinInjector.getEditFileMetadataModalWidget())
@@ -506,11 +499,8 @@ public class EntityActionControllerImplTest {
       .thenReturn(mockGlobalApplicationState);
     when(mockPortalGinInjector.getEvaluationSubmitter())
       .thenReturn(mockSubmitter);
-    when(mockSynapseProperties.getPublicPrincipalIds())
-      .thenReturn(mockPublicPrincipalIds);
     when(mockPortalGinInjector.getSynapseJavascriptClient())
       .thenReturn(mockSynapseJavascriptClient);
-    when(mockPortalGinInjector.getSynapseJSNIUtils()).thenReturn(mockJsniUtils);
     when(mockPortalGinInjector.getCreateTableViewWizard())
       .thenReturn(mockCreateTableViewWizard);
     when(mockPortalGinInjector.getCreateTableFromCsvDialog())
@@ -541,8 +531,7 @@ public class EntityActionControllerImplTest {
 
     when(mockPortalGinInjector.getEntityTypeIcon())
       .thenReturn(mockEntityTypeIcon);
-    when(mockEntityTypeIcon.getElement()).thenReturn(mockIconElement);
-    when(mockIconElement.getInnerHTML()).thenReturn("");
+    when(mockEntityTypeIcon.getIconHTML()).thenReturn("");
 
     // The controller under test.
     controller =
@@ -590,8 +579,6 @@ public class EntityActionControllerImplTest {
     entityBundle.setDoiAssociation(new DoiAssociation());
     entityBundle.setBenefactorAcl(mockACL);
     resourceAccessSet = new HashSet<>();
-    when(mockACL.getResourceAccess()).thenReturn(resourceAccessSet);
-    when(mockPublicPrincipalIds.isPublic(PUBLIC_USER_ID)).thenReturn(true);
     selected = new Reference();
     selected.setTargetId("syn9876");
 
@@ -617,10 +604,6 @@ public class EntityActionControllerImplTest {
       .when(mockEntityFinder)
       .show();
     currentEntityArea = null;
-    CallbackMockStubber
-      .invokeCallback()
-      .when(mockGWT)
-      .scheduleExecution(any(), anyInt());
 
     when(mockPromptModalConfigurationBuilder.buildConfiguration())
       .thenReturn(mockPromptModalConfiguration);
@@ -1510,10 +1493,6 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testConfigureProjectLevelTableCommandsCanEdit() {
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
     entityBundle.setEntity(new Project());
     currentEntityArea = EntityArea.TABLES;
     boolean canCertifiedUserEdit = true;
@@ -1577,10 +1556,6 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testConfigureProjectLevelDatasetCommandsCanEdit() {
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
     entityBundle.setEntity(new Project());
     currentEntityArea = EntityArea.DATASETS;
     boolean canCertifiedUserEdit = true;
@@ -2704,8 +2679,6 @@ public class EntityActionControllerImplTest {
       .deleteEntityById(anyString(), any(AsyncCallback.class));
     verify(mockView)
       .showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + error);
-    QueryKey mockQueryKey = mock(QueryKey.class);
-    when(mockKeyFactory.getTrashCanItemsQueryKey()).thenReturn(mockQueryKey);
     verify(mockKeyFactoryProvider, never()).getKeyFactory(anyString());
     verify(mockKeyFactory, never()).getTrashCanItemsQueryKey();
     verify(mockQueryClient, never())
@@ -2752,8 +2725,6 @@ public class EntityActionControllerImplTest {
       );
     verify(mockPlaceChanger)
       .goTo(new Synapse(parentId, null, EntityArea.TABLES, null));
-    QueryKey mockQueryKey = mock(QueryKey.class);
-    when(mockKeyFactory.getTrashCanItemsQueryKey()).thenReturn(mockQueryKey);
     verify(mockKeyFactoryProvider).getKeyFactory(any());
     verify(mockKeyFactory).getTrashCanItemsQueryKey();
     verify(mockQueryClient)
@@ -2929,10 +2900,6 @@ public class EntityActionControllerImplTest {
       .callNoInvovke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callNoInvovke()
-      .when(mockRenameEntityModalWidget)
-      .onRename(any(Entity.class), any(Callback.class));
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -2952,14 +2919,6 @@ public class EntityActionControllerImplTest {
   public void testRenameDatasetIsNotLatestVersion() {
     entityBundle.setEntity(mockDataset);
     entityBundle.setEntityType(dataset);
-    AsyncMockStubber
-      .callWithInvoke()
-      .when(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callWithInvoke()
-      .when(mockRenameEntityModalWidget)
-      .onRename(any(Entity.class), any(Callback.class));
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -3058,19 +3017,10 @@ public class EntityActionControllerImplTest {
       null,
       currentUserId
     );
-    when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(currentPlace);
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callNoInvovke()
-      .when(mockEditFileMetadataModalWidget)
-      .configure(
-        any(FileEntity.class),
-        any(FileHandle.class),
-        any(Callback.class)
-      );
 
     controller.configure(
       mockActionMenu,
@@ -3094,18 +3044,6 @@ public class EntityActionControllerImplTest {
     file.setVersionNumber(1L);
     entityBundle.setEntity(file);
     // currentPlace returns a non-null versionNumber
-    AsyncMockStubber
-      .callWithInvoke()
-      .when(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callNoInvovke()
-      .when(mockEditFileMetadataModalWidget)
-      .configure(
-        any(FileEntity.class),
-        any(FileHandle.class),
-        any(Callback.class)
-      );
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -3165,10 +3103,6 @@ public class EntityActionControllerImplTest {
       .callNoInvovke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callNoInvovke()
-      .when(mockEditProjectMetadataModalWidget)
-      .configure(any(Project.class), anyBoolean(), any(Callback.class));
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -3216,15 +3150,6 @@ public class EntityActionControllerImplTest {
       .callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callSuccessWith(new WikiPage())
-      .when(mockSynapseClient)
-      .createV2WikiPageWithV1(
-        anyString(),
-        anyString(),
-        any(WikiPage.class),
-        any(AsyncCallback.class)
-      );
     entityBundle.setRootWikiId(null);
     controller.configure(
       mockActionMenu,
@@ -4227,10 +4152,6 @@ public class EntityActionControllerImplTest {
     // project settings menu
     currentEntityArea = null;
     entityBundle.setEntity(new Project());
-    AsyncMockStubber
-      .callSuccessWith(new Challenge())
-      .when(mockChallengeClient)
-      .getChallengeForProject(any(), any());
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -4266,15 +4187,7 @@ public class EntityActionControllerImplTest {
     // SWC-3876: if tools menu is set up for wiki commands, do not show the Run Challenge command (even
     // in alpha mode)
     currentEntityArea = EntityArea.WIKI;
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
     entityBundle.setEntity(new Project());
-    AsyncMockStubber
-      .callFailureWith(new NotFoundException())
-      .when(mockChallengeClient)
-      .getChallengeForProject(anyString(), any(AsyncCallback.class));
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -4292,10 +4205,6 @@ public class EntityActionControllerImplTest {
   public void testConfigureChallengeFoundNonEditable() throws Exception {
     entityBundle.setEntity(new Project());
     permissions.setCanEdit(false);
-    AsyncMockStubber
-      .callSuccessWith(new Challenge())
-      .when(mockChallengeClient)
-      .getChallengeForProject(anyString(), any(AsyncCallback.class));
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -4767,9 +4676,7 @@ public class EntityActionControllerImplTest {
   @Test
   public void testOnEditDefiningSqlOnCancel() {
     when(mockMaterializedView.getId()).thenReturn(entityId);
-    String oldSql = "select everything";
     entityBundle.setEntity(mockMaterializedView);
-    when(mockMaterializedView.getDefiningSQL()).thenReturn(oldSql);
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -4810,9 +4717,7 @@ public class EntityActionControllerImplTest {
   @Test
   public void testOnEditDefiningSqlOnUpdate() {
     when(mockMaterializedView.getId()).thenReturn(entityId);
-    String oldSql = "select everything";
     entityBundle.setEntity(mockMaterializedView);
-    when(mockMaterializedView.getDefiningSQL()).thenReturn(oldSql);
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -5347,9 +5252,6 @@ public class EntityActionControllerImplTest {
     profile.setLastName(lastName);
     profile.setUserName(username);
     profile.setEmails(Collections.singletonList(email));
-    when(mockAuthenticationController.getCurrentUserProfile())
-      .thenReturn(profile);
-    when(mockGWT.getCurrentURL()).thenReturn(url);
     entityBundle.setEntity(new FileEntity());
     entityBundle.getEntity().setId(entityId);
 
@@ -5504,9 +5406,6 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testConfigureWithRecordSetHideCreateNewGridWithNoEdit() {
-    when(mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.SYNAPSE_GRID))
-      .thenReturn(true);
-
     boolean canEdit = false;
 
     RecordSet recordSet = new RecordSet();
