@@ -21,7 +21,7 @@
     </webappDirectory>
 
     <synapse.version>590.0-2-g176723d14c</synapse.version>
-    <gwtVersion>2.11.0</gwtVersion>
+    <gwtVersion>2.13.0</gwtVersion>
     <org.springframework.version>5.3.39</org.springframework.version>
     <guiceVersion>6.0.0</guiceVersion>
     <ginVersion>2.1.2</ginVersion>
@@ -230,7 +230,7 @@
           <encoding>${project.build.sourceEncoding}</encoding>
           <!-- <compilerMetrics>true</compilerMetrics> -->
           <logLevel>INFO</logLevel>
-          <sourceLevel>auto</sourceLevel>
+          <sourceLevel>17</sourceLevel>
           <extraJvmArgs>
             -Xmx2048m -Xms2048m -XX:MaxDirectMemorySize=256m
           </extraJvmArgs>
@@ -790,7 +790,7 @@
     <dependency>
       <groupId>org.gwtproject</groupId>
       <artifactId>gwt-user</artifactId>
-      <version>2.11.0</version>
+      <version>${gwtVersion}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
