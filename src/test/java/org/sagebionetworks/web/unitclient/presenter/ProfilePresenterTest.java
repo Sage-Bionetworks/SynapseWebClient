@@ -11,7 +11,6 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwtmockito.GwtMockitoTestRunner;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -21,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.*;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -49,7 +49,7 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitserver.ChallengeClientImplTest;
 
-@RunWith(GwtMockitoTestRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ProfilePresenterTest {
 
   ProfilePresenter profilePresenter;
@@ -201,8 +201,6 @@ public class ProfilePresenterTest {
       .when(mockSynapseJavascriptClient)
       .getPrincipalAlias(any(), any());
     when(mockUserBundle.getUserProfile()).thenReturn(userProfile);
-    when(mockUserBundle.getIsCertified()).thenReturn(true);
-    when(mockUserBundle.getIsVerified()).thenReturn(false);
     when(mockUserBundle.getORCID()).thenReturn(ORC_ID);
     // by default, we only have a single page of results
     when(mockPaginatedTeamIds.getNextPageToken()).thenReturn(null);
@@ -272,7 +270,6 @@ public class ProfilePresenterTest {
     testEvaluationResults.add(testEvaluation);
     testBatchResults.setTotalNumberOfResults(1);
     testBatchResults.setResults(testEvaluationResults);
-    when(mockGlobalApplicationState.isEditing()).thenReturn(false);
     setupTestChallengePagedResults();
 
     when(place.toToken()).thenReturn(targetUserId);
@@ -1200,10 +1197,6 @@ public class ProfilePresenterTest {
   @Test
   public void testRefreshTeamsOwnerOnlyTeams() {
     int totalNotifications = 12; // must be even for tests to pass
-    AsyncMockStubber
-      .callSuccessWith((long) totalNotifications)
-      .when(mockSynapseJavascriptClient)
-      .getOpenMembershipInvitationCount(any(AsyncCallback.class));
     int inviteCount = 0;
     List<OpenUserInvitationBundle> invites = new ArrayList<
       OpenUserInvitationBundle
@@ -1229,10 +1222,6 @@ public class ProfilePresenterTest {
   @Test
   public void testRefreshTeamsOwnerOnlyInvites() {
     int totalNotifications = 12; // must be even for tests to pass
-    AsyncMockStubber
-      .callSuccessWith((long) totalNotifications)
-      .when(mockSynapseJavascriptClient)
-      .getOpenMembershipInvitationCount(any(AsyncCallback.class));
     int inviteCount = totalNotifications;
     List<OpenUserInvitationBundle> invites = new ArrayList<
       OpenUserInvitationBundle
@@ -1264,9 +1253,12 @@ public class ProfilePresenterTest {
 
   @Test
   public void testTabClickedSettings() {
+    String expectedUrl = "https://accounts.synapse.org/authenticated/myaccount";
+    when(mockOneSageUtils.getAccountSettingsURL()).thenReturn(expectedUrl);
     profilePresenter.setPlace(place);
     profilePresenter.showTab(ProfileArea.SETTINGS, true);
     verify(mockView).setTabSelected(eq(ProfileArea.SETTINGS));
+    verify(mockGwt).replaceCurrentWindowWith(expectedUrl);
   }
 
   @Test

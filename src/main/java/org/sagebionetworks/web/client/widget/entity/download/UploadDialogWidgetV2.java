@@ -14,7 +14,7 @@ import org.sagebionetworks.web.client.jsinterop.ReactRefObject;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
-public class UploadDialogWidgetV2 extends Widget {
+public class UploadDialogWidgetV2 extends Widget implements UploadDialogWidget {
 
   private final GlobalApplicationState globalApplicationState;
   private final EventBus eventBus;

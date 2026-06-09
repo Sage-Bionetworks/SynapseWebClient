@@ -90,7 +90,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.AlertButtonConfig;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.jsinterop.KeyFactory;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
@@ -130,7 +129,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDi
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
-import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetV2;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
@@ -267,7 +266,7 @@ public class EntityActionControllerImpl
   EntityAccessControlListModalWidget entityAccessControlListModalWidget;
   RenameEntityModalWidget renameEntityModalWidget;
   EntityFinderWidget.Builder entityFinderBuilder;
-  UploadDialogWidgetV2 uploadDialogWidgetV2;
+  UploadDialogWidget uploadDialogWidgetV2;
   EvaluationSubmitter submitter;
   EditFileMetadataModalWidget editFileMetadataModalWidget;
   EditProjectMetadataModalWidget editProjectMetadataModalWidget;
@@ -567,7 +566,7 @@ public class EntityActionControllerImpl
     return submitter;
   }
 
-  private UploadDialogWidgetV2 getUploadDialogWidget() {
+  private UploadDialogWidget getUploadDialogWidget() {
     if (uploadDialogWidgetV2 == null) {
       uploadDialogWidgetV2 = ginInjector.getUploadDialogWidget();
       view.setUploadDialogWidget(uploadDialogWidgetV2.asWidget());
@@ -642,7 +641,7 @@ public class EntityActionControllerImpl
   }
 
   private void configureUploader() {
-    UploadDialogWidgetV2 uploadDialogWidgetV2 = getUploadDialogWidget();
+    UploadDialogWidget uploadDialogWidgetV2 = getUploadDialogWidget();
     if (canUploadNewFileVersion() || canUploadFileToContainer()) {
       uploadDialogWidgetV2.configure(entity.getId());
     } else {
@@ -2892,10 +2891,7 @@ public class EntityActionControllerImpl
   private String getIconHTML() {
     EntityTypeIcon icon = ginInjector.getEntityTypeIcon();
     icon.configure(entityBundle.getEntityType());
-    // Pull the HTML out of the icon React component and inline it
-    // It's possible ReactDOM has not injected HTML to the widget yet, so use flushSync to force it to be written
-    ReactDOM.flushSync();
-    return icon.getElement().getInnerHTML();
+    return icon.getIconHTML();
   }
 
   @Override

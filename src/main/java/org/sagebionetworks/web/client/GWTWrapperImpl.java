@@ -48,6 +48,11 @@ public class GWTWrapperImpl implements GWTWrapper {
   }
 
   @Override
+  public void replaceCurrentWindowWith(String url) {
+    Window.Location.replace(url);
+  }
+
+  @Override
   public String encode(String decodedURL) {
     return URL.encode(decodedURL);
   }
