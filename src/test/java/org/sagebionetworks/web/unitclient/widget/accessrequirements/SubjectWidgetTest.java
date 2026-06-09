@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -66,7 +66,7 @@ public class SubjectWidgetTest {
       mockSubjectDeletedCallback
     );
 
-    verifyZeroInteractions(mockGinInjector);
+    verifyNoInteractions(mockGinInjector);
   }
 
   @Test

@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -87,7 +87,7 @@ public class EntityIdCellRendererImplTest {
     // verify that attempting to load data again is a no-op
     reset(mockEntityHeaderAsyncHandler);
     renderer.loadData();
-    verifyZeroInteractions(mockEntityHeaderAsyncHandler);
+    verifyNoInteractions(mockEntityHeaderAsyncHandler);
   }
 
   @Test
@@ -101,7 +101,7 @@ public class EntityIdCellRendererImplTest {
     // verify that attempting to load data again is a no-op
     reset(mockEntityHeaderAsyncHandler);
     renderer.loadData();
-    verifyZeroInteractions(mockEntityHeaderAsyncHandler);
+    verifyNoInteractions(mockEntityHeaderAsyncHandler);
   }
 
   @Test

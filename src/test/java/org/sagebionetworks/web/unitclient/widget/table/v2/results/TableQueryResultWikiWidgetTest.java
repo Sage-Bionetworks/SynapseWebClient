@@ -3,17 +3,17 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -151,7 +151,7 @@ public class TableQueryResultWikiWidgetTest {
 
     widget.configure(wikiKey, descriptor, null, null);
 
-    verifyZeroInteractions(mockGWT);
+    verifyNoInteractions(mockGWT);
     verify(mockView).setTableQueryResultWidget(any());
     verify(mockSynapseJavascriptClient)
       .getEntityBundleFromCache(eq(tableId), any(AsyncCallback.class));
@@ -314,7 +314,7 @@ public class TableQueryResultWikiWidgetTest {
 
     widget1.configure(wikiKey, descriptor, null, null);
 
-    verifyZeroInteractions(mockGWT);
+    verifyNoInteractions(mockGWT);
     verify(mockSynapseJavascriptClient)
       .getEntityBundleFromCache(anyString(), asyncCallbackCaptor.capture());
     assertTrue(TableQueryResultWikiWidget.isLoading);

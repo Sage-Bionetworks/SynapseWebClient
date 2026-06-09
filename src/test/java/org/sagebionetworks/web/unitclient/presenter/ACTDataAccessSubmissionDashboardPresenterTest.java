@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionDashboardPresenter.NO_RESULTS;
 import static org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionDashboardPresenter.TITLE;
@@ -139,7 +139,7 @@ public class ACTDataAccessSubmissionDashboardPresenterTest {
     verify(mockSynAlert).clear();
     verify(mockNoResultsDiv).setVisible(true);
     verify(mockLoadMoreContainer, never()).add(any(Widget.class));
-    verifyZeroInteractions(mockGinInjector);
+    verifyNoInteractions(mockGinInjector);
     verify(mockLoadMoreContainer).setIsMore(false);
   }
 

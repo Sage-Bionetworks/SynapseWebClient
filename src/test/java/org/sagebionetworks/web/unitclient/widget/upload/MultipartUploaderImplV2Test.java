@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.ContentTypeUtils.fixDefaultContentType;
 
@@ -228,7 +228,7 @@ public class MultipartUploaderImplV2Test {
     assertEquals(true, isCancelled.isCancelled());
     // never updated the handler because the upload has been canceled (can't verify the abort(), since
     // xhr is a js object).
-    verifyZeroInteractions(mockHandler);
+    verifyNoInteractions(mockHandler);
   }
 
   @Test

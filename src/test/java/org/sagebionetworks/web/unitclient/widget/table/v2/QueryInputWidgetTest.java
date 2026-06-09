@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;

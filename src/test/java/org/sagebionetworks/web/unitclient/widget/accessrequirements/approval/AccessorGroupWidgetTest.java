@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.approval;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget.*;

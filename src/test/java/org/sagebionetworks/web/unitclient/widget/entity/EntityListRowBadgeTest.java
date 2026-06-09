@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.event.shared.EventBus;
@@ -326,7 +326,7 @@ public class EntityListRowBadgeTest {
         eq(version),
         any(AsyncCallback.class)
       );
-    verifyZeroInteractions(mockPopupUtils, mockEventBus);
+    verifyNoInteractions(mockPopupUtils, mockEventBus);
     verify(mockView).showErrorIcon(errorMessage);
   }
 }

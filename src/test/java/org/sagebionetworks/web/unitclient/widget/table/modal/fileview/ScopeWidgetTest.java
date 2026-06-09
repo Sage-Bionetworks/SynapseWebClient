@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import com.google.gwt.event.shared.EventBus;

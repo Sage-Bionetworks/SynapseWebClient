@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.profile;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

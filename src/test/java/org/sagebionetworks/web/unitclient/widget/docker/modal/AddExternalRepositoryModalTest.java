@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.docker.modal;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal.ADD_EXTERNAL_REPO_MODAL_TITLE;
 import static org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal.SUCCESS_MESSAGE;

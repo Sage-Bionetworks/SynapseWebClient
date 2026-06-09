@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements;
 
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -85,7 +85,7 @@ public class TeamSubjectsWidgetTest {
 
     // verify no widget created if not ACT
     callback.invoke(false);
-    verifyZeroInteractions(mockGinInjector);
+    verifyNoInteractions(mockGinInjector);
 
     // Verify widget is not created, even if ACT, because the TeamSubjectsWidget only supports Teams.
     // Entity subjects are now handled by the EntitySubjectsWidget (using a SRC EntityHeaderTable)

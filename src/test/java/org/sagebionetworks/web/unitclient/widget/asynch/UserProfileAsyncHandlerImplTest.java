@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.asynch;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -63,7 +63,7 @@ public class UserProfileAsyncHandlerImplTest {
   public void testSuccess() {
     // verify no rpc if nothing has been requested.
     userProfileAsyncHandler.executeRequests();
-    verifyZeroInteractions(mockSynapseJavascriptClient);
+    verifyNoInteractions(mockSynapseJavascriptClient);
 
     // add one, simulate single file response
     userProfileAsyncHandler.getUserProfile(userId, mockCallback);

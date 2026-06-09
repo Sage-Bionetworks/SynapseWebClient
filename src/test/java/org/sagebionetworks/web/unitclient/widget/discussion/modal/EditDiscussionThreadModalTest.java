@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.discussion.modal;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -120,7 +120,7 @@ public class EditDiscussionThreadModalTest {
     verify(mockSynAlert).clear();
     verify(mockSynAlert).showError(anyString());
     verify(mockView, never()).hideDialog();
-    verifyZeroInteractions(mockDiscussionForumClient);
+    verifyNoInteractions(mockDiscussionForumClient);
   }
 
   @SuppressWarnings("unchecked")
@@ -172,7 +172,7 @@ public class EditDiscussionThreadModalTest {
         any(UpdateThread.class),
         any(AsyncCallback.class)
       );
-    verifyZeroInteractions(mockCallback);
+    verifyNoInteractions(mockCallback);
     verify(mockView).resetButton();
     verify(mockSynAlert).handleException(any(Throwable.class));
   }

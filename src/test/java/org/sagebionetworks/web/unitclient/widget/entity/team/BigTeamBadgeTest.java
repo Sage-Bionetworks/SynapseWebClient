@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

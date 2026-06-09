@@ -2,10 +2,10 @@ package org.sagebionetworks.web.unitclient;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.DateTimeUtilsImpl.DATE_ONLY_FORMAT_STRING;
 import static org.sagebionetworks.web.client.DateTimeUtilsImpl.LONG_DATE_FORMAT_STRING;
@@ -101,14 +101,14 @@ public class DateTimeUtilsImplTest {
     Date d = new Date();
     CalendarUtil.addDaysToDate(d, -2);
     dateTimeUtils.getRelativeTime(d);
-    verifyZeroInteractions(mockMoment);
+    verifyNoInteractions(mockMoment);
     verify(mockDateOnlyFormat).format(d);
 
     d = new Date();
     CalendarUtil.addDaysToDate(d, 2);
     dateTimeUtils.getRelativeTime(d);
     verify(mockDateOnlyFormat).format(d);
-    verifyZeroInteractions(mockMoment);
+    verifyNoInteractions(mockMoment);
 
     d = new Date();
     dateTimeUtils.getRelativeTime(d);

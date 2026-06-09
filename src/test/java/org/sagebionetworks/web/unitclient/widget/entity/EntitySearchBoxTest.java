@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static junit.framework.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -112,7 +112,7 @@ public class EntitySearchBoxTest {
   public void testSetNullSuggestion() throws RestServiceException {
     suggestBox.setSelectedSuggestion(null);
     assertNull(suggestBox.getSelectedSuggestion());
-    verifyZeroInteractions(mockJsClient);
+    verifyNoInteractions(mockJsClient);
   }
 
   private SearchResults getResponsePage() {
