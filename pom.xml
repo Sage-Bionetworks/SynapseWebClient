@@ -355,15 +355,6 @@
         <version>3.6.0</version>
       </plugin>
       <plugin>
-        <groupId>org.apache.tomcat.maven</groupId>
-        <artifactId>tomcat7-maven-plugin</artifactId>
-        <version>2.2</version>
-        <configuration>
-          <port>8989</port>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
         <version>1.15.1</version>
@@ -636,11 +627,6 @@
       <version>${gwtvisualizationwrappers.version}</version>
     </dependency>
     <!-- Sage Bionetworks Dependencies -->
-    <dependency>
-      <groupId>javax.mail</groupId>
-      <artifactId>mail</artifactId>
-      <version>1.4</version>
-    </dependency>
     <dependency>
       <groupId>org.freemarker</groupId>
       <artifactId>freemarker</artifactId>

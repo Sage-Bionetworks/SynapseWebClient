@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.server.servlet;
 
+import com.google.inject.Inject;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
