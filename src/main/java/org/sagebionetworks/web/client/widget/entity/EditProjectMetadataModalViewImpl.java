@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -7,9 +8,8 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.shared.event.ModalShownEvent;
 import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.gwtbootstrap3.client.ui.Alert;
@@ -45,8 +45,10 @@ public class EditProjectMetadataModalViewImpl
 
   String originalButtonText;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public EditProjectMetadataModalViewImpl(Binder binder) {
+  public EditProjectMetadataModalViewImpl() {
     binder.createAndBindUi(this);
     modal.addShownHandler(
       new ModalShownHandler() {

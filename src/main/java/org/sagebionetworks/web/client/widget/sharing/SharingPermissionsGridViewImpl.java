@@ -1,14 +1,15 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.HashSet;
 import java.util.Map;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -52,11 +53,12 @@ public class SharingPermissionsGridViewImpl
   private String publicAclPrincipalId;
   private boolean isOpenData, isInherited;
 
+  private final SharingPermissionsGridViewImplUiBinder uiBinder = GWT.create(
+    SharingPermissionsGridViewImplUiBinder.class
+  );
+
   @Inject
-  public SharingPermissionsGridViewImpl(
-    SharingPermissionsGridViewImplUiBinder uiBinder,
-    PortalGinInjector ginInjector
-  ) {
+  public SharingPermissionsGridViewImpl(PortalGinInjector ginInjector) {
     initWidget(uiBinder.createAndBindUi(this));
     this.ginInjector = ginInjector;
     publicAclPrincipalId =

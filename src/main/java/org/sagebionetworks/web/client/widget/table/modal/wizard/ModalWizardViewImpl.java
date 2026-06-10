@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.table.modal.wizard;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
@@ -45,8 +46,10 @@ public class ModalWizardViewImpl implements ModalWizardView {
   Modal modal;
   Presenter presenter;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public ModalWizardViewImpl(Binder binder) {
+  public ModalWizardViewImpl() {
     modal = binder.createAndBindUi(this);
     primaryButton.addClickHandler(event -> {
       presenter.onPrimary();

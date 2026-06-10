@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -30,8 +31,10 @@ public class OpenSubmissionWidgetViewImpl implements OpenSubmissionWidgetView {
   Widget w;
   Presenter presenter;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public OpenSubmissionWidgetViewImpl(Binder binder) {
+  public OpenSubmissionWidgetViewImpl() {
     this.w = binder.createAndBindUi(this);
     w.addAttachHandler(
       new AttachEvent.Handler() {

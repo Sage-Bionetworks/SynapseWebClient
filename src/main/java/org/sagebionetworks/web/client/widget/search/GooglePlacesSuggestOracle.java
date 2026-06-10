@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.search;
 
 import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.inject.Inject;
 import java.util.ArrayList;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;

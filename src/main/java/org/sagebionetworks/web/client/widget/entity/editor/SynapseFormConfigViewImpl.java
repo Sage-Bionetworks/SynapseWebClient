@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -23,8 +24,12 @@ public class SynapseFormConfigViewImpl implements SynapseFormConfigView {
 
   Widget widget;
 
+  private final SynapseFormViewImplUiBinder binder = GWT.create(
+    SynapseFormViewImplUiBinder.class
+  );
+
   @Inject
-  public SynapseFormConfigViewImpl(SynapseFormViewImplUiBinder binder) {
+  public SynapseFormConfigViewImpl() {
     widget = binder.createAndBindUi(this);
     initClickHandlers();
   }

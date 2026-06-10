@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -10,7 +11,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -62,9 +63,10 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
   Linkify linkify;
   Widget widget;
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
   public BigTeamBadgeViewImpl(
-    Binder uiBinder,
     GlobalApplicationState globalApplicationState,
     IconsImageBundle iconsImageBundle,
     Linkify linkify

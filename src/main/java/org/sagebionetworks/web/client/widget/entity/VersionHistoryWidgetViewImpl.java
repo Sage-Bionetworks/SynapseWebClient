@@ -11,12 +11,11 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Panel;
@@ -42,7 +41,7 @@ public class VersionHistoryWidgetViewImpl
   extends Composite
   implements VersionHistoryWidgetView, IsWidget {
 
-  interface VersionHistoryWidgetViewImplUiBinder
+  public interface VersionHistoryWidgetViewImplUiBinder
     extends UiBinder<Widget, VersionHistoryWidgetViewImpl> {}
 
   private static VersionHistoryWidgetViewImplUiBinder uiBinder = GWT.create(

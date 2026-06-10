@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.search.table.SearchIndex;

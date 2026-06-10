@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
@@ -55,8 +56,10 @@ public class RejectReasonViewImpl implements RejectReasonView {
   // Presenter
   Presenter presenter;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public RejectReasonViewImpl(Binder binder) {
+  public RejectReasonViewImpl() {
     widget = binder.createAndBindUi(this);
 
     defaultButton.addClickHandler(event -> modal.hide());

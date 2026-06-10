@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.lazyload;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.utils.Callback;
 
 public class LazyLoadHelper {

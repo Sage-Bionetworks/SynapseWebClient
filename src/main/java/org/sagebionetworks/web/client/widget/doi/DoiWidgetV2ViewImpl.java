@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.doi;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
@@ -28,8 +29,10 @@ public class DoiWidgetV2ViewImpl implements DoiWidgetV2View {
 
   CopyTextModal copyTextModal;
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public DoiWidgetV2ViewImpl(Binder uiBinder, CopyTextModal copyTextModal) {
+  public DoiWidgetV2ViewImpl(CopyTextModal copyTextModal) {
     widget = uiBinder.createAndBindUi(this);
     this.copyTextModal = copyTextModal;
     copyTextModal.setTitle("DOI");

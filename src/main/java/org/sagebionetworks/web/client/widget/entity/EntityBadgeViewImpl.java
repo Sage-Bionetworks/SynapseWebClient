@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import static org.sagebionetworks.repo.model.EntityTypeUtils.getEntityTypeForClassName;
 import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -15,7 +16,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
@@ -35,7 +36,6 @@ import org.sagebionetworks.web.client.jsinterop.EntityBadgeIconsProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.jsinterop.SynapseReactClientFullContextProviderProps;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
@@ -125,9 +125,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
     }
   };
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
   public EntityBadgeViewImpl(
-    final Binder uiBinder,
     final SynapseJSNIUtils synapseJSNIUtils,
     PortalGinInjector ginInjector,
     GlobalApplicationState globalAppState,

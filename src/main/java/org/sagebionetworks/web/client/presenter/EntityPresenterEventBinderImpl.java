@@ -2,9 +2,13 @@ package org.sagebionetworks.web.client.presenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.web.bindery.event.shared.binder.EventBinder;
+import javax.inject.Inject;
 
 public class EntityPresenterEventBinderImpl
   implements EntityPresenterEventBinder {
+
+  @Inject
+  public EntityPresenterEventBinderImpl() {}
 
   /** Event binder code **/
   interface EntityViewBinder extends EventBinder<EntityPresenter> {}

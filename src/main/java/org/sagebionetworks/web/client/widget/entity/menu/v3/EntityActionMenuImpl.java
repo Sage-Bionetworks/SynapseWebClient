@@ -2,10 +2,10 @@ package org.sagebionetworks.web.client.widget.entity.menu.v3;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.ActionConfiguration;

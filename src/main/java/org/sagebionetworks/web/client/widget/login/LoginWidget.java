@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.login;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 public class LoginWidget {

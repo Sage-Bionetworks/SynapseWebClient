@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 

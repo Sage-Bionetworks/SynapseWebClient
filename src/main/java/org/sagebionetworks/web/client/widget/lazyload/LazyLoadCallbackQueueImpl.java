@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.lazyload;
 
-import com.google.inject.Inject;
 import java.util.HashSet;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 

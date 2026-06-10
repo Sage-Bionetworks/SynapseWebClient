@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client;
 import static org.sagebionetworks.web.shared.WebConstants.ONESAGE_ACCOUNT_SETTINGS_PATH;
 
 import com.google.gwt.user.client.Window;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class OneSageUtilsImpl implements OneSageUtils {

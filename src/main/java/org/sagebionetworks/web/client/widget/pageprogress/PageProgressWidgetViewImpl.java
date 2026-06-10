@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.pageprogress;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.jsinterop.PageProgressProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -24,8 +25,12 @@ public class PageProgressWidgetViewImpl
   Widget widget;
   boolean isConfigured = false;
 
+  private final PageProgressWidgetViewImplUiBinder binder = GWT.create(
+    PageProgressWidgetViewImplUiBinder.class
+  );
+
   @Inject
-  public PageProgressWidgetViewImpl(PageProgressWidgetViewImplUiBinder binder) {
+  public PageProgressWidgetViewImpl() {
     widget = binder.createAndBindUi(this);
   }
 

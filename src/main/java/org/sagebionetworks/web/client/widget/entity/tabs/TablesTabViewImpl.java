@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
@@ -71,8 +72,12 @@ public class TablesTabViewImpl implements TablesTabView {
 
   Widget widget;
 
+  private final TabsViewImplUiBinder binder = GWT.create(
+    TabsViewImplUiBinder.class
+  );
+
   @Inject
-  public TablesTabViewImpl(TabsViewImplUiBinder binder) {
+  public TablesTabViewImpl() {
     widget = binder.createAndBindUi(this);
     initClickHandlers();
   }

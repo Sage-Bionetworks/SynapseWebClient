@@ -5,11 +5,13 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.OneSageUtils;
 import org.sagebionetworks.web.client.place.PersonalAccessTokenPlace;
 
+@Singleton
 public class PersonalAccessTokensPresenter
   extends AbstractActivity
   implements Presenter<PersonalAccessTokenPlace> {

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -8,7 +9,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -41,8 +42,10 @@ public class NewReplyWidgetViewImpl implements NewReplyWidgetView {
   private Widget widget;
   String originalButtonText;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public NewReplyWidgetViewImpl(Binder binder) {
+  public NewReplyWidgetViewImpl() {
     widget = binder.createAndBindUi(this);
     replyTextBox.addClickHandler(
       new ClickHandler() {

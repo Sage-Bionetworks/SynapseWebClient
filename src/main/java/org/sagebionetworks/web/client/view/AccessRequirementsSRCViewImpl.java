@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
 import com.google.gwt.user.client.ui.Widget;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.web.client.jsinterop.AccessRequirementListProps;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -16,6 +17,7 @@ public class AccessRequirementsSRCViewImpl
   ReactComponent requestDataAccessWidget;
   RestrictableObjectDescriptor subject;
 
+  @Inject
   public AccessRequirementsSRCViewImpl() {
     container = new Container();
     SxProps sx = new SxProps();

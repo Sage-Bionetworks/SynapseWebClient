@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -27,8 +28,10 @@ public class UserListViewImpl implements UserListView {
 
   public interface Binder extends UiBinder<Widget, UserListViewImpl> {}
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public UserListViewImpl(Binder binder) {
+  public UserListViewImpl() {
     this.widget = binder.createAndBindUi(this);
   }
 

@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -25,9 +26,12 @@ public class HomeViewImpl extends Composite implements HomeView {
   private Header headerWidget;
   private GlobalApplicationState globalAppState;
 
+  private final HomeViewImplUiBinder binder = GWT.create(
+    HomeViewImplUiBinder.class
+  );
+
   @Inject
   public HomeViewImpl(
-    HomeViewImplUiBinder binder,
     Header headerWidget,
     GlobalApplicationState globalAppState
   ) {

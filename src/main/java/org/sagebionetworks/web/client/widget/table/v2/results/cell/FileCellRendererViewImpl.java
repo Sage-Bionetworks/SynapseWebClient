@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -28,8 +29,10 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 
   Widget widget;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public FileCellRendererViewImpl(Binder binder) {
+  public FileCellRendererViewImpl() {
     widget = binder.createAndBindUi(this);
   }
 

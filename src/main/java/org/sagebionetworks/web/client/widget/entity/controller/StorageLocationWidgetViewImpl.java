@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
@@ -116,10 +117,12 @@ public class StorageLocationWidgetViewImpl
   Widget widget;
   Presenter presenter;
 
+  private final StorageLocationWidgetViewImplUiBinder binder = GWT.create(
+    StorageLocationWidgetViewImplUiBinder.class
+  );
+
   @Inject
-  public StorageLocationWidgetViewImpl(
-    StorageLocationWidgetViewImplUiBinder binder
-  ) {
+  public StorageLocationWidgetViewImpl() {
     widget = binder.createAndBindUi(this);
     saveButton.addClickHandler(event -> presenter.onSave());
     cancelButton.addClickHandler(event -> modal.hide());

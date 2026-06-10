@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -13,8 +14,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import elemental2.dom.File;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.Image;
@@ -84,8 +85,10 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
   @UiField
   ModalBody previewModalBody;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public CroppedImageUploadViewImpl(Binder binder) {
+  public CroppedImageUploadViewImpl() {
     widget = binder.createAndBindUi(this);
     // Create a unique for each new instance.
     this.fileInput.getElement().setId(PREFIX_FILE_INPUT_WIDGET + ID_SEQUENCE++);

@@ -1,15 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import static org.sagebionetworks.web.client.widget.entity.controller.ProvenanceType.*;
+import static org.sagebionetworks.web.client.widget.entity.controller.ProvenanceType.EXECUTED;
+import static org.sagebionetworks.web.client.widget.entity.controller.ProvenanceType.USED;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;

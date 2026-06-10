@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.jsinterop.EvaluationCardProps;
@@ -27,8 +28,10 @@ public class AdministerEvaluationsListViewImpl
 
   Widget widget;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public AdministerEvaluationsListViewImpl(Binder binder) {
+  public AdministerEvaluationsListViewImpl() {
     widget = binder.createAndBindUi(this);
   }
 

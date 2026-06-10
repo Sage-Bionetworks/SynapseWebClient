@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.client.widget.docker.modal;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -37,8 +36,10 @@ public class AddDockerCommitModalViewImpl implements AddDockerCommitModalView {
   private Widget widget;
   private Presenter presenter;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public AddDockerCommitModalViewImpl(Binder binder) {
+  public AddDockerCommitModalViewImpl() {
     widget = binder.createAndBindUi(this);
     saveButton.addClickHandler(event -> presenter.onSave());
     cancelButton.addClickHandler(event -> presenter.onCancel());

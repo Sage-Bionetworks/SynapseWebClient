@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -8,9 +9,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -43,9 +44,10 @@ public class BaseEditWidgetDescriptorViewImpl
   private DialogCallback dialogCallback;
   private SynapseAlert synAlert;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
   public BaseEditWidgetDescriptorViewImpl(
-    Binder binder,
     WidgetRegistrar widgetRegistrar,
     SynapseAlert synAlert
   ) {

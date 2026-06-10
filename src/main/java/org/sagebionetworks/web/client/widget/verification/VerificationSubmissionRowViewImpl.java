@@ -2,11 +2,12 @@ package org.sagebionetworks.web.client.widget.verification;
 
 import static org.sagebionetworks.web.shared.WebConstants.ACT_PROFILE_VALIDATION_REJECTION_REASONS_TABLE_PROPERTY_KEY;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -89,9 +90,10 @@ public class VerificationSubmissionRowViewImpl
     this.presenter = presenter;
   }
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
   public VerificationSubmissionRowViewImpl(
-    Binder binder,
     SynapseProperties synapseProperties
   ) {
     this.synapseProperties = synapseProperties;

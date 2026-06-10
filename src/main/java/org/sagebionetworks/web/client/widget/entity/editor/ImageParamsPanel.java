@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
 public class ImageParamsPanel implements ImageParamsPanelView.Presenter {

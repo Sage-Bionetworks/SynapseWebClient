@@ -3,13 +3,14 @@ package org.sagebionetworks.web.client.view;
 import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_ATTRIBUTE;
 import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_VALUE_NEW_PASSWORD;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Input;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -37,11 +38,12 @@ public class PasswordResetSignedTokenViewImpl
   Header headerWidget;
   Widget w;
 
+  private final PasswordResetSignedTokenViewImplUiBinder binder = GWT.create(
+    PasswordResetSignedTokenViewImplUiBinder.class
+  );
+
   @Inject
-  public PasswordResetSignedTokenViewImpl(
-    PasswordResetSignedTokenViewImplUiBinder binder,
-    Header headerWidget
-  ) {
+  public PasswordResetSignedTokenViewImpl(Header headerWidget) {
     w = binder.createAndBindUi(this);
     this.headerWidget = headerWidget;
     changePasswordBtn.addClickHandler(event -> {

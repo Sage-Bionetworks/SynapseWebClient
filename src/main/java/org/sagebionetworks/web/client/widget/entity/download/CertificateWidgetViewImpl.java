@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 
 public class CertificateWidgetViewImpl
@@ -20,8 +21,10 @@ public class CertificateWidgetViewImpl
 
   public interface Binder extends UiBinder<Widget, CertificateWidgetViewImpl> {}
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public CertificateWidgetViewImpl(Binder uiBinder) {
+  public CertificateWidgetViewImpl() {
     widget = uiBinder.createAndBindUi(this);
   }
 

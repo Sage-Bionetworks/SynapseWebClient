@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.sharing;
 import static org.sagebionetworks.web.client.jsinterop.SRC.SynapseComponents.EntityAclEditorModal;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.jsinterop.EntityAclEditorModalProps;
 import org.sagebionetworks.web.client.jsinterop.React;

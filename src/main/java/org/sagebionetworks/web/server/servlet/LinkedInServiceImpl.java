@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -14,7 +14,6 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.web.client.LinkedInService;
-import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;

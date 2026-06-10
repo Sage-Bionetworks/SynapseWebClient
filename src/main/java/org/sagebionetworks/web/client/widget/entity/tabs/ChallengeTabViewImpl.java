@@ -6,7 +6,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import org.gwtbootstrap3.client.ui.Container;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorReactComponentPage;
@@ -33,6 +33,7 @@ public class ChallengeTabViewImpl implements ChallengeTabView {
 
   Widget widget;
 
+  @Inject
   public ChallengeTabViewImpl() {
     // empty constructor, you can include this widget in the ui xml
     TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);

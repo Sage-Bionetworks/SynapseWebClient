@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.ScriptElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -7,7 +8,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -35,8 +36,12 @@ public class EntityViewImpl implements EntityView {
   private Widget widget;
   ScriptElement datasetScriptElement;
 
+  private final EntityViewImplUiBinder binder = GWT.create(
+    EntityViewImplUiBinder.class
+  );
+
   @Inject
-  public EntityViewImpl(EntityViewImplUiBinder binder) {
+  public EntityViewImpl() {
     widget = binder.createAndBindUi(this);
     Window.scrollTo(0, 0); // scroll user to top of page
     // TODO : need to dynamically set the header widget

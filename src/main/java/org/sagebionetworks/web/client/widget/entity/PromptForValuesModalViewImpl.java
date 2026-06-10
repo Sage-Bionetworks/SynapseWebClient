@@ -1,15 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.ValueBoxBase;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
@@ -79,8 +80,10 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
   KeyDownHandler handler;
   String originalButtonText;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public PromptForValuesModalViewImpl(Binder binder, SynapseAlert synAlert) {
+  public PromptForValuesModalViewImpl(SynapseAlert synAlert) {
     modal = binder.createAndBindUi(this);
     this.synAlert = synAlert;
     synAlertContainer.add(synAlert);

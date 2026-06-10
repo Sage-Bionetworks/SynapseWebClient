@@ -20,9 +20,13 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 import java.util.Date;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.utils.Callback;
 
 public class GWTWrapperImpl implements GWTWrapper {
+
+  @Inject
+  public GWTWrapperImpl() {}
 
   private static final RegExp PATTERN_WHITE_SPACE = RegExp.compile("^\\s+$");
   // Used to replace all characters expect letters and numbers.

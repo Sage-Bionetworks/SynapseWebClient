@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Span;
 
 public class UserIdCellEditorViewImpl implements UserIdCellEditorView {
@@ -20,8 +21,10 @@ public class UserIdCellEditorViewImpl implements UserIdCellEditorView {
 
   Widget widget;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public UserIdCellEditorViewImpl(Binder binder) {
+  public UserIdCellEditorViewImpl() {
     widget = binder.createAndBindUi(this);
   }
 

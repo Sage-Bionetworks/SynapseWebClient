@@ -2,7 +2,7 @@ package org.sagebionetworks.web.server;
 
 import com.amazonaws.services.appconfigdata.AWSAppConfigData;
 import com.amazonaws.services.kms.AWSKMS;
-import com.google.gwt.user.server.rpc.XsrfTokenServiceServlet;
+import com.google.gwt.user.server.rpc.jakarta.XsrfTokenServiceServlet;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;

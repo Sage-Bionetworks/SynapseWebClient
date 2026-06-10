@@ -4,6 +4,8 @@ import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import java.util.Collection;
 import java.util.Date;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * A simple wrapper of the GWT cookie implementation.
@@ -11,7 +13,11 @@ import java.util.Date;
  * @author jmhill
  *
  */
+@Singleton
 public class GWTCookieImpl implements CookieProvider {
+
+  @Inject
+  public GWTCookieImpl() {}
 
   @Override
   public String getCookie(String name) {

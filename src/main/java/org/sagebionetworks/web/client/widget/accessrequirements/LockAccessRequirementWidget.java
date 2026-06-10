@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;

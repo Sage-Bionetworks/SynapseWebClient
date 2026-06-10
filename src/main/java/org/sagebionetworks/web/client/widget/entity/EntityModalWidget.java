@@ -2,10 +2,9 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.jsinterop.EntityModalProps;
-import org.sagebionetworks.web.client.jsinterop.SqlDefinedTableEditorModalProps;
 
 public class EntityModalWidget implements IsWidget {
 

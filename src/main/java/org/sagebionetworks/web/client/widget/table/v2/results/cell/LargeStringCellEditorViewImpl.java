@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.FocusEvent;
@@ -10,7 +11,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.TextArea;
@@ -37,8 +38,10 @@ public class LargeStringCellEditorViewImpl
 
   Widget widget;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public LargeStringCellEditorViewImpl(Binder binder) {
+  public LargeStringCellEditorViewImpl() {
     widget = binder.createAndBindUi(this);
     // users want us to select all on focus see SWC-2213
     textArea.addFocusHandler(

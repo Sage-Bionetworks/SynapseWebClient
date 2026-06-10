@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
@@ -57,8 +58,10 @@ public class CreateAccessRequirementStep1ViewImpl
   @UiField
   Div entityUI;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public CreateAccessRequirementStep1ViewImpl(Binder binder) {
+  public CreateAccessRequirementStep1ViewImpl() {
     widget = binder.createAndBindUi(this);
 
     teamMultiIdButton.addClickHandler(

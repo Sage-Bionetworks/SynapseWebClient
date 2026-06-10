@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.provenance.v2;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.jsinterop.ProvenanceGraphProps;
 import org.sagebionetworks.web.client.jsinterop.ProvenanceGraphProps.OnUpdateJavaScriptObject;

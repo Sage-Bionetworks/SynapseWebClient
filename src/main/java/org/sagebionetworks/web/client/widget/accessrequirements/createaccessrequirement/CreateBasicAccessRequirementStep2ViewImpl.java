@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
@@ -50,8 +51,10 @@ public class CreateBasicAccessRequirementStep2ViewImpl
 
   Presenter presenter;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public CreateBasicAccessRequirementStep2ViewImpl(Binder binder) {
+  public CreateBasicAccessRequirementStep2ViewImpl() {
     widget = binder.createAndBindUi(this);
     editWikiButton.addClickHandler(
       new ClickHandler() {

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
 import com.google.gwt.user.client.Timer;
+import javax.inject.Inject;
 
 /**
  * Basic wrapper for a GWT timer.
@@ -9,6 +10,9 @@ import com.google.gwt.user.client.Timer;
  *
  */
 public class TimerProviderImpl implements TimerProvider {
+
+  @Inject
+  public TimerProviderImpl() {}
 
   Timer timer;
 

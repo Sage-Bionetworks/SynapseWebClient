@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -7,8 +8,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.Map;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -47,11 +48,10 @@ public class AnnotationsRendererWidgetViewImpl
   private AnnotationTransformer transformer;
   private Widget widget;
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public AnnotationsRendererWidgetViewImpl(
-    final Binder uiBinder,
-    AnnotationTransformer transformer
-  ) {
+  public AnnotationsRendererWidgetViewImpl(AnnotationTransformer transformer) {
     widget = uiBinder.createAndBindUi(this);
     this.transformer = transformer;
     editAnnotationsButton.addClickHandler(

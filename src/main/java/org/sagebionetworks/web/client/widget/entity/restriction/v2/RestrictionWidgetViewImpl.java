@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.restriction.v2;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
@@ -55,11 +56,10 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
   Widget widget;
   RestrictionWidgetModalsViewImpl modals;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public RestrictionWidgetViewImpl(
-    Binder binder,
-    RestrictionWidgetModalsViewImpl modals
-  ) {
+  public RestrictionWidgetViewImpl(RestrictionWidgetModalsViewImpl modals) {
     this.widget = binder.createAndBindUi(this);
     this.modals = modals;
     modalsContainer.add(modals);

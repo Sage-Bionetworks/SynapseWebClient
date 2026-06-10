@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;

@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 
@@ -37,10 +38,12 @@ public class JoinTeamConfigEditorViewImpl implements JoinTeamConfigEditorView {
 
   Widget widget;
 
+  private final JoinTeamConfigWidgetViewImplUiBinder binder = GWT.create(
+    JoinTeamConfigWidgetViewImplUiBinder.class
+  );
+
   @Inject
-  public JoinTeamConfigEditorViewImpl(
-    JoinTeamConfigWidgetViewImplUiBinder binder
-  ) {
+  public JoinTeamConfigEditorViewImpl() {
     widget = binder.createAndBindUi(this);
   }
 

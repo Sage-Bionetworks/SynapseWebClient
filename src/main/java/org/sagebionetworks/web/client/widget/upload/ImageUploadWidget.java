@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.upload;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import elemental2.dom.Blob;
 import elemental2.dom.FileList;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;

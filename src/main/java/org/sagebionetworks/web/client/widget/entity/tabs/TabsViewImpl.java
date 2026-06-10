@@ -4,6 +4,7 @@ import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.NavTabs;
 import org.gwtbootstrap3.client.ui.TabContent;
 
@@ -20,6 +21,7 @@ public class TabsViewImpl implements TabsView {
 
   Widget widget;
 
+  @Inject
   public TabsViewImpl() {
     // empty constructor, you can include this widget in the ui xml
     TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);

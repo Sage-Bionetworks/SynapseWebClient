@@ -6,6 +6,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -39,6 +40,7 @@ public class RevokeUserAccessModalViewImpl
   Widget widget;
   String originalButtonText;
 
+  @Inject
   public RevokeUserAccessModalViewImpl() {
     widget = uiBinder.createAndBindUi(this);
     cancelButton.addClickHandler(

@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.user.client.Timer;
+import javax.inject.Inject;
 
 public class GWTTimerImpl implements GWTTimer {
+
+  @Inject
+  public GWTTimerImpl() {}
 
   Timer timer;
 

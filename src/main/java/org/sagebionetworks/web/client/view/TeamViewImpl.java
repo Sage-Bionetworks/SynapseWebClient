@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -8,7 +9,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -118,9 +119,12 @@ public class TeamViewImpl extends Composite implements TeamView {
   private CookieProvider cookieProvider;
   private FeatureFlagConfig featureFlagConfig;
 
+  private final TeamViewImplUiBinder binder = GWT.create(
+    TeamViewImplUiBinder.class
+  );
+
   @Inject
   public TeamViewImpl(
-    TeamViewImplUiBinder binder,
     InviteWidget inviteWidget,
     Header headerWidget,
     GWTWrapper gwt,

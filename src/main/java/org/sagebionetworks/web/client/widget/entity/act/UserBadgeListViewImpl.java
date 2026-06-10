@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.widget.SelectionOptions;
 
@@ -20,8 +21,10 @@ public class UserBadgeListViewImpl implements UserBadgeListView {
   @UiField
   Div userBadgeContainer;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public UserBadgeListViewImpl(Binder binder) {
+  public UserBadgeListViewImpl() {
     widget = binder.createAndBindUi(this);
 
     selectionOptions.setDeleteClickedCallback(event -> {

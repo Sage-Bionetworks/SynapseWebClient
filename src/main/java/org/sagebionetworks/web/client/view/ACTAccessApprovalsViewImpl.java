@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Element;
@@ -7,13 +8,13 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Panel;
@@ -90,9 +91,12 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
   SynapseJavascriptClient jsClient;
   Widget widget;
 
+  private final ACTViewImplUiBinder binder = GWT.create(
+    ACTViewImplUiBinder.class
+  );
+
   @Inject
   public ACTAccessApprovalsViewImpl(
-    ACTViewImplUiBinder binder,
     Header headerWidget,
     SynapseJavascriptClient jsClient,
     DateTimeUtils dateTimeUtils

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -7,7 +8,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.header.Header;
 
@@ -22,8 +23,12 @@ public class AccountViewImpl extends Composite implements AccountView {
   private Presenter presenter;
   private Header headerWidget;
 
+  private final AccountViewImplUiBinder binder = GWT.create(
+    AccountViewImplUiBinder.class
+  );
+
   @Inject
-  public AccountViewImpl(AccountViewImplUiBinder binder, Header headerWidget) {
+  public AccountViewImpl(Header headerWidget) {
     initWidget(binder.createAndBindUi(this));
 
     this.headerWidget = headerWidget;

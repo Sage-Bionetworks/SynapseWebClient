@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 
 public class TableQueryResultWikiViewImpl implements TableQueryResultWikiView {
 
@@ -25,8 +25,12 @@ public class TableQueryResultWikiViewImpl implements TableQueryResultWikiView {
   @UiField
   CheckBox isShowTableOnly;
 
+  private final TableQueryResultViewUiBinder binder = GWT.create(
+    TableQueryResultViewUiBinder.class
+  );
+
   @Inject
-  public TableQueryResultWikiViewImpl(TableQueryResultViewUiBinder binder) {
+  public TableQueryResultWikiViewImpl() {
     widget = binder.createAndBindUi(this);
     isShowTableOnly.addClickHandler(event -> {
       updateIsQueryVisibleEnableState();

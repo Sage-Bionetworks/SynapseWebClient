@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.web.client.jsinterop.EntityHeaderTableProps;
 import org.sagebionetworks.web.client.jsinterop.React;

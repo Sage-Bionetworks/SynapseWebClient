@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -25,11 +26,12 @@ public class FollowingPageViewImpl
   public interface LoginViewImplBinder
     extends UiBinder<Widget, FollowingPageViewImpl> {}
 
+  private final LoginViewImplBinder uiBinder = GWT.create(
+    LoginViewImplBinder.class
+  );
+
   @Inject
-  public FollowingPageViewImpl(
-    LoginViewImplBinder uiBinder,
-    Header headerWidget
-  ) {
+  public FollowingPageViewImpl(Header headerWidget) {
     initWidget(uiBinder.createAndBindUi(this));
     this.headerWidget = headerWidget;
     configure();

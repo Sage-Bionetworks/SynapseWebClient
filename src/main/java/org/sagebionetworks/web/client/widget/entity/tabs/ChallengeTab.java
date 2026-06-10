@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import com.google.inject.Inject;
 import java.util.function.Consumer;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayConstants;

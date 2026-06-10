@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormLabel;
@@ -40,8 +41,10 @@ public class BigPromptModalViewImpl implements BigPromptModalView {
   Callback callback;
   String originalButtonText;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public BigPromptModalViewImpl(Binder binder) {
+  public BigPromptModalViewImpl() {
     widget = binder.createAndBindUi(this);
     modal.addShownHandler(evt -> {
       nameField.setFocus(true);

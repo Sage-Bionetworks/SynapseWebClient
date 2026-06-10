@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -7,7 +8,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -56,9 +57,12 @@ public class LoginViewImpl extends Composite implements LoginView {
   public interface LoginViewImplBinder
     extends UiBinder<Widget, LoginViewImpl> {}
 
+  private final LoginViewImplBinder uiBinder = GWT.create(
+    LoginViewImplBinder.class
+  );
+
   @Inject
   public LoginViewImpl(
-    LoginViewImplBinder uiBinder,
     Header headerWidget,
     LoginWidget loginWidget,
     SynapseJSNIUtils jsniUtils

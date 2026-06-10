@@ -4,7 +4,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -20,7 +20,7 @@ public class EntityActionMenuViewImpl implements EntityActionMenuView {
   private final SimplePanel controllerWidgetContainer = new SimplePanel();
 
   @Inject
-  private EntityActionMenuViewImpl() {
+  public EntityActionMenuViewImpl() {
     renderLoaderComponent();
 
     panel.add(menuComponent);

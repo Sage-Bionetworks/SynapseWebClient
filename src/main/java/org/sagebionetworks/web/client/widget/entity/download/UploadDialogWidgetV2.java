@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.download;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.FileList;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.EntityUploadHandle;

@@ -2,12 +2,13 @@ package org.sagebionetworks.web.client.widget.statistics;
 
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -43,9 +44,12 @@ public class StatisticsPlotWidgetViewImpl
   SynapseReactClientFullContextPropsProvider propsProvider;
   String endpoint;
 
+  private final StatisticsPlotWidgetViewImplUiBinder binder = GWT.create(
+    StatisticsPlotWidgetViewImplUiBinder.class
+  );
+
   @Inject
   public StatisticsPlotWidgetViewImpl(
-    StatisticsPlotWidgetViewImplUiBinder binder,
     SynapseJSNIUtils jsniUtils,
     SynapseProperties synapseProperties,
     SynapseReactClientFullContextPropsProvider propsProvider

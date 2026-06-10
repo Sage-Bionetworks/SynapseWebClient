@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.presenter;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.place.ChatPlace;
 import org.sagebionetworks.web.client.view.ChatView;

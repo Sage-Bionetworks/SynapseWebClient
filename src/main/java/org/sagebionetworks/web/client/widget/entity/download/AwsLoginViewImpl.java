@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.html.Strong;
 
@@ -22,8 +23,10 @@ public class AwsLoginViewImpl implements AwsLoginView {
   @UiField
   Input secretKeyField;
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public AwsLoginViewImpl(Binder uiBinder) {
+  public AwsLoginViewImpl() {
     w = uiBinder.createAndBindUi(this);
   }
 

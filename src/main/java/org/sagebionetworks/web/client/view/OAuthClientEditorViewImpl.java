@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.oauthclient.OAuthClientEditor;
 
@@ -21,11 +22,12 @@ public class OAuthClientEditorViewImpl
 
   private Header headerWidget;
 
+  private final OAuthClientEditorViewImplUiBinder binder = GWT.create(
+    OAuthClientEditorViewImplUiBinder.class
+  );
+
   @Inject
-  public OAuthClientEditorViewImpl(
-    OAuthClientEditorViewImplUiBinder binder,
-    Header headerWidget
-  ) {
+  public OAuthClientEditorViewImpl(Header headerWidget) {
     initWidget(binder.createAndBindUi(this));
     this.headerWidget = headerWidget;
     headerWidget.configure();

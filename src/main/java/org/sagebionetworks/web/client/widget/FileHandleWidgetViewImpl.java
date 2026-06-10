@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Text;
 
@@ -22,8 +23,10 @@ public class FileHandleWidgetViewImpl implements FileHandleWidgetView {
 
   Widget widget;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public FileHandleWidgetViewImpl(Binder binder) {
+  public FileHandleWidgetViewImpl() {
     widget = binder.createAndBindUi(this);
   }
 

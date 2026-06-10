@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -13,8 +14,8 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.Arrays;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -239,9 +240,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
   JSONObjectAdapter jsonObjectAdapter;
   GlobalApplicationState globalAppState;
 
+  private final ProfileViewImplUiBinder binder = GWT.create(
+    ProfileViewImplUiBinder.class
+  );
+
   @Inject
   public ProfileViewImpl(
-    ProfileViewImplUiBinder binder,
     Header headerWidget,
     CookieProvider cookies,
     OrientationBanner orientationBanner,

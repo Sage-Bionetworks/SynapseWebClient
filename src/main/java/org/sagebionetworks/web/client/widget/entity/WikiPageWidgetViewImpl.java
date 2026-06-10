@@ -9,8 +9,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.binder.EventBinder;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
@@ -114,8 +114,10 @@ public class WikiPageWidgetViewImpl
 
   SynapseJSNIUtils jsniUtils;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public WikiPageWidgetViewImpl(Binder binder, SynapseJSNIUtils jsniUtils) {
+  public WikiPageWidgetViewImpl(SynapseJSNIUtils jsniUtils) {
     widget = binder.createAndBindUi(this);
     this.jsniUtils = jsniUtils;
     restoreButton.addClickHandler(

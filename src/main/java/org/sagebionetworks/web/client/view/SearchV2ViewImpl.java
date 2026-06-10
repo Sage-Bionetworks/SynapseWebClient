@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.widget.entity.SearchV2Impl;
 
 public class SearchV2ViewImpl extends Composite implements SearchV2View {
@@ -17,8 +18,10 @@ public class SearchV2ViewImpl extends Composite implements SearchV2View {
   @UiField
   SimplePanel componentContainer;
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public SearchV2ViewImpl(final Binder uiBinder, SearchV2Impl searchV2) {
+  public SearchV2ViewImpl(SearchV2Impl searchV2) {
     initWidget(uiBinder.createAndBindUi(this));
 
     this.searchV2 = searchV2;

@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.function.Consumer;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;

@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.user.client.ui.Widget;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
@@ -20,6 +20,7 @@ public class StringRendererCellViewImpl implements StringRendererCellView {
   Paragraph p = new Paragraph();
   public static final int LENGTH_REQUIRES_TOOLTIP = 20;
 
+  @Inject
   public StringRendererCellViewImpl() {
     super();
     div.addAttachHandler(event -> {

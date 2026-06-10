@@ -2,15 +2,15 @@ package org.sagebionetworks.web.server.servlet;
 
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.HOST_HEADER;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.gwt.user.server.rpc.SerializationPolicy;
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 

@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.ReviewerDashboardProps;
@@ -24,11 +25,12 @@ public class DataAccessManagementViewImpl implements DataAccessManagementView {
 
   Widget widget;
 
+  private final DataAccessManagementViewImplUiBinder binder = GWT.create(
+    DataAccessManagementViewImplUiBinder.class
+  );
+
   @Inject
-  public DataAccessManagementViewImpl(
-    DataAccessManagementViewImplUiBinder binder,
-    Header headerWidget
-  ) {
+  public DataAccessManagementViewImpl(Header headerWidget) {
     widget = binder.createAndBindUi(this);
     this.headerWidget = headerWidget;
     headerWidget.configure();

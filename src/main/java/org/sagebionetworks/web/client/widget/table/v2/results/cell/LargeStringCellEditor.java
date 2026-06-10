@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 
 /**

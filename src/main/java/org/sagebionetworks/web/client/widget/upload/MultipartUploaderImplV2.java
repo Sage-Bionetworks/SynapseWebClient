@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.upload;
 
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.inject.Inject;
 import elemental2.dom.Blob;
 import elemental2.promise.Promise;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;

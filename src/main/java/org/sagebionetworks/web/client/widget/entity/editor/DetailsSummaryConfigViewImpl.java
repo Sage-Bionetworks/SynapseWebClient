@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -21,10 +22,12 @@ public class DetailsSummaryConfigViewImpl implements DetailsSummaryConfigView {
 
   private Widget widget;
 
+  private final DetailsSummaryConfigViewImplUiBinder binder = GWT.create(
+    DetailsSummaryConfigViewImplUiBinder.class
+  );
+
   @Inject
-  public DetailsSummaryConfigViewImpl(
-    DetailsSummaryConfigViewImplUiBinder binder
-  ) {
+  public DetailsSummaryConfigViewImpl() {
     widget = binder.createAndBindUi(this);
   }
 

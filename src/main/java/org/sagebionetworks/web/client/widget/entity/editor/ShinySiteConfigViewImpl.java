@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -29,11 +30,12 @@ public class ShinySiteConfigViewImpl implements ShinySiteConfigView {
   Widget widget;
   SynapseJSNIUtils jsniUtils;
 
+  private final ShinySiteConfigViewImplUiBinder binder = GWT.create(
+    ShinySiteConfigViewImplUiBinder.class
+  );
+
   @Inject
-  public ShinySiteConfigViewImpl(
-    ShinySiteConfigViewImplUiBinder binder,
-    SynapseJSNIUtils jsniUtils
-  ) {
+  public ShinySiteConfigViewImpl(SynapseJSNIUtils jsniUtils) {
     widget = binder.createAndBindUi(this);
     this.jsniUtils = jsniUtils;
   }

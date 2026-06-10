@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
@@ -7,7 +8,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -82,9 +83,10 @@ public class TableEntityWidgetViewImpl
   SubmissionViewScopeWidget submissionViewScopeWidget;
   TableEntityWidgetView.Presenter presenter;
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
   public TableEntityWidgetViewImpl(
-    final Binder uiBinder,
     PortalGinInjector ginInjector,
     EntityViewScopeWidget scopeWidget,
     SubmissionViewScopeWidget submissionViewScopeWidget

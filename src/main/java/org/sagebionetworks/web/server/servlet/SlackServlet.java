@@ -1,17 +1,17 @@
 package org.sagebionetworks.web.server.servlet;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,7 +21,6 @@ import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
-import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class SlackServlet extends HttpServlet {
@@ -70,7 +69,7 @@ public class SlackServlet extends HttpServlet {
   @Override
   public void doGet(
     HttpServletRequest request,
-    javax.servlet.http.HttpServletResponse response
+    jakarta.servlet.http.HttpServletResponse response
   ) throws ServletException, IOException {
     // instruct not to cache
     response.setHeader(

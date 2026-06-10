@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditor.HasChangesHandler;

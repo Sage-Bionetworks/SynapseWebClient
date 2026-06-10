@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import com.google.gwt.regexp.shared.RegExp;
-import com.google.inject.Inject;
-// import java.util.regex.Pattern;
-
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.StringUtils;
+
+// import java.util.regex.Pattern;
 
 /**
  * Entity cell editor only allows values of the form "syn132.45"

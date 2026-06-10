@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -40,8 +41,12 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
   CallbackP<String> entityClickedCallback;
 
+  private final FilesBrowserViewImplUiBinder binder = GWT.create(
+    FilesBrowserViewImplUiBinder.class
+  );
+
   @Inject
-  public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder) {
+  public FilesBrowserViewImpl() {
     widget = binder.createAndBindUi(this);
   }
 

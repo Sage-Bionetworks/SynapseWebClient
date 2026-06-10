@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;

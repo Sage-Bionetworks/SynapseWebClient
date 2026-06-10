@@ -7,7 +7,7 @@ import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtvisualizationwrappers.client.cytoscape.CytoscapeGraph25;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -36,8 +36,10 @@ public class CytoscapeViewImpl implements CytoscapeView {
   String cyJS, styleJson;
   SynapseJSNIUtils jsniUtils;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public CytoscapeViewImpl(Binder binder, SynapseJSNIUtils jsniUtils) {
+  public CytoscapeViewImpl(SynapseJSNIUtils jsniUtils) {
     widget = binder.createAndBindUi(this);
     this.jsniUtils = jsniUtils;
     isAttached = false;

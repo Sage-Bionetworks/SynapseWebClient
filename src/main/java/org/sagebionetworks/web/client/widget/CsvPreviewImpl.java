@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.web.client.jsinterop.CsvPreviewProps;
 import org.sagebionetworks.web.client.jsinterop.React;

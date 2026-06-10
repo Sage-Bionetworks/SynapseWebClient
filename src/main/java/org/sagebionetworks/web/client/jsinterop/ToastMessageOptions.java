@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.jsinterop;
 
 import com.google.gwt.user.client.Window;
+import javax.inject.Inject;
 import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsOverlay;
@@ -89,6 +90,7 @@ public class ToastMessageOptions extends ReactComponentProps {
     private AlertButtonConfig.Callback onSecondaryButtonClickOrHref;
     private boolean dismissOnSecondaryButtonClick;
 
+    @Inject
     public Builder() {}
 
     public Builder setTitle(String title) {

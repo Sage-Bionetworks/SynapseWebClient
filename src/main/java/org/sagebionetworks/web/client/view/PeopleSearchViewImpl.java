@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -12,7 +13,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.place.PeopleSearch;
@@ -46,11 +47,12 @@ public class PeopleSearchViewImpl
   private Header headerWidget;
   private Presenter presenter;
 
+  private final PeopleSearchViewImplUiBinder binder = GWT.create(
+    PeopleSearchViewImplUiBinder.class
+  );
+
   @Inject
-  public PeopleSearchViewImpl(
-    PeopleSearchViewImplUiBinder binder,
-    Header headerWidget
-  ) {
+  public PeopleSearchViewImpl(Header headerWidget) {
     initWidget(binder.createAndBindUi(this));
     this.headerWidget = headerWidget;
     headerWidget.configure();

@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.jsinterop.CreatedByModifiedByProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -21,10 +22,12 @@ public class ModifiedCreatedByWidgetViewImpl
 
   private Widget widget;
 
+  private final ModifiedCreatedByWidgetViewImplUiBinder binder = GWT.create(
+    ModifiedCreatedByWidgetViewImplUiBinder.class
+  );
+
   @Inject
-  public ModifiedCreatedByWidgetViewImpl(
-    ModifiedCreatedByWidgetViewImplUiBinder binder
-  ) {
+  public ModifiedCreatedByWidgetViewImpl() {
     widget = binder.createAndBindUi(this);
   }
 

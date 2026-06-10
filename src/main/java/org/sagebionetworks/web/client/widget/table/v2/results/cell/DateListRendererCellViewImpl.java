@@ -1,8 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-import com.google.inject.Inject;
 import java.util.Date;
-import org.gwtbootstrap3.client.ui.html.Paragraph;
+import javax.inject.Inject;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DateTimeUtils;

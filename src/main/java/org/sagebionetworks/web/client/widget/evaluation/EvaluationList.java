@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.evaluation;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 

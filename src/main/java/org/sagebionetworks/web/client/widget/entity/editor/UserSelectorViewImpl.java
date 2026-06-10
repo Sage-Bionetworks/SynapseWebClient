@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -23,8 +24,12 @@ public class UserSelectorViewImpl implements UserSelectorView {
 
   Presenter presenter;
 
+  private final UserSelectorViewImplUiBinder binder = GWT.create(
+    UserSelectorViewImplUiBinder.class
+  );
+
   @Inject
-  public UserSelectorViewImpl(UserSelectorViewImplUiBinder binder) {
+  public UserSelectorViewImpl() {
     w = binder.createAndBindUi(this);
     modal.addShownHandler(event -> {
       presenter.onModalShown();

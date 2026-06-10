@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
@@ -38,8 +39,12 @@ public class AttachmentConfigViewImpl implements AttachmentConfigView {
 
   private Widget widget;
 
+  private final AttachmentConfigViewImplUiBinder binder = GWT.create(
+    AttachmentConfigViewImplUiBinder.class
+  );
+
   @Inject
-  public AttachmentConfigViewImpl(AttachmentConfigViewImplUiBinder binder) {
+  public AttachmentConfigViewImpl() {
     widget = binder.createAndBindUi(this);
   }
 

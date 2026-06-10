@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -9,7 +10,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -85,8 +86,10 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
   Widget widget;
   String originalButtonText;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public QueryResultEditorViewImpl(Binder binder) {
+  public QueryResultEditorViewImpl() {
     widget = binder.createAndBindUi(this);
     originalButtonText = saveRowsButton.getText();
   }

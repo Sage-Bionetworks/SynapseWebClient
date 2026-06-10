@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.ProgressBar;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
@@ -40,8 +41,10 @@ public class AsynchronousProgressViewImpl implements AsynchronousProgressView {
   Presenter presenter;
   Div container;
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public AsynchronousProgressViewImpl(final Binder uiBinder) {
+  public AsynchronousProgressViewImpl() {
     container = uiBinder.createAndBindUi(this);
   }
 

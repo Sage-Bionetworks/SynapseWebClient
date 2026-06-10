@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.widget;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.Iterator;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.utils.Callback;
 
 /**

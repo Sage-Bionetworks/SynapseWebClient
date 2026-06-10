@@ -4,8 +4,8 @@ import static org.sagebionetworks.web.client.ClientProperties.AWS_SDK_JS;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
 import elemental2.dom.Blob;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.resources.ResourceLoader;

@@ -3,9 +3,11 @@ package org.sagebionetworks.web.client;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 
+@Singleton
 public class FeatureFlagConfig {
 
   private final CookieProvider cookieProvider;

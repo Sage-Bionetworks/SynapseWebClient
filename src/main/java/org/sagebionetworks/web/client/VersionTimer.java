@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.user.client.Timer;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 
 public class VersionTimer {
 
