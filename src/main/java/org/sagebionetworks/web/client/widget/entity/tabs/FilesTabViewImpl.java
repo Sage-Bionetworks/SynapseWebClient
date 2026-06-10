@@ -99,7 +99,6 @@ public class FilesTabViewImpl implements FilesTabView {
 
   Widget widget;
   UserBadge createdByBadge, modifiedByBadge;
-  public static final String DEFAULT_WIDGET_HEIGHT = 197 + "px";
 
   @Inject
   public FilesTabViewImpl(UserBadge createdByBadge, UserBadge modifiedByBadge) {
@@ -110,7 +109,10 @@ public class FilesTabViewImpl implements FilesTabView {
     this.modifiedByBadge = modifiedByBadge;
   }
 
-  private ClickHandler getExpandClickHandler(final Widget w) {
+  private ClickHandler getExpandClickHandler(
+    final Widget w,
+    final String resetHeight
+  ) {
     return event -> {
       modalDialogContainer.clear();
       final Modal window = new Modal();
@@ -119,16 +121,18 @@ public class FilesTabViewImpl implements FilesTabView {
       final Div oldParent = (Div) w.getParent();
       w.removeFromParent();
       body.add(new ScrollPanel(w));
-      w.setHeight(
-        new Double(com.google.gwt.user.client.Window.getClientHeight())
-          .intValue() -
-        170 +
-        "px"
-      );
+      if (!resetHeight.isEmpty()) {
+        w.setHeight(
+          new Double(com.google.gwt.user.client.Window.getClientHeight())
+            .intValue() -
+          170 +
+          "px"
+        );
+      }
       ClickHandler closeHandler = closeEvent -> {
         w.removeFromParent();
         oldParent.add(w);
-        w.setHeight(DEFAULT_WIDGET_HEIGHT);
+        w.setHeight(resetHeight);
         window.hide();
         presenter.onExpandClosed();
       };
@@ -173,20 +177,20 @@ public class FilesTabViewImpl implements FilesTabView {
   @Override
   public void setPreview(Widget w) {
     previewWidget = w;
-    w.setHeight(DEFAULT_WIDGET_HEIGHT);
     filePreviewWidgetContainer.clear();
     filePreviewWidgetContainer.add(w);
     if (expandPreviewHandlerRegistration != null) {
       expandPreviewHandlerRegistration.removeHandler();
     }
     expandPreviewHandlerRegistration =
-      expandPreviewLink.addClickHandler(getExpandClickHandler(previewWidget));
+      expandPreviewLink.addClickHandler(
+        getExpandClickHandler(previewWidget, "")
+      );
   }
 
   @Override
   public void setProvenance(Widget w) {
     provenanceGraphWidget = w;
-    w.setHeight(DEFAULT_WIDGET_HEIGHT);
     fileProvenanceGraphContainer.clear();
     fileProvenanceGraphContainer.add(w);
     if (expandProvHandlerRegistration != null) {
@@ -195,7 +199,7 @@ public class FilesTabViewImpl implements FilesTabView {
     modalDialogContainer.clear();
     expandProvHandlerRegistration =
       expandProvenanceLink.addClickHandler(
-        getExpandClickHandler(provenanceGraphWidget)
+        getExpandClickHandler(provenanceGraphWidget, "")
       );
   }
 
