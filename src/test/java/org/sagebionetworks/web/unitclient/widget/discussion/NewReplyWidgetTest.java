@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.discussion;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.discussion.NewReplyWidget.DEFAULT_MARKDOWN;
 
@@ -172,7 +172,7 @@ public class NewReplyWidgetTest {
     verify(mockSynAlert).clear();
     verify(mockMarkdownEditor).getMarkdown();
     verify(mockSynAlert).showError(anyString());
-    verifyZeroInteractions(mockDiscussionForumClient);
+    verifyNoInteractions(mockDiscussionForumClient);
   }
 
   @Test
@@ -209,7 +209,7 @@ public class NewReplyWidgetTest {
     verify(mockView).showSaving();
     verify(mockDiscussionForumClient)
       .createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
-    verifyZeroInteractions(mockCallback);
+    verifyNoInteractions(mockCallback);
     verify(mockSynAlert).handleException(exception);
     verify(mockView, times(2)).resetButton();
     // only called once on the initial reset (not after save)

@@ -2,11 +2,11 @@ package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_COUNT;
 
 import java.util.Arrays;
@@ -236,6 +236,6 @@ public class TotalVisibleResultsWidgetTest {
     widget.configure(entityView);
 
     verify(mockView, times(2)).setVisible(false);
-    verifyZeroInteractions(mockAsyncJobTracker);
+    verifyNoInteractions(mockAsyncJobTracker);
   }
 }

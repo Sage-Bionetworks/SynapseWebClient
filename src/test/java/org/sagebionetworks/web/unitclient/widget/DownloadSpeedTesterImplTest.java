@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyDouble;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.http.client.RequestCallback;
@@ -199,7 +199,7 @@ public class DownloadSpeedTesterImplTest {
 
     downloadSpeedTester.testDownloadSpeed(mockCallback);
 
-    verifyZeroInteractions(mockRequestBuilder, mockJsClient);
+    verifyNoInteractions(mockRequestBuilder, mockJsClient);
     verify(mockCallback).onSuccess(Double.valueOf(cachedDownloadSpeedString));
   }
 

@@ -54,7 +54,7 @@ public class ColumnModelsEditorWidgetTest {
     assertEquals(props.onCancel, mockOnCancel);
     assertFalse(props.open);
 
-    verifyZeroInteractions(mockGlobalAppState);
+    verifyNoInteractions(mockGlobalAppState);
   }
 
   @Test

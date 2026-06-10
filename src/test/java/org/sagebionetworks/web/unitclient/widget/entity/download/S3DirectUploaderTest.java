@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.core.client.JavaScriptObject;
@@ -176,7 +176,7 @@ public class S3DirectUploaderTest {
     // attempting to update progress when view is not attached is a no-op
     when(mockView.isAttached()).thenReturn(false);
     uploader.uploadFailed(errorMessage);
-    verifyZeroInteractions(mockProgressHandler);
+    verifyNoInteractions(mockProgressHandler);
 
     // if view is attached, error is forwarded to the progress handler
     when(mockView.isAttached()).thenReturn(true);

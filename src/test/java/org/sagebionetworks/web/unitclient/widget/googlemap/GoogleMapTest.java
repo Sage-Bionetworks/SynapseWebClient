@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.googlemap;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -78,7 +78,7 @@ public class GoogleMapTest {
     GoogleMap.isLoaded = false;
     map.configure();
     verify(mockLazyLoadHelper).setIsConfigured();
-    verifyZeroInteractions(mockJsClient);
+    verifyNoInteractions(mockJsClient);
     simulateInView();
     // verify attempt to load
     verify(mockJsClient)

@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl.NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER;
 
@@ -99,7 +99,7 @@ public class EditFileMetadataModalWidgetTest {
     when(mockView.getEntityName()).thenReturn(null);
     widget.onPrimary();
     verify(mockView).showError(NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
-    verifyZeroInteractions(mockSynapseClient);
+    verifyNoInteractions(mockSynapseClient);
     // should only be called on success
     verify(mockCallback, never()).invoke();
   }
@@ -113,7 +113,7 @@ public class EditFileMetadataModalWidgetTest {
       .showError(
         EditFileMetadataModalWidgetImpl.FILE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER
       );
-    verifyZeroInteractions(mockSynapseClient);
+    verifyNoInteractions(mockSynapseClient);
     // should only be called on success
     verify(mockCallback, never()).invoke();
   }

@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -119,12 +119,12 @@ public class UserIdCellRendererImplTest {
   @Test
   public void testSetValueEmpty() {
     renderer.setValue("");
-    verifyZeroInteractions(mockUserGroupHeaderAsyncHandler);
+    verifyNoInteractions(mockUserGroupHeaderAsyncHandler);
   }
 
   @Test
   public void testSetValueNull() {
     renderer.setValue(null);
-    verifyZeroInteractions(mockUserGroupHeaderAsyncHandler);
+    verifyNoInteractions(mockUserGroupHeaderAsyncHandler);
   }
 }

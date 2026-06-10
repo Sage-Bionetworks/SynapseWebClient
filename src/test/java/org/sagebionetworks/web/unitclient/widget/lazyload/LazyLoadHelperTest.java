@@ -3,7 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.lazyload;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -56,14 +56,14 @@ public class LazyLoadHelperTest {
     // in before, simulated the view is not yet attached, or in viewport, and underlying widget is not
     // yet configured
     lazyLoadHelper.startCheckingIfAttachedAndConfigured();
-    verifyZeroInteractions(mockLazyLoadCallbackQueue);
+    verifyNoInteractions(mockLazyLoadCallbackQueue);
 
     // configure
     lazyLoadHelper.setIsConfigured();
 
     // has not yet started looking loading data, because it's been configured but not attached (view
     // tells presenter when it's attached).
-    verifyZeroInteractions(mockLazyLoadCallbackQueue);
+    verifyNoInteractions(mockLazyLoadCallbackQueue);
     verify(mockInViewportCallback, never()).invoke();
 
     // attach, but still not in viewport

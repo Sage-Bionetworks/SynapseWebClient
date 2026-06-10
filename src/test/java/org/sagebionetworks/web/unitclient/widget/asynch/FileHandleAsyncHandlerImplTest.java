@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.asynch;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -107,7 +107,7 @@ public class FileHandleAsyncHandlerImplTest {
   public void testSuccess() {
     // verify no rpc if nothing has been requested.
     fileHandleAsyncHandler.executeRequests();
-    verifyZeroInteractions(mockSynapseJavascriptClient);
+    verifyNoInteractions(mockSynapseJavascriptClient);
 
     // simulate single file response for multiple requests for that file
     fileHandleAsyncHandler.getFileResult(mockFileAssociation, mockCallback);
@@ -208,7 +208,7 @@ public class FileHandleAsyncHandlerImplTest {
       when(mockFha.getFileHandleId()).thenReturn("file handle id = " + i);
       fileHandleAsyncHandler.getFileResult(mockFha, mockCallback);
     }
-    verifyZeroInteractions(mockSynapseJavascriptClient);
+    verifyNoInteractions(mockSynapseJavascriptClient);
 
     fileHandleAsyncHandler.getFileResult(mockFileAssociation, mockCallback);
     verify(mockSynapseJavascriptClient)

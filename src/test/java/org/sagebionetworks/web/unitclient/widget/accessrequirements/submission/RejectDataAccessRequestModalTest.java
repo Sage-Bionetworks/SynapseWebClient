@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.submission;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.act.RejectDataAccessRequestModal.ERROR_MESSAGE;

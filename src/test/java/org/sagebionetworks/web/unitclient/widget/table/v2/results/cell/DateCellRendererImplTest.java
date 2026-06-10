@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

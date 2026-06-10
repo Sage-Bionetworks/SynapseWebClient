@@ -3,9 +3,9 @@ package org.sagebionetworks.web.unitclient.widget.sharing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -19,7 +19,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -140,7 +140,7 @@ public class EvaluationAccessControlListEditorTest {
       .callSuccessWith(userGroupHeaderRP)
       .when(mockSynapseJavascriptClient)
       .getUserGroupHeadersById(
-        Matchers.<ArrayList<String>>any(),
+        ArgumentMatchers.<ArrayList<String>>any(),
         any(AsyncCallback.class)
       );
 
