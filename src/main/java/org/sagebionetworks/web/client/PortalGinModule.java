@@ -387,6 +387,8 @@ import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetVi
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidgetView;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetView;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
@@ -1254,6 +1256,7 @@ public class PortalGinModule extends AbstractGinModule {
 
     bind(WizardProgressWidgetView.class).to(WizardProgressWidgetViewImpl.class);
 
+    bind(UploadDialogWidget.class).to(UploadDialogWidgetV2.class);
     bind(UploadDialogWidgetView.class).to(UploadDialogWidgetViewImpl.class);
 
     bind(AddFolderDialogWidgetView.class)

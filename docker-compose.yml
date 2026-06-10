@@ -2,8 +2,8 @@
 services:
   # The GWT Codeserver compiles Java assets and serves an exploded WAR to be served by Tomcat
   gwt-codeserver:
-    # Use corretto 17 as in production. We use the Amazon Linux 2023 variant because it has a recent enough version of glibc required to run Node
-    image: maven:3.9.9-amazoncorretto-17-al2023
+    # Use corretto 21 as in production. We use the Amazon Linux 2023 variant because it has a recent enough version of glibc required to run Node
+    image: maven:3.9.16-amazoncorretto-21-al2023
     environment:
       - ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT=${ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT}
     command: mvn -Dorg.sagebionetworks.repositoryservice.endpoint=${ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT} -Dgwt.bindAddress=0.0.0.0 gwt:run-codeserver
