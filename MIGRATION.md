@@ -31,14 +31,14 @@ can be split into separate PRs vs. what must remain an atomic change.
 
 | Area | Finding |
 |------|---------|
-| Current state | Compiler target **11**, CI on JDK **11**, runtime **Corretto 17**, Tomcat **9**, `javax.servlet` only |
-| GWT | **2.11.0**; already ships `gwt-servlet-jakarta` (through 2.13.0) and runs on Java 21 |
-| GWT plugin | `org.codehaus.mojo:gwt-maven-plugin` **2.10.0** (frozen, June 2022); decoupled from GWT toolkit version. Fallback: `net.ltgt:gwt-maven-plugin:1.3.0` (maintained) |
+| Current state | Compiler target **11**, CI on JDK **11**, runtime **Corretto 17**, Tomcat **9**, `javax.servlet` only. GWT bumped to **2.13.0** (P4 ✓). |
+| GWT | **2.13.0** (bumped in P4); ships `gwt-servlet-jakarta` and runs on Java 21 |
+| GWT plugin | `org.codehaus.mojo:gwt-maven-plugin` **2.10.0** (frozen, June 2022); **confirmed working on JDK 21** (S0 spike). P4b not needed. |
 | `javax.servlet` surface | ~55 main files + ~24 test files; concentrated, no JAXB/validation/ws.rs/mail in source |
 | `@Inject` | 689 files use `com.google.inject.Inject` (jakarta-neutral); only 7 use `javax.inject.Inject` (5 client/GIN, 2 server) |
 | Spring | Shallow: no XML context, no DI, no MVC dispatcher. Only `RestTemplate`, `HttpStatus`, 3 `OncePerRequestFilter`, 1 `@Controller` |
 | Guice | 6.0.0; `guice-servlet` is `javax` -> needs Guice 7 (jakarta) |
-| Mockito | 2.28.2 (won't run on JDK 21); 267 files import the removed `org.mockito.Matchers`; 0 PowerMock; 0 static mocking |
+| Mockito | 2.28.2 (won't run on JDK 21); 267 files import the removed `org.mockito.Matchers`; 0 PowerMock; 0 static mocking. **S0 confirmed**: Mockito 5 + byte-buddy 1.15 resolves and has no JDK 21 runtime errors — only blocker is the P2 `Matchers` renames. |
 | GwtMockito | Abandoned at 1.1.9 (built vs Mockito 1.10.19); only **5** test files use it; drags in transitive `com.google.gwt:gwt-dev:2.8.0` |
 | Synapse libs | `synapseJavaClient` / `lib-*` are **servlet-neutral** today (verified via `dependency:tree`) |
 | Prod runtime | **Not configured in this repo** (no Dockerfile/deploy manifest); must be coordinated with ops |
@@ -49,15 +49,14 @@ can be split into separate PRs vs. what must remain an atomic change.
 
 ```mermaid
 flowchart LR
-    S0([S0: Build spike<br/>no merge])
+    S0([S0: Build spike<br/>complete - no merge])
     X([X: Upstream synapse<br/>jakarta release])
 
     subgraph PH1["Phase 1 — Java 21 + GWT 2.13 (Tomcat 9 / javax)"]
         P1[P1: Retire GwtMockito]
         P2[P2: Mockito 2 to 5]
         P3[P3: Remove dead test deps]
-        P4[P4: GWT 2.11 to 2.13]
-        P4b[P4b: Swap to Tbroyer plugin<br/>conditional]
+        P4[P4: GWT 2.11 to 2.13 ✓]
         P5[[P5: JDK 11 to 21 cutover]]
     end
 
@@ -69,14 +68,10 @@ flowchart LR
         P10[P10: Prod container/JDK - ops]
     end
 
-    S0 -. gates .-> P5
     P1 --> P2
     P2 --> P5
     P3 --> P5
     P4 --> P5
-    P4 -. if spike fails .-> P4b
-    P4b --> P5
-    S0 -. may insert .-> P4b
 
     P5 --> P9
     P6 --> P9
@@ -90,21 +85,17 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    S0([S0: Build spike])
+    S0([S0: Build spike<br/>complete])
     P1[P1: Retire GwtMockito<br/>5 test files + drop dep]
     P2[P2: Mockito 2 to 5<br/>267 Matchers renames]
     P3[P3: Remove Grizzly +<br/>servlet-api 2.5]
-    P4[P4: GWT 2.11 to 2.13<br/>pin sourceLevel 17]
-    P4b[P4b: Swap to Tbroyer<br/>net.ltgt 1.3.0]
+    P4[P4: GWT 2.11 to 2.13 ✓<br/>pin sourceLevel 17]
     P5[[P5: JDK 11 to 21 cutover<br/>compiler+CI+containers]]
 
     P1 --> P2 --> P5
     P3 --> P5
     P4 --> P5
     P1 -. soft .-> P4
-    P4 -. if S0 fails .-> P4b --> P5
-    S0 -. gates .-> P5
-    S0 -. gates .-> P4b
 ```
 
 ### Phase 2 detail
@@ -134,13 +125,12 @@ dependency, or ops coordination); dotted edges = conditional/soft dependencies.
 
 | ID | Title | Scope | Depends on | Merges green on | Size |
 |----|-------|-------|-----------|-----------------|------|
-| **S0** | Build spike | Prove (a) codehaus gwt-maven-plugin 2.10 + GWT 2.13 runs on JDK 21, (b) Mockito 5 + byte-buddy green on 21. No merge. | — | n/a | ~1 day |
+| **S0** | Build spike ✓ | Proved (a) codehaus gwt-maven-plugin 2.10 + GWT 2.13 runs on JDK 21 ✓, (b) Mockito 5 + byte-buddy 1.15 has no JDK 21 runtime errors ✓. P4b cancelled. | — | n/a | done |
 | **P1** | Retire GwtMockito | Migrate the 5 `GwtMockitoTestRunner` files to plain Mockito + mocked views; remove gwtmockito dep (also drops transitive `gwt-dev:2.8.0`) | — | JDK 11 / Mockito 2 | S |
 | **P2** | Mockito 2 -> 5 | `org.mockito.Matchers` -> `ArgumentMatchers` (267 files), version bump, explicit byte-buddy >=1.14 + objenesis pins | P1 | JDK 11 (Mockito 5 runs on 11) | M (mechanical) |
 | **P3** | Remove dead test deps | Drop Grizzly + `servlet-api:2.5` | — | any | XS |
-| **P4** | GWT 2.11 -> 2.13 | Bump `gwtVersion`, pin `<sourceLevel>17</sourceLevel>`, clean stale GWT artifacts | (soft) P1 | JDK 11 | S |
-| **P4b** | *Conditional:* swap to Tbroyer plugin | Only if S0 shows codehaus 2.10 fails on JDK 21; migrate plugin config/module layout to `net.ltgt:1.3.0` | P4, S0 | JDK 11 | M–L |
-| **P5** | JDK 11 -> 21 cutover | `maven.compiler.*` -> 21, `.mvn/jvm.config` add-opens, CI JDK -> 21, `.tool-versions` -> corretto-21, codeserver image 17 -> 21 | P2, P4 (+P4b), S0 | **JDK 21**, Tomcat 9 | M |
+| **P4** | GWT 2.11 -> 2.13 ✓ | Bump `gwtVersion`, pin `<sourceLevel>17</sourceLevel>`, normalize hardcoded `gwt-user` version | (soft) P1 | JDK 11 | done |
+| **P5** | JDK 11 -> 21 cutover | `maven.compiler.*` -> 21, `.mvn/jvm.config` add-opens, CI JDK -> 21, `.tool-versions` -> corretto-21, codeserver image 17 -> 21 | P2, P4 | **JDK 21**, Tomcat 9 | M |
 | **P6** | Server `@Inject` normalize | 2 server `javax.inject.Inject` -> `com.google.inject.Inject` (works under Guice 6) | — | Tomcat 9 | XS |
 | **P7** | Remove unused `javax.mail` | Delete dep | — | Tomcat 9 | XS |
 | **P8** | Replace `tomcat7-maven-plugin` | Remove dev-run plugin (rely on docker) | — | Tomcat 9 | XS |
@@ -166,7 +156,7 @@ Two ways to keep P9 reviewable despite being one merge:
 ## Ideal merge order
 
 1. `P3`, `P1` -> `P2`
-2. `P4` (-> `P4b` only if the spike requires it)
+2. ~~`P4`~~ done; ~~`P4b`~~ cancelled by S0
 3. **`P5`** closes Phase 1
 4. In parallel, land `P6`, `P7`, `P8` anytime (Tomcat 9, neutral prep)
 5. When `P5` is in and `X` (upstream jakarta release) is ready, open the `P9` branch
@@ -177,5 +167,4 @@ Two ways to keep P9 reviewable despite being one merge:
 - **Ops / infra:** production Tomcat 10 + JDK 21 image (outside this repo).
 - **Upstream:** synapse `lib-*` / `synapseJavaClient` jakarta release must land before P9
   merges.
-- **Step 0 spike** must run first; its outcome determines whether `P4b` (Tbroyer plugin
-  swap) is needed.
+- **Step 0 spike** is complete: codehaus plugin 2.10 works on JDK 21; P4b is cancelled.
