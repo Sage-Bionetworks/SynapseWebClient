@@ -22,7 +22,7 @@
   <inherits name="com.google.gwt.place.Place" />
   <inherits name="com.google.gwt.junit.JUnit" />
   <inherits name="com.google.gwt.logging.Logging" />
-  <inherits name="com.google.gwt.inject.Inject" />
+  <inherits name="dagger.Dagger" />
 
   <!-- inherit these modules to activate GWT internationalization -->
   <inherits name='com.google.gwt.i18n.I18N' />

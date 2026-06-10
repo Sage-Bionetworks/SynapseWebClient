@@ -35,10 +35,9 @@ public class Portal implements EntryPoint {
   // trying again...
   public static final int CODE_LOAD_DELAY = 5000;
 
-  // We are using gin to create all of our objects
-  private static final PortalGinInjector ginjector = GWT.create(
-    PortalGinInjector.class
-  );
+  // We use Dagger to create all of our objects
+  private static final PortalGinInjector ginjector =
+    DaggerPortalGinInjector.create();
   private SimplePanel appWidget = new SimplePanel();
 
   public static final native void _consoleError(String message) /*-{

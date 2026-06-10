@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.inject.client.GinModules;
-import com.google.gwt.inject.client.Ginjector;
+import dagger.Component;
+import javax.inject.Singleton;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
@@ -297,8 +297,9 @@ import org.sagebionetworks.web.client.widget.verification.VerificationSubmission
  * @author jmhill
  *
  */
-@GinModules(PortalGinModule.class)
-public interface PortalGinInjector extends Ginjector {
+@Singleton
+@Component(modules = { PortalGinModule.class, GwtBindingsModule.class })
+public interface PortalGinInjector {
   BulkPresenterProxy getBulkPresenterProxy();
 
   GlobalApplicationState getGlobalApplicationState();
