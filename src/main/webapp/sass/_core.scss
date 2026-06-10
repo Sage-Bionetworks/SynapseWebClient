@@ -2442,6 +2442,16 @@ i.fa.small-icon {
   font-size: 15px;
 }
 
+.file-preview-video-container video {
+  width: 100%;
+  height: auto;
+}
+
+.modal-fullscreen .modal-body video {
+  width: 100%;
+  height: auto;
+}
+
 .highlight-line-min {
   padding: 5px;
 }

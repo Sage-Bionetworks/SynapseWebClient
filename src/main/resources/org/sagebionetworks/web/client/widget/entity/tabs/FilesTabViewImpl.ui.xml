@@ -55,12 +55,9 @@
                 pull="RIGHT"
               />
             </bh:Div>
-            <g:ScrollPanel
-              height="200px"
-              addStyleNames="padding-15 whiteBackground"
-            >
-              <bh:Div ui:field="filePreviewWidgetContainer" />
-            </g:ScrollPanel>
+            <bh:Div addStyleNames="padding-15 whiteBackground">
+              <bh:Div ui:field="filePreviewWidgetContainer" addStyleNames="file-preview-video-container" />
+            </bh:Div>
           </g:FlowPanel>
         </MUI:Grid>
         <MUI:Grid xs="12" md="6">

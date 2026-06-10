@@ -29,19 +29,21 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
   ) {
     this.clear();
 
+    // Use the provided dimensions, defaulting to 640x480 if not specified.
+    // max-width:100% allows the video to shrink below its nominal width to fill
+    // smaller containers (e.g. the Files tab preview pane) while respecting the
+    // aspect ratio automatically.
+    String w = (width != null) ? SafeHtmlUtils.htmlEscape(width) : "640";
+    String h = (height != null) ? SafeHtmlUtils.htmlEscape(height) : "480";
+
     StringBuilder builder = new StringBuilder();
-
-    builder.append("<video width=\"");
-    if (width != null) builder.append(
-      SafeHtmlUtils.htmlEscape(width)
-    ); else builder.append("640");
-
-    builder.append("\" height=\"");
-    if (height != null) builder.append(
-      SafeHtmlUtils.htmlEscape(height)
-    ); else builder.append("480");
-
-    builder.append("\" controls crossorigin=\"anonymous\">");
+    builder.append(
+      "<video width=\"" +
+      w +
+      "\" height=\"" +
+      h +
+      "\" style=\"max-width:100%;height:auto;\" controls crossorigin=\"anonymous\">"
+    );
     if (mp4SynapseId != null) {
       builder.append("<source src=\"");
       builder.append(
