@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.Date;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DateTimeUtils;
@@ -54,9 +55,10 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
     }
   };
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
   public ProjectBadgeViewImpl(
-    final Binder uiBinder,
     SynapseJSNIUtils synapseJSNIUtils,
     SageImageBundle sageImageBundle,
     DateTimeUtils dateTimeUtils,

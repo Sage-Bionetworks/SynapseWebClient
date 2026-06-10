@@ -1,12 +1,14 @@
 package org.sagebionetworks.web.client.cache;
 
 import com.google.gwt.storage.client.Storage;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 
 public class StorageImpl implements StorageWrapper {
 
   private Storage storage;
 
+  @Inject
   public StorageImpl() {
     storage = Storage.getLocalStorageIfSupported();
   }

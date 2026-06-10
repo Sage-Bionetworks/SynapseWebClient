@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;

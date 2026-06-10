@@ -9,9 +9,9 @@ import static org.sagebionetworks.web.shared.WidgetConstants.UI_SCHEMA_ID_KEY;
 import static org.sagebionetworks.web.shared.WidgetConstants.UNAVAILABLE_MESSAGE;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;

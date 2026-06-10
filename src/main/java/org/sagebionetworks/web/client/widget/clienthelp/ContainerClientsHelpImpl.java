@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.clienthelp;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
@@ -46,8 +47,10 @@ public class ContainerClientsHelpImpl implements ContainerClientsHelp {
 
   public interface Binder extends UiBinder<Widget, ContainerClientsHelpImpl> {}
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public ContainerClientsHelpImpl(Binder binder) {
+  public ContainerClientsHelpImpl() {
     this.widget = binder.createAndBindUi(this);
     FileClientsHelpViewImpl.setId(cliTabListItem, cliTabPane);
     FileClientsHelpViewImpl.setId(pythonTabListItem, pythonTabPane);

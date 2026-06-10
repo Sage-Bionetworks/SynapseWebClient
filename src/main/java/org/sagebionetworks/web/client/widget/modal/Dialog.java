@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.Iterator;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalSize;
@@ -52,6 +53,7 @@ public class Dialog
   /**
    * Create a new Modal dialog.
    */
+  @Inject
   public Dialog() {
     uiBinder = GWT.create(DialogUiBinder.class);
     widget = uiBinder.createAndBindUi(this);

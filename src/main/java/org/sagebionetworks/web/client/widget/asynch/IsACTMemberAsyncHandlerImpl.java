@@ -9,7 +9,7 @@ import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;

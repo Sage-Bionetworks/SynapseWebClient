@@ -4,6 +4,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.jsinterop.AlertButtonConfig;
 import org.sagebionetworks.web.client.jsinterop.OrientationBannerProps;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -20,6 +21,7 @@ public class OrientationBanner implements IsWidget {
    * This is an OrientationBanner component, with an illustration, title, text, and optional link and call to action buttons.
    *
    */
+  @Inject
   public OrientationBanner() {
     container = new ReactComponent();
   }

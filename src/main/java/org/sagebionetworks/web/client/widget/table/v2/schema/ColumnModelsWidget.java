@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.HasDefiningSql;

@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
@@ -54,11 +55,12 @@ public class InviteWidgetViewImpl
   private PortalGinInjector ginInjector;
   private Widget widget;
 
+  private final InviteWidgetViewImplUiBinder binder = GWT.create(
+    InviteWidgetViewImplUiBinder.class
+  );
+
   @Inject
-  public InviteWidgetViewImpl(
-    InviteWidgetViewImplUiBinder binder,
-    PortalGinInjector ginInjector
-  ) {
+  public InviteWidgetViewImpl(PortalGinInjector ginInjector) {
     this.widget = binder.createAndBindUi(this);
     this.ginInjector = ginInjector;
     sendInviteButton.addClickHandler(event -> {

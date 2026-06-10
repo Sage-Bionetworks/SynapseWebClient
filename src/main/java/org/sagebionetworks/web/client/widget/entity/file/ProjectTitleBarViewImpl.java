@@ -6,7 +6,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityType;
@@ -27,7 +27,7 @@ public class ProjectTitleBarViewImpl implements ProjectTitleBarView {
   @UiField
   Div actionMenuContainer;
 
-  interface BasicTitleBarViewImplUiBinder
+  public interface BasicTitleBarViewImplUiBinder
     extends UiBinder<Widget, ProjectTitleBarViewImpl> {}
 
   private static BasicTitleBarViewImplUiBinder uiBinder = GWT.create(

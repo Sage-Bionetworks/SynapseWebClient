@@ -7,9 +7,9 @@ import static org.sagebionetworks.web.client.widget.table.v2.results.QueryBundle
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityRef;

@@ -21,9 +21,9 @@
 
     <synapse.version>590.0-2-g176723d14c</synapse.version>
     <gwtVersion>2.13.0</gwtVersion>
-    <org.springframework.version>5.3.39</org.springframework.version>
-    <guiceVersion>6.0.0</guiceVersion>
-    <ginVersion>2.1.2</ginVersion>
+    <org.springframework.version>6.2.8</org.springframework.version>
+    <guiceVersion>7.0.0</guiceVersion>
+    <daggerVersion>2.59.2</daggerVersion>
     <xstream.version>1.3.1</xstream.version>
     <schema-to-pojo.version>0.6.10</schema-to-pojo.version>
     <jackson.version>2.18.2</jackson.version>
@@ -35,7 +35,7 @@
     <gwtvisualizationwrappers.version>
       1.6-gwt-2.7.0
     </gwtvisualizationwrappers.version>
-    <freemarker.version>2.3.32</freemarker.version>
+    <freemarker.version>2.3.34</freemarker.version>
     <gwt.module.suffix />
   </properties>
 
@@ -351,7 +351,16 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.0</version>
+        <version>3.13.0</version>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>com.google.dagger</groupId>
+              <artifactId>dagger-compiler</artifactId>
+              <version>${daggerVersion}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>com.github.eirslett</groupId>
@@ -680,7 +689,7 @@
 
     <dependency>
       <groupId>com.fasterxml.jackson.module</groupId>
-      <artifactId>jackson-module-jaxb-annotations</artifactId>
+      <artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
       <version>${jackson.version}</version>
     </dependency>
 
@@ -730,9 +739,9 @@
       <version>2.4.0</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>4.5.14</version>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
+      <version>5.5.2</version>
     </dependency>
 
     <dependency>
@@ -767,10 +776,25 @@
       <version>${log4j.version}</version>
     </dependency>
     <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>6.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- Client DI (Dagger) uses javax.inject.* on GWT-translatable client code.
+         Pinned explicitly (not relying on dagger-gwt's transitive dep) and kept on
+         javax (not jakarta) because the GWT client is capped at Java 17 and Guice 7
+         dropped javax.inject. -->
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.gwtproject</groupId>
-      <artifactId>gwt-servlet</artifactId>
+      <artifactId>gwt-servlet-jakarta</artifactId>
       <version>${gwtVersion}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.gwtproject</groupId>
@@ -799,10 +823,13 @@
       <artifactId>guice-assistedinject</artifactId>
       <version>${guiceVersion}</version>
     </dependency>
+    <!-- Dagger-GWT: client-side DI replacing GIN. dagger-gwt ships the GWT module
+         descriptors (dagger.Dagger) and pulls dagger/javax.inject/jakarta.inject
+         *sources* onto the GWT compile classpath for translation. -->
     <dependency>
-      <groupId>com.google.gwt.inject</groupId>
-      <artifactId>gin</artifactId>
-      <version>${ginVersion}</version>
+      <groupId>com.google.dagger</groupId>
+      <artifactId>dagger-gwt</artifactId>
+      <version>${daggerVersion}</version>
       <scope>provided</scope>
     </dependency>
 

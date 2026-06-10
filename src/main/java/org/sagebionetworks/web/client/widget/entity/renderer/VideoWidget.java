@@ -3,15 +3,16 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import static com.google.common.util.concurrent.Futures.getDone;
 import static com.google.common.util.concurrent.Futures.whenAllComplete;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static org.sagebionetworks.web.client.DisplayConstants.*;
+import static org.sagebionetworks.web.client.DisplayConstants.ERROR_FAILURE_PRIVLEDGES;
+import static org.sagebionetworks.web.client.DisplayConstants.ERROR_LOGIN_REQUIRED;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;

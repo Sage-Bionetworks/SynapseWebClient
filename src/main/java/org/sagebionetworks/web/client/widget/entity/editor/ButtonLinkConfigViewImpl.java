@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.Map;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -51,8 +52,12 @@ public class ButtonLinkConfigViewImpl implements ButtonLinkConfigView {
   Widget widget;
   String alignment;
 
+  private final ButtonLinkConfigViewImplUiBinder binder = GWT.create(
+    ButtonLinkConfigViewImplUiBinder.class
+  );
+
   @Inject
-  public ButtonLinkConfigViewImpl(ButtonLinkConfigViewImplUiBinder binder) {
+  public ButtonLinkConfigViewImpl() {
     widget = binder.createAndBindUi(this);
 
     ClickHandler updatePreviewClickHandler = event -> {

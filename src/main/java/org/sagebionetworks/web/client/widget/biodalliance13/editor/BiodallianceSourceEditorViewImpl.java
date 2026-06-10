@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Input;
@@ -45,10 +46,12 @@ public class BiodallianceSourceEditorViewImpl
 
   Presenter presenter;
 
+  private final BiodallianceSourceViewImplUiBinder binder = GWT.create(
+    BiodallianceSourceViewImplUiBinder.class
+  );
+
   @Inject
-  public BiodallianceSourceEditorViewImpl(
-    BiodallianceSourceViewImplUiBinder binder
-  ) {
+  public BiodallianceSourceEditorViewImpl() {
     widget = binder.createAndBindUi(this);
     entityPickerTextbox.addClickHandler(event -> entityPicker());
     entityPickerButton.addClickHandler(event -> entityPicker());

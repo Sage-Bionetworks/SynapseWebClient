@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Span;
 
 public class ContainerItemCountWidgetViewImpl
@@ -17,8 +18,10 @@ public class ContainerItemCountWidgetViewImpl
   public interface Binder
     extends UiBinder<Widget, ContainerItemCountWidgetViewImpl> {}
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public ContainerItemCountWidgetViewImpl(Binder uiBinder) {
+  public ContainerItemCountWidgetViewImpl() {
     widget = uiBinder.createAndBindUi(this);
   }
 

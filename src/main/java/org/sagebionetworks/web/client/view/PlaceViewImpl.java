@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
@@ -32,8 +33,12 @@ public class PlaceViewImpl implements PlaceView {
 
   Widget widget;
 
+  private final PlaceViewImplUiBinder binder = GWT.create(
+    PlaceViewImplUiBinder.class
+  );
+
   @Inject
-  public PlaceViewImpl(PlaceViewImplUiBinder binder, Header headerWidget) {
+  public PlaceViewImpl(Header headerWidget) {
     widget = binder.createAndBindUi(this);
     this.headerWidget = headerWidget;
     headerWidget.configure();

@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_VALUE
 import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_VALUE_NEW_PASSWORD;
 import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_VALUE_USERNAME;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -20,7 +21,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
@@ -103,11 +104,12 @@ public class PasswordResetViewImpl
 
   private boolean isShowingResetUI;
 
+  private final PasswordResetViewImplUiBinder binder = GWT.create(
+    PasswordResetViewImplUiBinder.class
+  );
+
   @Inject
-  public PasswordResetViewImpl(
-    PasswordResetViewImplUiBinder binder,
-    Header headerWidget
-  ) {
+  public PasswordResetViewImpl(Header headerWidget) {
     initWidget(binder.createAndBindUi(this));
     this.headerWidget = headerWidget;
 

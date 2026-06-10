@@ -1,43 +1,18 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.dao.WikiPageKey;
-import org.sagebionetworks.repo.model.table.RowReference;
-import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.server.servlet.CdnRedirectorServlet;
-import org.sagebionetworks.web.server.servlet.RequestHostProvider;
-import org.sagebionetworks.web.server.servlet.SynapseProvider;
-import org.sagebionetworks.web.server.servlet.TokenProvider;
-import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 
 public class CdnRedirectorServletTest {
 

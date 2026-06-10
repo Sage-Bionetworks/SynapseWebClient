@@ -5,15 +5,12 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-import java.util.HashMap;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
-import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 public class ChallengeWidget

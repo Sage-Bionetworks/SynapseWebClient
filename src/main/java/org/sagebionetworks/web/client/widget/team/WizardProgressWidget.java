@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.team;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 
 public class WizardProgressWidget
   implements WizardProgressWidgetView.Presenter, IsWidget {

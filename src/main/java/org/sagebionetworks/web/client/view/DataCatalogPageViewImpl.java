@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.view;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.jsinterop.CardConfiguration;
 import org.sagebionetworks.web.client.jsinterop.GenericCardSchema;
 import org.sagebionetworks.web.client.widget.header.Header;

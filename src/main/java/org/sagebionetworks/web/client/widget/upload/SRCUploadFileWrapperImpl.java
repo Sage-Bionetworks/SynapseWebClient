@@ -2,11 +2,15 @@ package org.sagebionetworks.web.client.widget.upload;
 
 import elemental2.dom.Blob;
 import elemental2.promise.Promise;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.IsCancelled;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.Progress;
 
 public class SRCUploadFileWrapperImpl implements SRCUploadFileWrapper {
+
+  @Inject
+  public SRCUploadFileWrapperImpl() {}
 
   @Override
   public Promise uploadFile(

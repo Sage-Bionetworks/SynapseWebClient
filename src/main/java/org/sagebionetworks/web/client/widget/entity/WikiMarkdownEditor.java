@@ -5,9 +5,9 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.HashSet;
 import java.util.List;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;

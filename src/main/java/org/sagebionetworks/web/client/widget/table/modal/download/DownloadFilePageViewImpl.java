@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.modal.download;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Form;
 
 public class DownloadFilePageViewImpl implements DownloadFilePageView {
@@ -11,8 +12,10 @@ public class DownloadFilePageViewImpl implements DownloadFilePageView {
 
   Form form;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public DownloadFilePageViewImpl(Binder binder) {
+  public DownloadFilePageViewImpl() {
     form = binder.createAndBindUi(this);
   }
 

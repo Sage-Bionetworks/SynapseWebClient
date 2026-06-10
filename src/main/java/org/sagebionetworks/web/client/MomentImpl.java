@@ -1,6 +1,11 @@
 package org.sagebionetworks.web.client;
 
+import javax.inject.Inject;
+
 public class MomentImpl implements Moment {
+
+  @Inject
+  public MomentImpl() {}
 
   @Override
   public String getRelativeTime(String s) {

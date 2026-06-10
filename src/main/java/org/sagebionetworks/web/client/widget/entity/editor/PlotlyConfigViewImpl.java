@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -8,8 +9,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
@@ -92,8 +93,12 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 
   Widget widget;
 
+  private final PlotlyConfigViewImplUiBinder binder = GWT.create(
+    PlotlyConfigViewImplUiBinder.class
+  );
+
   @Inject
-  public PlotlyConfigViewImpl(PlotlyConfigViewImplUiBinder binder) {
+  public PlotlyConfigViewImpl() {
     widget = binder.createAndBindUi(this);
     entityPickerButton.addClickHandler(
       new ClickHandler() {

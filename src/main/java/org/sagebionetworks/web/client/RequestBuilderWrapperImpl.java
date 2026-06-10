@@ -5,8 +5,12 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestBuilder.Method;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
+import javax.inject.Inject;
 
 public class RequestBuilderWrapperImpl implements RequestBuilderWrapper {
+
+  @Inject
+  public RequestBuilderWrapperImpl() {}
 
   RequestBuilder requestBuilder;
 

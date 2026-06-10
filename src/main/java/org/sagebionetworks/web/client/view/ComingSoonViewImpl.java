@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -43,9 +44,12 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
   private Header headerWidget;
   JSONObjectAdapter jsonObjectAdapter;
 
+  private final ComingSoonViewImplUiBinder binder = GWT.create(
+    ComingSoonViewImplUiBinder.class
+  );
+
   @Inject
   public ComingSoonViewImpl(
-    ComingSoonViewImplUiBinder binder,
     Header headerWidget,
     Footer footerWidget,
     SynapseJSNIUtils synapseJSNIUtils,

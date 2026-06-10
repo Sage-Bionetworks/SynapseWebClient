@@ -1,7 +1,7 @@
 # Compose file for SynapseWebClient E2E tests
 services:
   swc-e2e-tomcat:
-    image: tomcat:9
+    image: tomcat:10
     ports:
       - '8888:8080' # Adjust as needed
     volumes:

@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.docker;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.web.client.utils.CallbackP;
 

@@ -4,7 +4,7 @@ import static org.sagebionetworks.web.client.DisplayConstants.WORKING_COPY;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalBody;
 import org.gwtbootstrap3.client.ui.ModalSize;

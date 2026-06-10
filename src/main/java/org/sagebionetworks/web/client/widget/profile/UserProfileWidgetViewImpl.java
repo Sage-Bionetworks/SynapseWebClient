@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.profile;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTIFIED;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_VERIFIED;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -10,8 +11,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
@@ -120,9 +121,10 @@ public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
 
   SynapseJavascriptClient jsClient;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
   public UserProfileWidgetViewImpl(
-    Binder binder,
     SynapseJavascriptClient jsClient,
     OneSageUtils oneSageUtils
   ) {

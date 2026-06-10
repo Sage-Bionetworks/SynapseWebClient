@@ -4,6 +4,7 @@ import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -19,6 +20,7 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
   public interface TabsViewImplUiBinder
     extends UiBinder<Widget, DiscussionTabViewImpl> {}
 
+  @Inject
   public DiscussionTabViewImpl() {
     TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);
     widget = binder.createAndBindUi(this);

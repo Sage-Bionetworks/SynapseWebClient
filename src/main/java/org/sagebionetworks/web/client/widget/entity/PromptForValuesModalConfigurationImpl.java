@@ -118,6 +118,7 @@ public class PromptForValuesModalConfigurationImpl
     String helpPopoverHref;
     Placement helpPopoverPlacement;
 
+    @javax.inject.Inject
     public Builder() {
       prompts = new ArrayList<>();
       initialValues = new ArrayList<>();

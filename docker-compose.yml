@@ -42,7 +42,7 @@ services:
 
   # The Tomcat server serves the exploded WAR as a web application
   swc-dev-tomcat:
-    image: tomcat:9
+    image: tomcat:10
     ports:
       - '8888:8080' # Adjust as needed
     environment:

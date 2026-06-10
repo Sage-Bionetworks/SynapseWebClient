@@ -1,17 +1,20 @@
 package org.sagebionetworks.web.client.widget;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.OneSageUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
+@Singleton
 public class QuarantinedEmailModal implements IsWidget {
 
   public interface Binder extends UiBinder<Widget, QuarantinedEmailModal> {}
@@ -21,9 +24,10 @@ public class QuarantinedEmailModal implements IsWidget {
 
   Modal widget;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
   public QuarantinedEmailModal(
-    Binder binder,
     AuthenticationController authController,
     GlobalApplicationState globalAppState,
     OneSageUtils oneSageUtils

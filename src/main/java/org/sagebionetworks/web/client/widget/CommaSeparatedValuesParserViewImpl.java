@@ -1,17 +1,13 @@
 package org.sagebionetworks.web.client.widget;
 
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextArea;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorViewImpl;
 
 public class CommaSeparatedValuesParserViewImpl
   implements CommaSeparatedValuesParserView {
@@ -34,10 +30,12 @@ public class CommaSeparatedValuesParserViewImpl
   @UiField
   TextArea commaSeparatedTextBox;
 
+  private final CommaSeparatedValuesParserViewImpl.Binder uiBinder = GWT.create(
+    CommaSeparatedValuesParserViewImpl.Binder.class
+  );
+
   @Inject
-  public CommaSeparatedValuesParserViewImpl(
-    CommaSeparatedValuesParserViewImpl.Binder uiBinder
-  ) {
+  public CommaSeparatedValuesParserViewImpl() {
     widget = uiBinder.createAndBindUi(this);
     cancelButton.addClickHandler(clickEvent -> presenter.onCancel());
     addButton.addClickHandler(clickEvent -> presenter.onAdd());

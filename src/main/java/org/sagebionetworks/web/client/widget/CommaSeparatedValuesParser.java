@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.widget.csv.PapaCSVParser;
 import org.sagebionetworks.web.client.widget.csv.PapaParseResult;
 

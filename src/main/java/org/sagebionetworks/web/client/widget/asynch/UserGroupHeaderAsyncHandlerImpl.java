@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.GWTWrapper;

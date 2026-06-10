@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -24,12 +25,12 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
   private Header headerWidget;
   private WikiPageWidget wikiPage;
 
+  private final WikiViewImplUiBinder binder = GWT.create(
+    WikiViewImplUiBinder.class
+  );
+
   @Inject
-  public SynapseWikiViewImpl(
-    WikiViewImplUiBinder binder,
-    Header headerWidget,
-    WikiPageWidget wikiPage
-  ) {
+  public SynapseWikiViewImpl(Header headerWidget, WikiPageWidget wikiPage) {
     initWidget(binder.createAndBindUi(this));
 
     this.headerWidget = headerWidget;

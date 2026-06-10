@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -27,8 +28,10 @@ public class EntityListWidgetViewImpl implements EntityListWidgetView {
   @UiField
   TableHeader descriptionHeader;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public EntityListWidgetViewImpl(Binder binder) {
+  public EntityListWidgetViewImpl() {
     widget = binder.createAndBindUi(this);
   }
 

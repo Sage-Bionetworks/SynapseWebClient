@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.cache;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 
 public class ClientCacheImpl implements ClientCache {
 

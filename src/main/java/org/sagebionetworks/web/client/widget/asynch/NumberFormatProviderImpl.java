@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
 import com.google.gwt.i18n.client.NumberFormat;
+import javax.inject.Inject;
 
 /**
  * Simple wrapper for a GWT NumberFormat.
@@ -9,6 +10,9 @@ import com.google.gwt.i18n.client.NumberFormat;
  *
  */
 public class NumberFormatProviderImpl implements NumberFormatProvider {
+
+  @Inject
+  public NumberFormatProviderImpl() {}
 
   NumberFormat format;
 

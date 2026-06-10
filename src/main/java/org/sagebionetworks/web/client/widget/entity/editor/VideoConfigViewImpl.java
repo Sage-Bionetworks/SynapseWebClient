@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.TabListItem;
@@ -66,11 +67,12 @@ public class VideoConfigViewImpl implements VideoConfigView {
 
   Widget widget;
 
+  private final VideoConfigViewImplUiBinder binder = GWT.create(
+    VideoConfigViewImplUiBinder.class
+  );
+
   @Inject
-  public VideoConfigViewImpl(
-    VideoConfigViewImplUiBinder binder,
-    EntityFinderWidget.Builder entityFinderBuilder
-  ) {
+  public VideoConfigViewImpl(EntityFinderWidget.Builder entityFinderBuilder) {
     widget = binder.createAndBindUi(this);
     this.entityFinder =
       entityFinderBuilder

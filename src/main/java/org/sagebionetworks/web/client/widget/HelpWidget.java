@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -40,6 +41,7 @@ public class HelpWidget implements IsWidget {
   boolean showCloseButton = true;
   String className = "vertical-align-middle";
 
+  @Inject
   public HelpWidget() {
     widget.addStyleName("HelpWidget");
   }

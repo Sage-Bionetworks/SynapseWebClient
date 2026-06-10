@@ -4,8 +4,8 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.TimeZone;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
-import com.google.inject.Inject;
 import java.util.Date;
+import javax.inject.Inject;
 
 public class DateTimeUtilsImpl implements DateTimeUtils {
 

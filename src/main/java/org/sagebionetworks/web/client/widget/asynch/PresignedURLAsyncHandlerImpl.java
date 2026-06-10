@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;

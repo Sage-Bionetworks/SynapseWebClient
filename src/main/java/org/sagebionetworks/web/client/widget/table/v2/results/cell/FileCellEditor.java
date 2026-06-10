@@ -4,7 +4,7 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;

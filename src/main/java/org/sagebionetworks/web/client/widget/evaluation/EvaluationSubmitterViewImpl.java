@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -12,8 +13,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
@@ -166,9 +167,10 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
   private PortalGinInjector ginInjector;
   String originalNextButtonText, originalSubmitButtonText;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
   public EvaluationSubmitterViewImpl(
-    Binder binder,
     EntityFinderWidget.Builder entityFinderBuilder,
     EvaluationList evaluationList,
     PortalGinInjector ginInjector,

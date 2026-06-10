@@ -2,10 +2,12 @@ package org.sagebionetworks.web.server;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.apache.http.client.HttpClient;
-import org.apache.http.config.SocketConfig;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import java.util.concurrent.TimeUnit;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
@@ -34,19 +36,21 @@ public class RestTemplateProviderImpl implements RestTemplateProvider {
       "org.sagebionetworks.rest.template.max.total.connections"
     ) int maxTotalConnections
   ) {
-    // This connection manager allows us to have multiple thread
-    // making http calls.
-    // For now use the default values.
     PoolingHttpClientConnectionManager poolingManager =
-      new PoolingHttpClientConnectionManager();
-    poolingManager.setMaxTotal(maxTotalConnections);
-    HttpClientBuilder builder = HttpClientBuilder.create();
-    builder.setConnectionManager(poolingManager);
-    builder.setDefaultSocketConfig(
-      SocketConfig.custom().setSoTimeout(connectionTimeout).build()
-    );
-    HttpClient client = builder.build();
-    // We can now use this manager to create our rest template
+      PoolingHttpClientConnectionManagerBuilder
+        .create()
+        .setMaxConnTotal(maxTotalConnections)
+        .setDefaultConnectionConfig(
+          ConnectionConfig
+            .custom()
+            .setSocketTimeout(connectionTimeout, TimeUnit.MILLISECONDS)
+            .build()
+        )
+        .build();
+    HttpClient client = HttpClients
+      .custom()
+      .setConnectionManager(poolingManager)
+      .build();
     HttpComponentsClientHttpRequestFactory factory =
       new HttpComponentsClientHttpRequestFactory(client);
     tempalteSingleton = new RestTemplate(factory);

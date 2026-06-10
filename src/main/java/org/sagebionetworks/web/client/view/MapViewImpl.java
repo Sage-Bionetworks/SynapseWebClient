@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -26,12 +27,12 @@ public class MapViewImpl implements MapView {
 
   private Header headerWidget;
 
+  private final MapViewImplUiBinder binder = GWT.create(
+    MapViewImplUiBinder.class
+  );
+
   @Inject
-  public MapViewImpl(
-    MapViewImplUiBinder binder,
-    Header headerWidget,
-    SynapseJSNIUtils synapseJSNIUtils
-  ) {
+  public MapViewImpl(Header headerWidget, SynapseJSNIUtils synapseJSNIUtils) {
     widget = binder.createAndBindUi(this);
     this.headerWidget = headerWidget;
     headerWidget.configure();

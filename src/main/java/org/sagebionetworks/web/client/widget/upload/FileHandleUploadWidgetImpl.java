@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.upload;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import elemental2.dom.Blob;
 import elemental2.dom.FileList;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.SynapseJsInteropUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;

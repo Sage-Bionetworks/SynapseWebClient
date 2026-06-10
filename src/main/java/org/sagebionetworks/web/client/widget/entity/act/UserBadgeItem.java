@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -7,7 +8,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Radio;
@@ -51,11 +52,12 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
   AccessorChange change;
   UserProfile profile;
 
+  private final UserBadgeItemUiBinder binder = GWT.create(
+    UserBadgeItemUiBinder.class
+  );
+
   @Inject
-  public UserBadgeItem(
-    UserBadgeItemUiBinder binder,
-    PortalGinInjector portalGinInjector
-  ) {
+  public UserBadgeItem(PortalGinInjector portalGinInjector) {
     widget = binder.createAndBindUi(this);
     this.portalGinInjector = portalGinInjector;
     select.addClickHandler(event -> {

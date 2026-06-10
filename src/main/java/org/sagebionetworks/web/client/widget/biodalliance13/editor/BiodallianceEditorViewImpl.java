@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.RadioButton;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -52,8 +53,12 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
   Widget widget;
   org.sagebionetworks.web.client.widget.SelectableListView.Presenter selectionToolbarHandler;
 
+  private final BiodallianceEditorViewImplUiBinder binder = GWT.create(
+    BiodallianceEditorViewImplUiBinder.class
+  );
+
   @Inject
-  public BiodallianceEditorViewImpl(BiodallianceEditorViewImplUiBinder binder) {
+  public BiodallianceEditorViewImpl() {
     widget = binder.createAndBindUi(this);
     addTrackButton.addClickHandler(
       new ClickHandler() {

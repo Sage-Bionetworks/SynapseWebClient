@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import com.google.gwt.place.shared.Place;
-import com.google.inject.Inject;
 import java.util.Map;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;

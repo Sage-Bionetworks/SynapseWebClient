@@ -2,8 +2,8 @@ package org.sagebionetworks.web.client.widget.team;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;

@@ -4,9 +4,9 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;

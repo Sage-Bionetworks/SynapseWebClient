@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -9,7 +10,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -44,8 +45,10 @@ public class AddFolderDialogWidgetViewImpl
   public interface Binder
     extends UiBinder<Widget, AddFolderDialogWidgetViewImpl> {}
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public AddFolderDialogWidgetViewImpl(Binder uiBinder) {
+  public AddFolderDialogWidgetViewImpl() {
     w = uiBinder.createAndBindUi(this);
     okNewFolderButton.addClickHandler(
       new ClickHandler() {

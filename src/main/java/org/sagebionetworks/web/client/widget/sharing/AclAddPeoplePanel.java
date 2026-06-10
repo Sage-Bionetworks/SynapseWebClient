@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -7,7 +8,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Tooltip;
@@ -42,9 +43,12 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 
   private HandlerRegistration makePublicReg;
 
+  private final AclAddPeoplePanelUiBinder uiBinder = GWT.create(
+    AclAddPeoplePanelUiBinder.class
+  );
+
   @Inject
   public AclAddPeoplePanel(
-    AclAddPeoplePanelUiBinder uiBinder,
     SynapseSuggestBox suggestBox,
     UserGroupSuggestionProvider provider
   ) {

@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.modal.download;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;

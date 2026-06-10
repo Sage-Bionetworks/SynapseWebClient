@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.docker;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -41,8 +42,10 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
   public interface Binder
     extends UiBinder<Widget, DockerRepoListWidgetViewImpl> {}
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public DockerRepoListWidgetViewImpl(Binder binder) {
+  public DockerRepoListWidgetViewImpl() {
     this.widget = binder.createAndBindUi(this);
   }
 

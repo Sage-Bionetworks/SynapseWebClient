@@ -5,11 +5,15 @@ import com.google.gwt.user.client.Event.NativePreviewHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import javax.inject.Inject;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 
 public class GlobalApplicationStateViewImpl
   implements GlobalApplicationStateView {
+
+  @Inject
+  public GlobalApplicationStateViewImpl() {}
 
   private static final int UNLIMITED_TIME = 0;
 

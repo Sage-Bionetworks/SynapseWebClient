@@ -25,6 +25,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
 import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +37,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;

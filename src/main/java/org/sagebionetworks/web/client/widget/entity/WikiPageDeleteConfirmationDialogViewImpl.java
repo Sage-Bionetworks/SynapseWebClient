@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListItem;
 import org.gwtbootstrap3.client.ui.Modal;
@@ -38,10 +39,11 @@ public class WikiPageDeleteConfirmationDialogViewImpl
 
   Modal modal;
 
+  private final WikiPageDeleteConfirmationDialogViewImplUiBinder binder =
+    GWT.create(WikiPageDeleteConfirmationDialogViewImplUiBinder.class);
+
   @Inject
-  public WikiPageDeleteConfirmationDialogViewImpl(
-    WikiPageDeleteConfirmationDialogViewImplUiBinder binder
-  ) {
+  public WikiPageDeleteConfirmationDialogViewImpl() {
     modal = (Modal) binder.createAndBindUi(this);
 
     deleteWikiButton.addClickHandler(event -> {

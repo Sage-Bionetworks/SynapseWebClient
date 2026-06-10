@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -18,8 +19,10 @@ public class TopicWidgetViewImpl implements TopicWidgetView {
   Widget w;
   Presenter presenter;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public TopicWidgetViewImpl(Binder binder) {
+  public TopicWidgetViewImpl() {
     this.w = binder.createAndBindUi(this);
   }
 

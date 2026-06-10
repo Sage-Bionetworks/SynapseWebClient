@@ -4,7 +4,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.jsinterop.EntityPageTitleBarProps;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -26,7 +26,7 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
     reactComponentContainer.render(reactElement);
   }
 
-  interface BasicTitleBarViewImplUiBinder
+  public interface BasicTitleBarViewImplUiBinder
     extends UiBinder<Widget, BasicTitleBarViewImpl> {}
 
   private static BasicTitleBarViewImplUiBinder uiBinder = GWT.create(

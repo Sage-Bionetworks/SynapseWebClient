@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.client.cache;
 
 import com.google.gwt.storage.client.Storage;
+import javax.inject.Inject;
 
 public class SessionStorageImpl implements SessionStorage {
 
   private Storage storage;
 
+  @Inject
   public SessionStorageImpl() {
     storage = Storage.getSessionStorageIfSupported();
   }

@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
@@ -26,8 +27,10 @@ public class RowViewImpl implements RowView {
 
   TableRow row;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public RowViewImpl(Binder binder) {
+  public RowViewImpl() {
     row = binder.createAndBindUi(this);
   }
 

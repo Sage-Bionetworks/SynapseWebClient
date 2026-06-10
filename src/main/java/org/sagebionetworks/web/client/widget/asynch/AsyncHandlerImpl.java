@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +21,6 @@ public abstract class AsyncHandlerImpl {
 
   public abstract String getId(Object singleItem);
 
-  @Inject
   public AsyncHandlerImpl(GWTWrapper gwt) {
     Callback callback = new Callback() {
       @Override

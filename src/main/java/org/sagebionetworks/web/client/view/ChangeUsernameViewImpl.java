@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -13,7 +14,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -37,11 +38,12 @@ public class ChangeUsernameViewImpl
   private Presenter presenter;
   private Header headerWidget;
 
+  private final ChangeUsernameViewImplUiBinder binder = GWT.create(
+    ChangeUsernameViewImplUiBinder.class
+  );
+
   @Inject
-  public ChangeUsernameViewImpl(
-    ChangeUsernameViewImplUiBinder binder,
-    Header headerWidget
-  ) {
+  public ChangeUsernameViewImpl(Header headerWidget) {
     initWidget(binder.createAndBindUi(this));
     this.headerWidget = headerWidget;
     headerWidget.configure();

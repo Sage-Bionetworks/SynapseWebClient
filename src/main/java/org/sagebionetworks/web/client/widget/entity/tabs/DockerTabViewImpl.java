@@ -7,6 +7,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 
@@ -39,6 +40,7 @@ public class DockerTabViewImpl implements DockerTabView {
   public interface TabsViewImplUiBinder
     extends UiBinder<Widget, DockerTabViewImpl> {}
 
+  @Inject
   public DockerTabViewImpl() {
     TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);
     widget = binder.createAndBindUi(this);

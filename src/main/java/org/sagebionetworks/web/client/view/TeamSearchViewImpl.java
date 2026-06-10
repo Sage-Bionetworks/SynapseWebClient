@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -13,7 +14,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -47,9 +48,12 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
   private Presenter presenter;
   private SynapseJSNIUtils synapseJsniUtils;
 
+  private final TeamSearchViewImplUiBinder binder = GWT.create(
+    TeamSearchViewImplUiBinder.class
+  );
+
   @Inject
   public TeamSearchViewImpl(
-    TeamSearchViewImplUiBinder binder,
     Header headerWidget,
     SynapseJSNIUtils synapseJsniUtils
   ) {

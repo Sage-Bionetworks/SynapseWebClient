@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.annotation;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
-import com.google.inject.Inject;
 import java.util.Date;
 import java.util.List;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValueType;
 import org.sagebionetworks.web.client.GWTWrapper;

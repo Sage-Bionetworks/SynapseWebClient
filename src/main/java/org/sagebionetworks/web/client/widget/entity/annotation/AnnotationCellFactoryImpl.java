@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;

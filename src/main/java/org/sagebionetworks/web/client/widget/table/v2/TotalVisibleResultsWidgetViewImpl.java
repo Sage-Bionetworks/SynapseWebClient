@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -38,11 +39,10 @@ public class TotalVisibleResultsWidgetViewImpl
 
   PortalGinInjector ginInjector;
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public TotalVisibleResultsWidgetViewImpl(
-    final Binder uiBinder,
-    PortalGinInjector ginInjector
-  ) {
+  public TotalVisibleResultsWidgetViewImpl(PortalGinInjector ginInjector) {
     initWidget(uiBinder.createAndBindUi(this));
     this.ginInjector = ginInjector;
   }

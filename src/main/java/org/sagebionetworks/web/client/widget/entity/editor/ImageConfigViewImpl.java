@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
@@ -89,9 +90,12 @@ public class ImageConfigViewImpl implements ImageConfigView {
 
   private ImageParamsPanel uploadParamsPanel, synapseParamsPanel;
 
+  private final ImageConfigViewImplUiBinder binder = GWT.create(
+    ImageConfigViewImplUiBinder.class
+  );
+
   @Inject
   public ImageConfigViewImpl(
-    ImageConfigViewImplUiBinder binder,
     SageImageBundle sageImageBundle,
     EntityFinderWidget.Builder entityFinderBuilder,
     ClientCache clientCache,

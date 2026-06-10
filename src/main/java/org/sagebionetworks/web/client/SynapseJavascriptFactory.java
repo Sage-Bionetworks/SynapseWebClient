@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -94,7 +96,11 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 
+@Singleton
 public class SynapseJavascriptFactory {
+
+  @Inject
+  public SynapseJavascriptFactory() {}
 
   public enum OBJECT_TYPE {
     GridSession,

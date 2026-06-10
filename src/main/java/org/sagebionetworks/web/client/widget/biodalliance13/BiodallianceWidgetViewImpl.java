@@ -7,8 +7,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtvisualizationwrappers.client.biodalliance13.Biodalliance013dev;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInterface;
@@ -28,7 +28,7 @@ public class BiodallianceWidgetViewImpl implements BiodallianceWidgetView {
   Widget widget;
   SynapseJSNIUtils jsniUtils;
 
-  interface BiodallianceWidgetViewImplUiBinder
+  public interface BiodallianceWidgetViewImplUiBinder
     extends UiBinder<Widget, BiodallianceWidgetViewImpl> {}
 
   private static BiodallianceWidgetViewImplUiBinder uiBinder = GWT.create(

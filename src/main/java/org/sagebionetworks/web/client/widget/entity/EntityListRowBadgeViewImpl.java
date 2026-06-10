@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -9,7 +10,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.sagebionetworks.repo.model.EntityType;
@@ -79,8 +80,10 @@ public class EntityListRowBadgeViewImpl
 
   Callback onAttachCallback;
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public EntityListRowBadgeViewImpl(final Binder uiBinder) {
+  public EntityListRowBadgeViewImpl() {
     initWidget(uiBinder.createAndBindUi(this));
     select.addClickHandler(
       new ClickHandler() {

@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -42,11 +43,12 @@ public class APITableConfigViewImpl implements APITableConfigView {
   private APITableColumnManager columnsManager;
   private Widget widget;
 
+  private final APITableConfigViewImplUiBinder binder = GWT.create(
+    APITableConfigViewImplUiBinder.class
+  );
+
   @Inject
-  public APITableConfigViewImpl(
-    APITableConfigViewImplUiBinder binder,
-    APITableColumnManager columnsManager
-  ) {
+  public APITableConfigViewImpl(APITableColumnManager columnsManager) {
     widget = binder.createAndBindUi(this);
     this.columnsManager = columnsManager;
     columnManagerContainer.setWidget(columnsManager.asWidget());

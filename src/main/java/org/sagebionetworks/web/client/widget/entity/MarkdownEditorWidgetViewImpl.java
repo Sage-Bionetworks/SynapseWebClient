@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
@@ -10,7 +11,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ModalSize;
@@ -237,12 +238,11 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
   // this UI widget
   Widget viewWidget;
   Widget formattingGuideWidget;
-  Binder binder;
+  private final Binder binder = GWT.create(Binder.class);
 
   @Inject
-  public MarkdownEditorWidgetViewImpl(Binder binder) {
+  public MarkdownEditorWidgetViewImpl() {
     super();
-    this.binder = binder;
   }
 
   @Override

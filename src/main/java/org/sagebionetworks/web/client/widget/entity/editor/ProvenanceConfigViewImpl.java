@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -37,9 +38,12 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 
   Widget widget;
 
+  private final ProvenanceConfigViewImplUiBinder binder = GWT.create(
+    ProvenanceConfigViewImplUiBinder.class
+  );
+
   @Inject
   public ProvenanceConfigViewImpl(
-    ProvenanceConfigViewImplUiBinder binder,
     EntityFinderWidget.Builder entityFinderBuilder
   ) {
     widget = binder.createAndBindUi(this);

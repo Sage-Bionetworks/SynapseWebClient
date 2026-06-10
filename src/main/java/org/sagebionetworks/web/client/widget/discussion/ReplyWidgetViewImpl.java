@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -63,8 +64,10 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
   private Widget widget;
   private ReplyWidget presenter;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public ReplyWidgetViewImpl(Binder binder) {
+  public ReplyWidgetViewImpl() {
     widget = binder.createAndBindUi(this);
     deleteIcon.addClickHandler(
       new ClickHandler() {

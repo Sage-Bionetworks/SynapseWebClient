@@ -5,7 +5,7 @@ import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;

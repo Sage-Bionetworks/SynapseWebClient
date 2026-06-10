@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.team.controller;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -9,7 +10,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Icon;
@@ -81,8 +82,10 @@ public class TeamEditModalWidgetViewImpl
   Presenter presenter;
   Team team;
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public TeamEditModalWidgetViewImpl(Binder uiBinder) {
+  public TeamEditModalWidgetViewImpl() {
     this.widget = uiBinder.createAndBindUi(this);
     primaryButton.addClickHandler(event -> {
       presenter.onConfirm();

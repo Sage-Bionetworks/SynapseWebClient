@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import com.google.gwt.place.shared.Place;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;

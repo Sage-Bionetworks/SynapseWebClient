@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.Map;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;

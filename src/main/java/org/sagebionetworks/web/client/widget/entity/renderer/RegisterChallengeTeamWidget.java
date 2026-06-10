@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.Map;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.web.client.DisplayConstants;

@@ -5,9 +5,8 @@ import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
 import java.util.HashMap;
-import org.sagebionetworks.web.client.utils.Callback;
+import javax.inject.Inject;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 

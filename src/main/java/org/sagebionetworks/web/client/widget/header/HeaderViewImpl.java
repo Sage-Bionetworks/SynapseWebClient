@@ -7,8 +7,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.binder.EventBinder;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -50,8 +50,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   private Presenter presenter;
   PortalGinInjector ginInjector;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public HeaderViewImpl(Binder binder, PortalGinInjector ginInjector) {
+  public HeaderViewImpl(PortalGinInjector ginInjector) {
     this.initWidget(binder.createAndBindUi(this));
     this.ginInjector = ginInjector;
     initClickHandlers();

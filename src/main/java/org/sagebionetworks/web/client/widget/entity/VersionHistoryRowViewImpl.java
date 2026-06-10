@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -65,12 +66,10 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
   private Widget widget;
   Md5Link md5Link;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public VersionHistoryRowViewImpl(
-    Binder binder,
-    UserBadge userBadge,
-    Md5Link md5Link
-  ) {
+  public VersionHistoryRowViewImpl(UserBadge userBadge, Md5Link md5Link) {
     widget = binder.createAndBindUi(this);
     this.md5Link = md5Link;
     deleteButton.addClickHandler(event -> {

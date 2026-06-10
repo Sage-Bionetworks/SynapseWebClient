@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 

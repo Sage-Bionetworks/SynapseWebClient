@@ -1,11 +1,15 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import com.google.gwt.user.client.ui.Widget;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 
 public class LinkCellRendererViewImpl
   extends Anchor
   implements LinkCellRendererView {
+
+  @Inject
+  public LinkCellRendererViewImpl() {}
 
   @Override
   public Widget asWidget() {

@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.login;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.jsinterop.LoginPageProps;
@@ -36,9 +37,12 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
   GlobalApplicationState globalAppState;
   AuthenticationController authController;
 
+  private final LoginWidgetViewImplUiBinder binder = GWT.create(
+    LoginWidgetViewImplUiBinder.class
+  );
+
   @Inject
   public LoginWidgetViewImpl(
-    LoginWidgetViewImplUiBinder binder,
     SynapseJSNIUtils jsniUtils,
     GlobalApplicationState globalAppState,
     AuthenticationController authController

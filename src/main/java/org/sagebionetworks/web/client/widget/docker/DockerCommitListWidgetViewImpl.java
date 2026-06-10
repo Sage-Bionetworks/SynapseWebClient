@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.docker;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 
 public class DockerCommitListWidgetViewImpl
   implements DockerCommitListWidgetView {
@@ -22,8 +23,10 @@ public class DockerCommitListWidgetViewImpl
   Widget widget;
   Presenter presenter;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public DockerCommitListWidgetViewImpl(Binder binder) {
+  public DockerCommitListWidgetViewImpl() {
     this.widget = binder.createAndBindUi(this);
   }
 

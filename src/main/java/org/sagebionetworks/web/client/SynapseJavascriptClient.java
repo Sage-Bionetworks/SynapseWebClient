@@ -29,7 +29,6 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,6 +38,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -52,7 +53,6 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
-import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -194,6 +194,7 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
  * @author Jay
  *
  */
+@Singleton
 public class SynapseJavascriptClient {
 
   public static final String BUNDLE2 = "/bundle2";

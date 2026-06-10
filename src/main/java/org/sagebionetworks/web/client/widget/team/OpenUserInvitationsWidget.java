@@ -6,9 +6,9 @@ import static org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidg
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;

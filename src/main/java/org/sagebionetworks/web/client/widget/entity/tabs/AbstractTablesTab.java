@@ -9,7 +9,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -124,7 +123,6 @@ public abstract class AbstractTablesTab
 
   protected abstract boolean isEntityShownInTab(Entity entity);
 
-  @Inject
   public AbstractTablesTab(
     Tab tab,
     PortalGinInjector ginInjector,

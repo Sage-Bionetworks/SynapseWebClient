@@ -5,11 +5,11 @@ import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetT
 import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.Values;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.StringUtils;

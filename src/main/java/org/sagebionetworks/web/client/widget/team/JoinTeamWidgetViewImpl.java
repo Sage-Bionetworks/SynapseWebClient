@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -11,7 +12,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.TextArea;
@@ -23,7 +24,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
 public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
@@ -88,11 +88,12 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
   private Callback okButtonCallback;
   private Widget widget;
 
+  private final JoinTeamWidgetViewImplUiBinder binder = GWT.create(
+    JoinTeamWidgetViewImplUiBinder.class
+  );
+
   @Inject
-  public JoinTeamWidgetViewImpl(
-    JoinTeamWidgetViewImplUiBinder binder,
-    MarkdownWidget wikiPage
-  ) {
+  public JoinTeamWidgetViewImpl(MarkdownWidget wikiPage) {
     widget = binder.createAndBindUi(this);
     this.wikiPage = wikiPage;
     anonUserButton.addClickHandler(

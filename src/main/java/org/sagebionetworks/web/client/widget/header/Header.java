@@ -3,11 +3,13 @@ package org.sagebionetworks.web.client.widget.header;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 
+@Singleton
 public class Header implements HeaderView.Presenter, IsWidget {
 
   public static final String WWW_SYNAPSE_ORG = "www.synapse.org";

@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 
 public class QuizInfoViewImpl extends Composite implements QuizInfoWidgetView {
 
@@ -11,8 +12,10 @@ public class QuizInfoViewImpl extends Composite implements QuizInfoWidgetView {
 
   public interface Binder extends UiBinder<Widget, QuizInfoViewImpl> {}
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public QuizInfoViewImpl(Binder uiBinder) {
+  public QuizInfoViewImpl() {
     initWidget(uiBinder.createAndBindUi(this));
   }
 

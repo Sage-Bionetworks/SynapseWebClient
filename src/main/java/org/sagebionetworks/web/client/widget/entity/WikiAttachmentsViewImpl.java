@@ -7,9 +7,9 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
@@ -24,7 +24,7 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 
   private static final String FILENAMES = "filenames";
 
-  interface WikiAttachmentsViewImplUiBinder
+  public interface WikiAttachmentsViewImplUiBinder
     extends UiBinder<Widget, WikiAttachmentsViewImpl> {}
 
   private static WikiAttachmentsViewImplUiBinder uiBinder = GWT.create(

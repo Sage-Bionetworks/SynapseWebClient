@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.doi;
 
-import com.google.inject.Inject;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.jsinterop.CreateOrUpdateDoiModalProps;

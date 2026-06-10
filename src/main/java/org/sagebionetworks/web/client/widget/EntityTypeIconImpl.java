@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget;
 
 import com.google.gwt.dom.client.SpanElement;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.jsinterop.EntityTypeIconProps;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -12,6 +13,7 @@ public class EntityTypeIconImpl
   extends ReactComponent
   implements EntityTypeIcon {
 
+  @Inject
   public EntityTypeIconImpl() {
     super(SpanElement.TAG);
   }

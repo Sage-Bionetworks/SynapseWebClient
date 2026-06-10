@@ -1,13 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -35,11 +36,12 @@ public class QueryTableConfigViewImpl implements QueryTableConfigView {
   @UiField
   SimplePanel columnManagerContainer;
 
+  private final QueryTableConfigViewImplUiBinder binder = GWT.create(
+    QueryTableConfigViewImplUiBinder.class
+  );
+
   @Inject
-  public QueryTableConfigViewImpl(
-    QueryTableConfigViewImplUiBinder binder,
-    APITableColumnManager columnsManager
-  ) {
+  public QueryTableConfigViewImpl(APITableColumnManager columnsManager) {
     widget = binder.createAndBindUi(this);
     this.columnsManager = columnsManager;
     columnManagerContainer.setWidget(columnsManager.asWidget());

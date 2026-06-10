@@ -6,9 +6,13 @@ import elemental2.dom.DomGlobal;
 import elemental2.dom.File;
 import elemental2.dom.FileList;
 import elemental2.dom.HTMLInputElement;
+import javax.inject.Inject;
 import jsinterop.base.Js;
 
 public class SynapseJsInteropUtilsImpl implements SynapseJsInteropUtils {
+
+  @Inject
+  public SynapseJsInteropUtilsImpl() {}
 
   @Override
   public FileList getFileList(String fileFieldId) {

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -10,7 +11,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
@@ -44,8 +45,10 @@ public class EmailAddressesWidgetViewImpl implements EmailAddressesWidgetView {
   @UiField
   Div emailsPanel;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public EmailAddressesWidgetViewImpl(Binder binder) {
+  public EmailAddressesWidgetViewImpl() {
     widget = binder.createAndBindUi(this);
     newEmailTextBox.addKeyDownHandler(
       new KeyDownHandler() {

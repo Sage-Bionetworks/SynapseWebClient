@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.client;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
+@Singleton
 public class WebStorageMaxSizeDetector {
 
   public static final double MAX_SIZE = 4 * ClientProperties.MB; // cleared when approaching ~5MB limit that most browsers implement

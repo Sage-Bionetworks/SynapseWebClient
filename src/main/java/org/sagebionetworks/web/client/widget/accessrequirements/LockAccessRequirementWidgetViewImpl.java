@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 
 public class LockAccessRequirementWidgetViewImpl
@@ -37,8 +38,10 @@ public class LockAccessRequirementWidgetViewImpl
 
   Widget w;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public LockAccessRequirementWidgetViewImpl(Binder binder) {
+  public LockAccessRequirementWidgetViewImpl() {
     this.w = binder.createAndBindUi(this);
   }
 

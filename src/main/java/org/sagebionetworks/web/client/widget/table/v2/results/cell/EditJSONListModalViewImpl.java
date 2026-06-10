@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
@@ -47,8 +48,10 @@ public class EditJSONListModalViewImpl implements EditJSONListModalView {
 
   Widget widget;
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public EditJSONListModalViewImpl(final Binder uiBinder) {
+  public EditJSONListModalViewImpl() {
     widget = uiBinder.createAndBindUi(this);
     saveButton.addClickHandler(event -> {
       presenter.onSave();

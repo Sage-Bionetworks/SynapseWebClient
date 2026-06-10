@@ -2,14 +2,9 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-import java.util.Date;
 import javax.annotation.Nullable;
-import org.sagebionetworks.web.client.DateTimeUtils;
-import org.sagebionetworks.web.client.help.HelpButton;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.jsinterop.CreatedByModifiedByProps;
-import org.sagebionetworks.web.client.jsinterop.ReferenceJsObject;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 public class ModifiedCreatedByWidget implements IsWidget {
 

@@ -4,11 +4,12 @@ import static com.google.common.util.concurrent.Futures.whenAllComplete;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 import com.google.common.util.concurrent.FluentFuture;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -16,6 +17,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
+@Singleton
 public class ViewDefaultColumns {
 
   private SynapseJavascriptClient jsClient;

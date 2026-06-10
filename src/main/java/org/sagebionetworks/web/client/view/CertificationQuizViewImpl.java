@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.widget.certificationquiz.CertificationQuiz;
 import org.sagebionetworks.web.client.widget.header.Header;
 
@@ -21,11 +22,12 @@ public class CertificationQuizViewImpl
 
   private Header headerWidget;
 
+  private final CertificationViewImplUiBinder binder = GWT.create(
+    CertificationViewImplUiBinder.class
+  );
+
   @Inject
-  public CertificationQuizViewImpl(
-    CertificationViewImplUiBinder binder,
-    Header headerWidget
-  ) {
+  public CertificationQuizViewImpl(Header headerWidget) {
     initWidget(binder.createAndBindUi(this));
     this.headerWidget = headerWidget;
     headerWidget.configure();

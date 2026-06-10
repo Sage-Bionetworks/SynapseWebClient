@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -7,7 +8,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.Icon;
@@ -48,8 +49,10 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
   CellFactory cellFactory;
   String rawValue = null;
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public JSONListCellEditorViewImpl(Binder binder, CellFactory cellFactory) {
+  public JSONListCellEditorViewImpl(CellFactory cellFactory) {
     widget = binder.createAndBindUi(this);
     this.cellFactory = cellFactory;
     rendererFocusPanel.getElement().setAttribute("readonly", "true");

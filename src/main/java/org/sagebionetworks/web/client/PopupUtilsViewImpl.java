@@ -1,10 +1,14 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.user.client.Window;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
 
 public class PopupUtilsViewImpl implements PopupUtilsView {
+
+  @Inject
+  public PopupUtilsViewImpl() {}
 
   @Override
   public void notify(

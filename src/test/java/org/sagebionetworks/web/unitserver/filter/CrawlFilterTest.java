@@ -13,12 +13,12 @@ import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.META_ROBOTS_NOINDEX;
 import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.QUERY_RESULTS_PART_MASK;
 
+import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.ServletException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -8,6 +8,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
@@ -78,6 +79,7 @@ public class ApproveUserAccessModalViewImpl
   Widget widget;
   String originalSubmitButtonText, originalRevokeButtonText;
 
+  @Inject
   public ApproveUserAccessModalViewImpl() {
     widget = uiBinder.createAndBindUi(this);
     submitButton.addClickHandler(

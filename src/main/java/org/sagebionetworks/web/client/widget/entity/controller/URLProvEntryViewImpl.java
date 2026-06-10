@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Text;
@@ -30,8 +31,12 @@ public class URLProvEntryViewImpl implements URLProvEntryView {
   String url;
   Callback removalCallback;
 
+  private final URLProvEntryUIBinder binder = GWT.create(
+    URLProvEntryUIBinder.class
+  );
+
   @Inject
-  public URLProvEntryViewImpl(URLProvEntryUIBinder binder) {
+  public URLProvEntryViewImpl() {
     this.widget = binder.createAndBindUi(this);
     removeButton.addClickHandler(
       new ClickHandler() {

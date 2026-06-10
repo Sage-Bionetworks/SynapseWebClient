@@ -11,9 +11,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.binder.EventHandler;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -47,10 +48,10 @@ import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+@Singleton
 public class EntityPresenter
   extends AbstractActivity
   implements EntityView.Presenter, Presenter<Synapse>, IsWidget {

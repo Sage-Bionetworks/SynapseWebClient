@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.table.modal.wizard;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 

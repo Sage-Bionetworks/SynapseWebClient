@@ -7,6 +7,7 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FlowPanel;
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOMClient;
 import org.sagebionetworks.web.client.jsinterop.ReactDOMRoot;
@@ -20,6 +21,7 @@ public class ReactComponent extends FlowPanel implements HasClickHandlers {
   private ReactDOMRoot root;
   private ReactElement<?, ?> reactElement;
 
+  @Inject
   public ReactComponent() {
     super(DivElement.TAG);
   }

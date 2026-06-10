@@ -1,13 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
@@ -47,8 +48,10 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
   //Not in UI XML because it is moved around a lot
   Button addNewAnnotationValueButton;
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public AnnotationEditorViewImpl(Binder uiBinder) {
+  public AnnotationEditorViewImpl() {
     widget = uiBinder.createAndBindUi(this);
     typeComboBox.addChangeHandler(
       new ChangeHandler() {

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -8,7 +9,7 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -33,10 +34,12 @@ public class EditRegisteredTeamDialogViewImpl
 
   Modal modal;
 
+  private final RegisterTeamDialogViewImplUiBinder binder = GWT.create(
+    RegisterTeamDialogViewImplUiBinder.class
+  );
+
   @Inject
-  public EditRegisteredTeamDialogViewImpl(
-    RegisterTeamDialogViewImplUiBinder binder
-  ) {
+  public EditRegisteredTeamDialogViewImpl() {
     modal = (Modal) binder.createAndBindUi(this);
     recruitmentMessageField.addKeyDownHandler(
       new KeyDownHandler() {

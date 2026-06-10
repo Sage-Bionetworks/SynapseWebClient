@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
@@ -23,8 +24,10 @@ public class UploadDialogWidgetViewImpl
   public interface Binder
     extends UiBinder<Widget, UploadDialogWidgetViewImpl> {}
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
-  public UploadDialogWidgetViewImpl(Binder uiBinder, Dialog uploadDialog) {
+  public UploadDialogWidgetViewImpl(Dialog uploadDialog) {
     initWidget(uiBinder.createAndBindUi(this));
     this.uploadDialog = uploadDialog;
     uploadDialog.setSize(ModalSize.LARGE);

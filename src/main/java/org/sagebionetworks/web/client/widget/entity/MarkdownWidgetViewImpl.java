@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
@@ -13,7 +14,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -65,9 +66,10 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
     }
   };
 
+  private final Binder uiBinder = GWT.create(Binder.class);
+
   @Inject
   public MarkdownWidgetViewImpl(
-    final Binder uiBinder,
     SynapseJSNIUtils jsniUtils,
     GlobalApplicationState globalAppState,
     GWTWrapper gwt

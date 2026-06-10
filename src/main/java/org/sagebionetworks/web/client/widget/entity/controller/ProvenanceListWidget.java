@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;

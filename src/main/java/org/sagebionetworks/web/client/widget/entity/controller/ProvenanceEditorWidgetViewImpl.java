@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
@@ -50,10 +51,12 @@ public class ProvenanceEditorWidgetViewImpl
   Widget widget;
   Presenter presenter;
 
+  private final ProvenanceEditorWidgetViewImplUiBinder binder = GWT.create(
+    ProvenanceEditorWidgetViewImplUiBinder.class
+  );
+
   @Inject
-  public ProvenanceEditorWidgetViewImpl(
-    ProvenanceEditorWidgetViewImplUiBinder binder
-  ) {
+  public ProvenanceEditorWidgetViewImpl() {
     widget = binder.createAndBindUi(this);
     saveButton.addClickHandler(event -> {
       presenter.onSave();

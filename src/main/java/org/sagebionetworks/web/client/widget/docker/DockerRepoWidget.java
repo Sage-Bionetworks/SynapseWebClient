@@ -2,8 +2,8 @@ package org.sagebionetworks.web.client.widget.docker;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.Map;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;

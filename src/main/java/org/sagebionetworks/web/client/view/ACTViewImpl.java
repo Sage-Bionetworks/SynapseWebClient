@@ -1,13 +1,14 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
@@ -49,8 +50,12 @@ public class ACTViewImpl implements ACTView {
 
   Widget widget;
 
+  private final ACTViewImplUiBinder binder = GWT.create(
+    ACTViewImplUiBinder.class
+  );
+
   @Inject
-  public ACTViewImpl(ACTViewImplUiBinder binder, Header headerWidget) {
+  public ACTViewImpl(Header headerWidget) {
     widget = binder.createAndBindUi(this);
     this.headerWidget = headerWidget;
     headerWidget.configure();

@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GWTWrapper;

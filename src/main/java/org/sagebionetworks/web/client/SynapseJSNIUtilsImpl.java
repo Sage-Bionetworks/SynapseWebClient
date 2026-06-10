@@ -11,6 +11,7 @@ import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 import elemental2.dom.Blob;
+import javax.inject.Inject;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -21,6 +22,9 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
+
+  @Inject
+  public SynapseJSNIUtilsImpl() {}
 
   private static ProgressCallback progressCallback;
 

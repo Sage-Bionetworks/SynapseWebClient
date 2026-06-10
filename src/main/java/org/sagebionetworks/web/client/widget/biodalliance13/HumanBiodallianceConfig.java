@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.biodalliance13;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInterface;
 import org.sagebionetworks.web.client.SynapseProperties;
 

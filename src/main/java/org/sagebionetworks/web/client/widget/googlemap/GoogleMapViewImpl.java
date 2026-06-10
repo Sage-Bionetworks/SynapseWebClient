@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.googlemap;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.logical.shared.AttachEvent;
@@ -10,9 +11,9 @@ import com.google.gwt.json.client.JSONString;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -47,8 +48,12 @@ public class GoogleMapViewImpl implements GoogleMapView {
   Callback onAttachCallback;
   JavaScriptObject currentInfoWindow;
 
+  private final GoogleMapViewImplUiBinder binder = GWT.create(
+    GoogleMapViewImplUiBinder.class
+  );
+
   @Inject
-  public GoogleMapViewImpl(GoogleMapViewImplUiBinder binder) {
+  public GoogleMapViewImpl() {
     widget = binder.createAndBindUi(this);
     widget.addAttachHandler(
       new AttachEvent.Handler() {

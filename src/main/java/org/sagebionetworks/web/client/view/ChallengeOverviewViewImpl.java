@@ -1,18 +1,21 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+@Singleton
 public class ChallengeOverviewViewImpl
   extends Composite
   implements ChallengeOverviewView {
@@ -27,9 +30,12 @@ public class ChallengeOverviewViewImpl
   private Header headerWidget;
   private WikiPageWidget wikiPage;
 
+  private final ChallengeOverviewViewImplUiBinder binder = GWT.create(
+    ChallengeOverviewViewImplUiBinder.class
+  );
+
   @Inject
   public ChallengeOverviewViewImpl(
-    ChallengeOverviewViewImplUiBinder binder,
     Header headerWidget,
     WikiPageWidget wikiPage
   ) {

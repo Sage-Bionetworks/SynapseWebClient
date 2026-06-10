@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 
 public class LinkifyImpl implements Linkify {
 

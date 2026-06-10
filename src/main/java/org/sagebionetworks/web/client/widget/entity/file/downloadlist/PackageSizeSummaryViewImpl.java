@@ -5,7 +5,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -15,7 +15,7 @@ public class PackageSizeSummaryViewImpl
 
   Widget w;
 
-  interface PackageSizeSummaryViewImplUiBinder
+  public interface PackageSizeSummaryViewImplUiBinder
     extends UiBinder<Widget, PackageSizeSummaryViewImpl> {}
 
   @UiField

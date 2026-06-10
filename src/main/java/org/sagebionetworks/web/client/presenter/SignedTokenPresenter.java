@@ -6,8 +6,9 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
@@ -28,6 +29,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+@Singleton
 public class SignedTokenPresenter
   extends AbstractActivity
   implements SignedTokenView.Presenter, Presenter<SignedToken> {

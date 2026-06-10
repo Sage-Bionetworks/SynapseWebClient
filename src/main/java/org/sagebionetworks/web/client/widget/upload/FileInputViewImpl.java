@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Progress;
@@ -35,8 +36,10 @@ public class FileInputViewImpl implements FileInputView {
 
   public interface Binder extends UiBinder<Widget, FileInputViewImpl> {}
 
+  private final Binder binder = GWT.create(Binder.class);
+
   @Inject
-  public FileInputViewImpl(Binder binder) {
+  public FileInputViewImpl() {
     this.widget = binder.createAndBindUi(this);
     // Create a unique for each new instance.
     this.fileInput.getElement().setId(PREFIX_FILE_INPUT_WIDGET + ID_SEQUENCE++);
