@@ -202,8 +202,8 @@ importers:
         specifier: ^8.52.0
         version: 8.52.0(eslint@9.39.2)(typescript@5.8.3)
       uuid:
-        specifier: ^9.0.1
-        version: 9.0.1
+        specifier: ^14.0.0
+        version: 14.0.0
       vite:
         specifier: ^8.0.8
         version: 8.0.8(@types/node@22.19.5)(esbuild@0.27.4)(sass@1.97.2)(tsx@4.21.0)(yaml@2.5.1)
