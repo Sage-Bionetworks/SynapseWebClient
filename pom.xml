@@ -455,10 +455,6 @@
                   tofile="src/main/webapp/generated/moment.min.js"
                 />
                 <copy
-                  file="${project.basedir}/node_modules/universal-cookie/umd/universalCookie.min.js"
-                  tofile="src/main/webapp/generated/universalCookie.min.js"
-                />
-                <copy
                   file="${project.basedir}/node_modules/prop-types/prop-types.min.js"
                   tofile="src/main/webapp/generated/prop-types.min.js"
                 />
