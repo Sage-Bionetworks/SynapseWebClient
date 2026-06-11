@@ -6,7 +6,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@mui/material": "7.1.1",
+    "@mui/material": "^7.3.11",
     "@sage-bionetworks/markdown-it-container": "^4.0.1",
     "@sage-bionetworks/react-datasheet-grid": "4.11.5-sage.3",
     "@sage-bionetworks/synapse-types": "^0.0.7",
@@ -43,7 +43,7 @@
     "react-plotly.js": "^2.6.0",
     "sass": "^1.100.0",
     "spark-md5": "^3.0.2",
-    "synapse-react-client": "link:../synapse-web-monorepo/packages/synapse-react-client",
+    "synapse-react-client": "4.0.19",
     "xss": "^1.0.15"
   },
   "devDependencies": {
