@@ -202,8 +202,8 @@ importers:
         specifier: ^8.0.16
         version: 8.0.16(@types/node@22.19.20)(esbuild@0.28.0)(sass@1.100.0)(tsx@4.22.4)(yaml@2.9.0)
       vite-plugin-node-polyfills:
-        specifier: 0.26.0
-        version: 0.26.0(rollup@4.60.1)(vite@8.0.16(@types/node@22.19.20)(esbuild@0.28.0)(sass@1.100.0)(tsx@4.22.4)(yaml@2.9.0))
+        specifier: 0.28.0
+        version: 0.28.0(rollup@4.60.1)(vite@8.0.16(@types/node@22.19.20)(esbuild@0.28.0)(sass@1.100.0)(tsx@4.22.4)(yaml@2.9.0))
       wait-on:
         specifier: ^8.0.5
         version: 8.0.5
@@ -5398,8 +5398,8 @@ packages:
   very-small-parser@1.15.0:
     resolution: {integrity: sha512-KGmFbbVlMLKVLt0cnyNrTwt2WCNzSntTXK1y9yxvxxJm9hA64EJEtmke3xw1PAH70OeHJN7Os7DDz5Fxl75ehQ==}
 
-  vite-plugin-node-polyfills@0.26.0:
-    resolution: {integrity: sha512-BAe5YzJf368XGev02hDvioidx4uVH8dqEJlG73bjQSxM26/AQnGcKFomq9n3vGq5yqpSHKN4h1XQNxx9l98mBg==}
+  vite-plugin-node-polyfills@0.28.0:
+    resolution: {integrity: sha512-NXct/ci2ef4fRyCfTb8fk2HmR80Rv7icLd+cRH41TnUugDzdKMFKqFPpZYCFUInZMMem9bkLv5pkq02+7Xu7+w==}
     peerDependencies:
       vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
 
@@ -9713,7 +9713,7 @@ snapshots:
 
   md5.js@1.3.5:
     dependencies:
-      hash-base: 3.0.5
+      hash-base: 3.1.2
       inherits: 2.0.4
       safe-buffer: 5.2.1
 
@@ -11692,7 +11692,7 @@ snapshots:
 
   very-small-parser@1.15.0: {}
 
-  vite-plugin-node-polyfills@0.26.0(rollup@4.60.1)(vite@8.0.16(@types/node@22.19.20)(esbuild@0.28.0)(sass@1.100.0)(tsx@4.22.4)(yaml@2.9.0)):
+  vite-plugin-node-polyfills@0.28.0(rollup@4.60.1)(vite@8.0.16(@types/node@22.19.20)(esbuild@0.28.0)(sass@1.100.0)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
       '@rollup/plugin-inject': 5.0.5(rollup@4.60.1)
       node-stdlib-browser: 1.3.1
