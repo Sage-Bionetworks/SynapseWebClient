@@ -18,11 +18,13 @@ public class DefaultEntityActionMenuLayoutUtil {
 
   private static final String TOOLS_SUFFIX = " Tools";
   private static final String ICON_COLOR = "#1C1B1F";
+  private static final String ICON_BORDER_COLOR = "#9EAAB7";
+  private static final String ENTITY_MENU_BUTTON_COLOR = "#4D535A";
 
   static SxProps entityMenuButtonSx = SxProps
     .create()
-    .setBorderColor("#9EAAB7")
-    .setColor("#4D535A");
+    .setBorderColor(ICON_BORDER_COLOR)
+    .setColor(ENTITY_MENU_BUTTON_COLOR);
 
   static SxProps entityMenuEndIconSx = SxProps.create().setColor(ICON_COLOR);
 
