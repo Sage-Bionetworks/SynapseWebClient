@@ -8,6 +8,9 @@
  */
 // vite/modulepreload-polyfill should be included per https://vite.dev/guide/backend-integration
 import 'vite/modulepreload-polyfill'
+// Install lazy-module load/link error diagnostics before anything else loads, so the
+// listeners are registered before any dynamically imported chunk can fail.
+import './moduleLoadDiagnostics.js'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactDOMClient from 'react-dom/client'
