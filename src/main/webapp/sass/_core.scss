@@ -236,8 +236,10 @@ a:focus {
       .MuiButton-root {
         font-size: 16px;
         line-height: 20px;
-        font-weight: 700;
         text-transform: none;
+        border-radius: 6px;
+        font-weight: 540;
+        padding: 4px 12px;
       }
     }
     .projectSupport .MuiButton-root:hover {

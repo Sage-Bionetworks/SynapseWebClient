@@ -49,7 +49,7 @@ public class DefaultActionConfigurationUtil {
         Action.UPLOAD_FILE,
         "Upload or Link to a File"
       ),
-      ActionConfiguration.create(Action.SHARE_THIS_PAGE, "Share this page"),
+      ActionConfiguration.create(Action.SHARE_THIS_PAGE, "Share"),
       ActionConfiguration.create(Action.CREATE_FOLDER, "Add New Folder"),
       ActionConfiguration.create(Action.SHOW_TABLE_SCHEMA, "Schema"),
       ActionConfiguration.create(Action.SHOW_VIEW_SCOPE, "Scope"),
@@ -57,10 +57,7 @@ public class DefaultActionConfigurationUtil {
         Action.CHANGE_STORAGE_LOCATION,
         "Change Storage Location"
       ),
-      ActionConfiguration.create(
-        Action.UPLOAD_NEW_FILE,
-        "Upload a New Version of File"
-      ),
+      ActionConfiguration.create(Action.UPLOAD_NEW_FILE, "Upload"),
       ActionConfiguration.create(
         Action.CREATE_TABLE_VERSION,
         "Create a New Table/View Version"

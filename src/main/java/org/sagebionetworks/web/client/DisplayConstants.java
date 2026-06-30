@@ -103,7 +103,7 @@ public class DisplayConstants {
   public static final String LABEL_TEAM_CREATED = "Team Created: ";
   public static final String TEXT_UPLOAD_FILE_OR_LINK =
     "Upload or Link to File";
-  public static final String SHARE_THIS_PAGE = "Share this page";
+  public static final String SHARE_THIS_PAGE = "Share";
   public static final String UPLOAD_FILE = "Upload File";
   public static final String LINK_TO_URL = "Link to URL";
   public static final String TEXT_LINK_FILE = "Link File";

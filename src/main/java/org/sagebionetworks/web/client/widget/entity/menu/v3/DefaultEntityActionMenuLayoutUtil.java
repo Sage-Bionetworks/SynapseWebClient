@@ -18,6 +18,13 @@ public class DefaultEntityActionMenuLayoutUtil {
 
   private static final String TOOLS_SUFFIX = " Tools";
 
+  static SxProps entityMenuButtonSx = SxProps
+    .create()
+    .setBorderColor("#9EAAB7")
+    .setColor("#4D535A");
+
+  static SxProps entityMenuEndIconSx = SxProps.create().setColor("#1C1B1F");
+
   static SxProps deleteTextStyle = SxProps
     .create()
     .setColor("error.main")
@@ -27,14 +34,21 @@ public class DefaultEntityActionMenuLayoutUtil {
     Synapse.EntityArea entityArea
   ) {
     EntityActionMenuLayout layout = EntityActionMenuLayout.create();
+    layout.setMenuButtonSx(entityMenuButtonSx);
+    layout.setPrimaryMenuEndIconSx(entityMenuEndIconSx);
+    layout.setPrimaryMenuEndIcon("verticalEllipsis");
 
     switch (entityArea) {
       case WIKI:
-        layout.setPrimaryMenuText("Wiki Tools");
+        layout.setPrimaryMenuText("Tools");
         layout.setButtonActions(
           Arrays.asList(
-            ActionViewProps.create(Action.EDIT_WIKI_PAGE, "edit"),
-            ActionViewProps.create(Action.VIEW_WIKI_SOURCE, "article")
+            ActionViewProps
+              .create(Action.EDIT_WIKI_PAGE)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.VIEW_WIKI_SOURCE)
+              .setVariant("outlined")
           )
         );
         layout.setPrimaryMenuActions(
@@ -57,8 +71,8 @@ public class DefaultEntityActionMenuLayoutUtil {
       case FILES:
         layout.setButtonActions(
           Arrays.asList(
-            ActionViewProps.create(Action.UPLOAD_FILE, "upload"),
-            ActionViewProps.create(Action.CREATE_FOLDER, "newFolder")
+            ActionViewProps.create(Action.UPLOAD_FILE).setVariant("outlined"),
+            ActionViewProps.create(Action.CREATE_FOLDER).setVariant("outlined")
           )
         );
         layout.setPrimaryMenuActions(Collections.emptyList());
@@ -89,7 +103,7 @@ public class DefaultEntityActionMenuLayoutUtil {
         layout.setPrimaryMenuEndIcon("expandMore");
         layout.setButtonActions(
           Collections.singletonList(
-            ActionViewProps.create(Action.UPLOAD_TABLE, "upload")
+            ActionViewProps.create(Action.UPLOAD_TABLE).setVariant("outlined")
           )
         );
         layout.setPrimaryMenuActions(
@@ -99,7 +113,7 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         break;
       case CHALLENGE:
-        layout.setPrimaryMenuText("Challenge Tools");
+        layout.setPrimaryMenuText(TOOLS_SUFFIX);
         layout.setButtonActions(Collections.emptyList());
         layout.setPrimaryMenuActions(
           Collections.singletonList(
@@ -111,7 +125,7 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         break;
       case DISCUSSION:
-        layout.setPrimaryMenuText("Discussion Tools");
+        layout.setPrimaryMenuText(TOOLS_SUFFIX);
         layout.setButtonActions(Collections.emptyList());
         layout.setPrimaryMenuActions(
           Collections.singletonList(
@@ -139,6 +153,9 @@ public class DefaultEntityActionMenuLayoutUtil {
 
   public static EntityActionMenuLayout getLayout(EntityType entityType) {
     EntityActionMenuLayout layout = EntityActionMenuLayout.create();
+    layout.setPrimaryMenuEndIcon("verticalEllipsis");
+    layout.setMenuButtonSx(entityMenuButtonSx);
+    layout.setPrimaryMenuEndIconSx(entityMenuEndIconSx);
 
     SxProps reportViolationIconStyle = SxProps.create().setColor("error.main");
     List<ActionViewProps> reportViolationMenuGroup = Collections.singletonList(
@@ -157,6 +174,9 @@ public class DefaultEntityActionMenuLayoutUtil {
 
     switch (entityType) {
       case project:
+        layout.setPrimaryMenuEndIcon("expandMore");
+        layout.setMenuButtonSx(null);
+        layout.setPrimaryMenuEndIconSx(null);
         layout.setPrimaryMenuText(
           EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
         );
@@ -189,15 +209,18 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         break;
       case folder:
-        layout.setPrimaryMenuText(
-          EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
-        );
+        layout.setPrimaryMenuText(TOOLS_SUFFIX);
         layout.setButtonActions(
           Arrays.asList(
-            ActionViewProps.create(Action.CREATE_FOLDER, "newFolder"),
-            ActionViewProps.create(Action.UPLOAD_FILE, "upload"),
-            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
-            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
+            ActionViewProps
+              .create(Action.SHARE_THIS_PAGE, "share")
+              .setVariant("text")
+              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+            ActionViewProps.create(Action.CREATE_FOLDER).setVariant("outlined"),
+            ActionViewProps.create(Action.UPLOAD_FILE).setVariant("outlined"),
+            ActionViewProps
+              .create(Action.SHOW_ANNOTATIONS)
+              .setVariant("outlined")
           )
         );
         layout.setDownloadMenuActions(
@@ -241,15 +264,22 @@ public class DefaultEntityActionMenuLayoutUtil {
         break;
       case file:
       case recordset:
-        layout.setPrimaryMenuText(
-          EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
-        );
+        layout.setPrimaryMenuText(TOOLS_SUFFIX);
         layout.setButtonActions(
           Arrays.asList(
-            ActionViewProps.create(Action.UPLOAD_NEW_FILE, "upload"),
-            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
-            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows"),
-            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
+            ActionViewProps
+              .create(Action.SHARE_THIS_PAGE, "share")
+              .setVariant("text")
+              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+            ActionViewProps
+              .create(Action.UPLOAD_NEW_FILE)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.SHOW_ANNOTATIONS)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.CREATE_NEW_GRID)
+              .setVariant("outlined")
           )
         );
         layout.setDownloadMenuActions(
@@ -299,16 +329,25 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         break;
       case table:
-        layout.setPrimaryMenuText(
-          EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
-        );
+        layout.setPrimaryMenuText(TOOLS_SUFFIX);
         layout.setButtonActions(
           Arrays.asList(
-            ActionViewProps.create(Action.EDIT_TABLE_DATA, "edit"),
-            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
-            ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns"),
-            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows"),
-            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
+            ActionViewProps
+              .create(Action.SHARE_THIS_PAGE, "share")
+              .setVariant("text")
+              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+            ActionViewProps
+              .create(Action.EDIT_TABLE_DATA)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.SHOW_ANNOTATIONS)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.SHOW_TABLE_SCHEMA)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.CREATE_NEW_GRID)
+              .setVariant("outlined")
           )
         );
         // Note that download actions for tables are currently inlined in the QueryWrapperPlotNav
@@ -352,16 +391,25 @@ public class DefaultEntityActionMenuLayoutUtil {
         break;
       case entityview:
       case submissionview:
-        layout.setPrimaryMenuText(
-          EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
-        );
+        layout.setPrimaryMenuText(TOOLS_SUFFIX);
         layout.setButtonActions(
           Arrays.asList(
-            ActionViewProps.create(Action.EDIT_TABLE_DATA, "edit"),
-            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
-            ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns"),
-            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows"),
-            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
+            ActionViewProps
+              .create(Action.SHARE_THIS_PAGE, "share")
+              .setVariant("text")
+              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+            ActionViewProps
+              .create(Action.EDIT_TABLE_DATA)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.SHOW_ANNOTATIONS)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.SHOW_TABLE_SCHEMA)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.CREATE_NEW_GRID)
+              .setVariant("outlined")
           )
         );
         // Note that download actions for tables are currently inlined in the QueryWrapperPlotNav
@@ -402,13 +450,16 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         break;
       case dockerrepo:
-        layout.setPrimaryMenuText(
-          EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
-        );
+        layout.setPrimaryMenuText(TOOLS_SUFFIX);
         layout.setButtonActions(
           Arrays.asList(
-            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
-            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
+            ActionViewProps
+              .create(Action.SHARE_THIS_PAGE, "share")
+              .setVariant("text")
+              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+            ActionViewProps
+              .create(Action.SHOW_ANNOTATIONS)
+              .setVariant("outlined")
           )
         );
         layout.setPrimaryMenuActions(
@@ -443,22 +494,25 @@ public class DefaultEntityActionMenuLayoutUtil {
       // Note that download actions for tables are currently inlined in the QueryWrapperPlotNav
       case dataset:
       case datasetcollection:
-        layout.setPrimaryMenuText(
-          EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
-        );
+        layout.setPrimaryMenuText(TOOLS_SUFFIX);
         layout.setButtonActions(
           Arrays.asList(
-            ActionViewProps.create(
-              Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
-              "edit"
-            ),
-            ActionViewProps.create(
-              Action.CREATE_TABLE_VERSION,
-              "createVersion"
-            ),
-            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
-            ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns"),
-            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
+            ActionViewProps
+              .create(Action.SHARE_THIS_PAGE, "share")
+              .setVariant("text")
+              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+            ActionViewProps
+              .create(Action.EDIT_ENTITYREF_COLLECTION_ITEMS)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.CREATE_TABLE_VERSION)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.SHOW_ANNOTATIONS)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.SHOW_TABLE_SCHEMA)
+              .setVariant("outlined")
           )
         );
         // Note that download actions for tables are currently inlined in the QueryWrapperPlotNav
@@ -495,16 +549,25 @@ public class DefaultEntityActionMenuLayoutUtil {
         break;
       case materializedview:
       case virtualtable:
-        layout.setPrimaryMenuText(
-          EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
-        );
+        layout.setPrimaryMenuText(TOOLS_SUFFIX);
         layout.setButtonActions(
           Arrays.asList(
-            ActionViewProps.create(Action.EDIT_DEFINING_SQL, "edit"),
-            ActionViewProps.create(Action.VIEW_DEFINING_SQL, "article"),
-            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
-            ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns"),
-            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
+            ActionViewProps
+              .create(Action.SHARE_THIS_PAGE, "share")
+              .setVariant("text")
+              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+            ActionViewProps
+              .create(Action.EDIT_DEFINING_SQL)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.VIEW_DEFINING_SQL)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.SHOW_ANNOTATIONS)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.SHOW_TABLE_SCHEMA)
+              .setVariant("outlined")
           )
         );
         // Note that download actions for tables are currently inlined in the QueryWrapperPlotNav
@@ -539,15 +602,22 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         break;
       case searchindex:
-        layout.setPrimaryMenuText(
-          EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
-        );
+        layout.setPrimaryMenuText(TOOLS_SUFFIX);
         layout.setButtonActions(
           Arrays.asList(
-            ActionViewProps.create(Action.EDIT_DEFINING_SQL, "edit"),
-            ActionViewProps.create(Action.VIEW_DEFINING_SQL, "article"),
-            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
-            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
+            ActionViewProps
+              .create(Action.SHARE_THIS_PAGE, "share")
+              .setVariant("text")
+              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+            ActionViewProps
+              .create(Action.EDIT_DEFINING_SQL)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.VIEW_DEFINING_SQL)
+              .setVariant("outlined"),
+            ActionViewProps
+              .create(Action.SHOW_ANNOTATIONS)
+              .setVariant("outlined")
           )
         );
         layout.setPrimaryMenuActions(

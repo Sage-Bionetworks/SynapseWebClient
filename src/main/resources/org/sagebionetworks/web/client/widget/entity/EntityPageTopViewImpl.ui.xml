@@ -25,7 +25,7 @@
           <MUI:Button
             ui:field="button"
             target="_blank"
-            variant="text"
+            variant="outlined"
             href="https://sagebionetworks.jira.com/servicedesk/customer/portal/9"
             addStyleNames="projectSupport"
              />

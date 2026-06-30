@@ -17,9 +17,17 @@ public class SxProps extends JsObject {
   public String pl;
   public String pb;
 
+  public String borderColor;
+
   @JsOverlay
   public static SxProps create() {
     return new SxProps();
+  }
+
+  @JsOverlay
+  public final SxProps setBorderColor(String borderColor) {
+    this.borderColor = borderColor;
+    return this;
   }
 
   @JsOverlay

@@ -15,6 +15,7 @@ public class EntityActionMenuLayout {
   private String primaryMenuText;
   /* Only strings that map to synapse-react-client Icons */
   private String primaryMenuEndIcon;
+  private Object primaryMenuEndIconSx;
 
   private Object menuButtonSx;
 
@@ -29,7 +30,7 @@ public class EntityActionMenuLayout {
     layout.downloadMenuActions = new ActionViewProps[][] {};
     layout.buttonActions = new ActionViewProps[] {};
     layout.primaryMenuText = "Tools";
-    layout.primaryMenuEndIcon = "verticalEllipsis";
+    layout.primaryMenuEndIcon = "expandMore";
     return layout;
   }
 
@@ -73,6 +74,11 @@ public class EntityActionMenuLayout {
   @JsOverlay
   public final void setPrimaryMenuEndIcon(String primaryMenuEndIcon) {
     this.primaryMenuEndIcon = primaryMenuEndIcon;
+  }
+
+  @JsOverlay
+  public final void setPrimaryMenuEndIconSx(Object primaryMenuEndIconSx) {
+    this.primaryMenuEndIconSx = primaryMenuEndIconSx;
   }
 
   @JsOverlay
