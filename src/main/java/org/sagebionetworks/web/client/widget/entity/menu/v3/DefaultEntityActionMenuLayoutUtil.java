@@ -87,7 +87,7 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         break;
       case DATASETS:
-        layout.setPrimaryMenuText("Add New...");
+        layout.setPrimaryMenuText("New...");
         layout.setPrimaryMenuEndIcon("expandMore");
         layout.setButtonActions(Collections.emptyList());
         layout.setPrimaryMenuActions(
@@ -100,7 +100,7 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         break;
       case TABLES:
-        layout.setPrimaryMenuText("Add New...");
+        layout.setPrimaryMenuText("New...");
         layout.setPrimaryMenuEndIcon("expandMore");
         layout.setButtonActions(
           Collections.singletonList(
