@@ -11,7 +11,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2.HIDE;
-import static org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2.SCHEMA;
 import static org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2.SCOPE;
 import static org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2.SHOW;
 
@@ -605,11 +604,11 @@ public class TableEntityWidgetV2Test {
     listener.onAction(Action.SHOW_TABLE_SCHEMA, null);
     verify(mockView).setSchemaVisible(true);
     verify(mockActionMenu)
-      .setActionText(Action.SHOW_TABLE_SCHEMA, HIDE + "Table" + SCHEMA);
+      .setActionText(Action.SHOW_TABLE_SCHEMA, HIDE + "Schema");
     listener.onAction(Action.SHOW_TABLE_SCHEMA, null);
     verify(mockView).setSchemaVisible(false);
     verify(mockActionMenu)
-      .setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + "Table" + SCHEMA);
+      .setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + "Schema");
   }
 
   @Test

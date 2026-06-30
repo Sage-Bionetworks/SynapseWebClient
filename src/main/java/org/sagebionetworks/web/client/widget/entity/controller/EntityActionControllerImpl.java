@@ -1464,7 +1464,10 @@ public class EntityActionControllerImpl
         permissions.getCanCertifiedUserEdit()
       );
       actionMenu.setActionListener(Action.EDIT_WIKI_PAGE, this);
-      actionMenu.setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX + WIKI);
+      actionMenu.setActionText(
+        Action.EDIT_WIKI_PAGE,
+        EDIT_WIKI_PREFIX + "Wiki"
+      );
     } else {
       actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, false);
     }

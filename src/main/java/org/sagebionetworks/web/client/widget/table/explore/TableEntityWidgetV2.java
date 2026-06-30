@@ -273,7 +273,7 @@ public class TableEntityWidgetV2
     // Listen to action events.
     view.setScopeVisible(false);
     view.setSchemaVisible(false);
-    actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + SCHEMA);
+    actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + "Schema");
     actionMenu.setActionText(
       Action.SHOW_VIEW_SCOPE,
       SHOW + SCOPE + entityTypeDisplay
@@ -296,7 +296,10 @@ public class TableEntityWidgetV2
           boolean isVisible = !view.isSchemaVisible();
           view.setSchemaVisible(isVisible);
           String showHide = isVisible ? HIDE : SHOW;
-          actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, showHide + SCHEMA);
+          actionMenu.setActionText(
+            Action.SHOW_TABLE_SCHEMA,
+            showHide + "Schema"
+          );
         }
       );
     this.actionMenu.setActionListener(

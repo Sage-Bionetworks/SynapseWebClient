@@ -41,7 +41,6 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.UPDATE_DOI_FOR;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -1827,12 +1826,7 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
     verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
     verify(mockActionMenu)
-      .setActionText(
-        Action.EDIT_WIKI_PAGE,
-        EDIT_WIKI_PREFIX +
-        EntityTypeUtils.getDisplayName(EntityType.project) +
-        WIKI
-      );
+      .setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX + "Wiki");
   }
 
   @Test
@@ -1850,12 +1844,7 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
     verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
     verify(mockActionMenu)
-      .setActionText(
-        Action.EDIT_WIKI_PAGE,
-        EDIT_WIKI_PREFIX +
-        EntityTypeUtils.getDisplayName(EntityType.folder) +
-        WIKI
-      );
+      .setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX + "Wiki");
   }
 
   @Test
