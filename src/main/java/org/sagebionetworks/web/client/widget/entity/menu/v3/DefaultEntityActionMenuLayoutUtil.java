@@ -17,13 +17,14 @@ public class DefaultEntityActionMenuLayoutUtil {
   }
 
   private static final String TOOLS_SUFFIX = " Tools";
+  private static final String ICON_COLOR = "#1C1B1F";
 
   static SxProps entityMenuButtonSx = SxProps
     .create()
     .setBorderColor("#9EAAB7")
     .setColor("#4D535A");
 
-  static SxProps entityMenuEndIconSx = SxProps.create().setColor("#1C1B1F");
+  static SxProps entityMenuEndIconSx = SxProps.create().setColor(ICON_COLOR);
 
   static SxProps deleteTextStyle = SxProps
     .create()
@@ -215,7 +216,7 @@ public class DefaultEntityActionMenuLayoutUtil {
             ActionViewProps
               .create(Action.SHARE_THIS_PAGE, "share")
               .setVariant("text")
-              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+              .setIconSx(SxProps.create().setColor(ICON_COLOR)),
             ActionViewProps.create(Action.CREATE_FOLDER).setVariant("outlined"),
             ActionViewProps.create(Action.UPLOAD_FILE).setVariant("outlined"),
             ActionViewProps
@@ -270,7 +271,7 @@ public class DefaultEntityActionMenuLayoutUtil {
             ActionViewProps
               .create(Action.SHARE_THIS_PAGE, "share")
               .setVariant("text")
-              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+              .setIconSx(SxProps.create().setColor(ICON_COLOR)),
             ActionViewProps
               .create(Action.UPLOAD_NEW_FILE)
               .setVariant("outlined"),
@@ -335,7 +336,7 @@ public class DefaultEntityActionMenuLayoutUtil {
             ActionViewProps
               .create(Action.SHARE_THIS_PAGE, "share")
               .setVariant("text")
-              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+              .setIconSx(SxProps.create().setColor(ICON_COLOR)),
             ActionViewProps
               .create(Action.EDIT_TABLE_DATA)
               .setVariant("outlined"),
@@ -397,7 +398,7 @@ public class DefaultEntityActionMenuLayoutUtil {
             ActionViewProps
               .create(Action.SHARE_THIS_PAGE, "share")
               .setVariant("text")
-              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+              .setIconSx(SxProps.create().setColor(ICON_COLOR)),
             ActionViewProps
               .create(Action.EDIT_TABLE_DATA)
               .setVariant("outlined"),
@@ -456,7 +457,7 @@ public class DefaultEntityActionMenuLayoutUtil {
             ActionViewProps
               .create(Action.SHARE_THIS_PAGE, "share")
               .setVariant("text")
-              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+              .setIconSx(SxProps.create().setColor(ICON_COLOR)),
             ActionViewProps
               .create(Action.SHOW_ANNOTATIONS)
               .setVariant("outlined")
@@ -500,7 +501,7 @@ public class DefaultEntityActionMenuLayoutUtil {
             ActionViewProps
               .create(Action.SHARE_THIS_PAGE, "share")
               .setVariant("text")
-              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+              .setIconSx(SxProps.create().setColor(ICON_COLOR)),
             ActionViewProps
               .create(Action.EDIT_ENTITYREF_COLLECTION_ITEMS)
               .setVariant("outlined"),
@@ -555,7 +556,7 @@ public class DefaultEntityActionMenuLayoutUtil {
             ActionViewProps
               .create(Action.SHARE_THIS_PAGE, "share")
               .setVariant("text")
-              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+              .setIconSx(SxProps.create().setColor(ICON_COLOR)),
             ActionViewProps
               .create(Action.EDIT_DEFINING_SQL)
               .setVariant("outlined"),
@@ -608,7 +609,7 @@ public class DefaultEntityActionMenuLayoutUtil {
             ActionViewProps
               .create(Action.SHARE_THIS_PAGE, "share")
               .setVariant("text")
-              .setIconSx(SxProps.create().setColor("#1C1B1F")),
+              .setIconSx(SxProps.create().setColor(ICON_COLOR)),
             ActionViewProps
               .create(Action.EDIT_DEFINING_SQL)
               .setVariant("outlined"),
