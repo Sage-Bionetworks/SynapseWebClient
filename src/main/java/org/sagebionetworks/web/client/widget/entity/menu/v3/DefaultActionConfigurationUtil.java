@@ -41,26 +41,17 @@ public class DefaultActionConfigurationUtil {
       ActionConfiguration.create(Action.EDIT_DEFINING_SQL, "Edit Defining SQL"),
       ActionConfiguration.create(Action.VIEW_DEFINING_SQL, "View Defining SQL"),
       ActionConfiguration.create(Action.SHOW_ANNOTATIONS, "Annotations"),
-      ActionConfiguration.create(
-        Action.CREATE_NEW_GRID,
-        "Create New " + WORKING_COPY
-      ),
-      ActionConfiguration.create(
-        Action.UPLOAD_FILE,
-        "Upload or Link to a File"
-      ),
-      ActionConfiguration.create(Action.SHARE_THIS_PAGE, "Share this page"),
-      ActionConfiguration.create(Action.CREATE_FOLDER, "Add New Folder"),
+      ActionConfiguration.create(Action.CREATE_NEW_GRID, WORKING_COPY),
+      ActionConfiguration.create(Action.UPLOAD_FILE, "Upload/Link File"),
+      ActionConfiguration.create(Action.SHARE_THIS_PAGE, "Share"),
+      ActionConfiguration.create(Action.CREATE_FOLDER, "New Folder"),
       ActionConfiguration.create(Action.SHOW_TABLE_SCHEMA, "Schema"),
       ActionConfiguration.create(Action.SHOW_VIEW_SCOPE, "Scope"),
       ActionConfiguration.create(
         Action.CHANGE_STORAGE_LOCATION,
         "Change Storage Location"
       ),
-      ActionConfiguration.create(
-        Action.UPLOAD_NEW_FILE,
-        "Upload a New Version of File"
-      ),
+      ActionConfiguration.create(Action.UPLOAD_NEW_FILE, "Upload"),
       ActionConfiguration.create(
         Action.CREATE_TABLE_VERSION,
         "Create a New Table/View Version"
@@ -82,7 +73,7 @@ public class DefaultActionConfigurationUtil {
         "Enable Full Text Search"
       ),
       ActionConfiguration.create(Action.EDIT_WIKI_PAGE, "Edit Wiki Page"),
-      ActionConfiguration.create(Action.VIEW_WIKI_SOURCE, "View Wiki Source"),
+      ActionConfiguration.create(Action.VIEW_WIKI_SOURCE, "Wiki Source"),
       ActionConfiguration.create(Action.ADD_WIKI_SUBPAGE, "Add Wiki Subpage"),
       ActionConfiguration.create(
         Action.REORDER_WIKI_SUBPAGES,
@@ -107,13 +98,13 @@ public class DefaultActionConfigurationUtil {
       ),
       ActionConfiguration.create(Action.CREATE_LINK, "Save Link"),
       ActionConfiguration.create(Action.DELETE_ENTITY, "Delete"),
-      ActionConfiguration.create(Action.UPLOAD_TABLE, "Upload a Table"),
+      ActionConfiguration.create(Action.UPLOAD_TABLE, "Upload Table"),
       ActionConfiguration.create(Action.ADD_DATASET, "Add Dataset"),
       ActionConfiguration.create(
         Action.ADD_DATASET_COLLECTION,
         "Add Dataset Collection"
       ),
-      ActionConfiguration.create(Action.ADD_TABLE, "Add Table or View"),
+      ActionConfiguration.create(Action.ADD_TABLE, "Table/View"),
       ActionConfiguration.create(Action.FOLLOW, "Follow"),
       ActionConfiguration.create(Action.CREATE_THREAD, "Create New Thread"),
       ActionConfiguration.create(
@@ -126,7 +117,7 @@ public class DefaultActionConfigurationUtil {
       ActionConfiguration.create(Action.RESTORE_THREAD, "Restore Thread"),
       ActionConfiguration.create(
         Action.CREATE_EXTERNAL_DOCKER_REPO,
-        "Add External Repository"
+        "External Repository"
       ),
       ActionConfiguration.create(Action.ADD_DOCKER_COMMIT, "Add a Commit"),
       ActionConfiguration.create(
@@ -137,10 +128,7 @@ public class DefaultActionConfigurationUtil {
         Action.MANAGE_ACCESS_REQUIREMENTS,
         "Manage Access Requirements (ACT)"
       ),
-      ActionConfiguration.create(
-        Action.EDIT_TABLE_DATA,
-        "Bulk Edit Table Cell Values"
-      ),
+      ActionConfiguration.create(Action.EDIT_TABLE_DATA, "Bulk Edit"),
       ActionConfiguration.create(
         Action.SHOW_PROGRAMMATIC_OPTIONS,
         "Programmatic Options"

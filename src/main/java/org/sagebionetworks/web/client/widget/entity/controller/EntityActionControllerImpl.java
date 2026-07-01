@@ -1466,7 +1466,7 @@ public class EntityActionControllerImpl
       actionMenu.setActionListener(Action.EDIT_WIKI_PAGE, this);
       actionMenu.setActionText(
         Action.EDIT_WIKI_PAGE,
-        EDIT_WIKI_PREFIX + entityTypeDisplay + WIKI
+        EDIT_WIKI_PREFIX + "Wiki"
       );
     } else {
       actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, false);
@@ -1540,15 +1540,9 @@ public class EntityActionControllerImpl
     ) {
       if (entityBundle.getEntity() instanceof Dataset) {
         // "Stable Version" for datasets (SWC-5919)
-        actionMenu.setActionText(
-          Action.CREATE_TABLE_VERSION,
-          "Create Stable Version"
-        );
+        actionMenu.setActionText(Action.CREATE_TABLE_VERSION, "Stable Version");
       } else {
-        actionMenu.setActionText(
-          Action.CREATE_TABLE_VERSION,
-          "Create Snapshot"
-        );
+        actionMenu.setActionText(Action.CREATE_TABLE_VERSION, "Snapshot");
       }
       actionMenu.setActionVisible(
         Action.CREATE_TABLE_VERSION,

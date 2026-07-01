@@ -13,6 +13,7 @@ public class ActionViewProps {
   private String icon;
   private SxProps textSx;
   private SxProps iconSx;
+  private String variant;
 
   @JsOverlay
   public static ActionViewProps create(Action action) {
@@ -39,5 +40,17 @@ public class ActionViewProps {
     actionViewProps.textSx = textSx;
     actionViewProps.iconSx = iconSx;
     return actionViewProps;
+  }
+
+  @JsOverlay
+  public final ActionViewProps setVariant(String variant) {
+    this.variant = variant;
+    return this;
+  }
+
+  @JsOverlay
+  public final ActionViewProps setIconSx(SxProps iconSx) {
+    this.iconSx = iconSx;
+    return this;
   }
 }

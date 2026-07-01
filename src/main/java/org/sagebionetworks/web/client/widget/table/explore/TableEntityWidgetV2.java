@@ -273,17 +273,14 @@ public class TableEntityWidgetV2
     // Listen to action events.
     view.setScopeVisible(false);
     view.setSchemaVisible(false);
-    actionMenu.setActionText(
-      Action.SHOW_TABLE_SCHEMA,
-      SHOW + entityTypeDisplay + SCHEMA
-    );
+    actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + "Schema");
     actionMenu.setActionText(
       Action.SHOW_VIEW_SCOPE,
       SHOW + SCOPE + entityTypeDisplay
     );
     actionMenu.setActionText(
       Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
-      "Edit " + entityTypeDisplay + " Items"
+      "Edit Items"
     );
     this.actionMenu.setActionListener(
         Action.UPLOAD_TABLE_DATA,
@@ -301,7 +298,7 @@ public class TableEntityWidgetV2
           String showHide = isVisible ? HIDE : SHOW;
           actionMenu.setActionText(
             Action.SHOW_TABLE_SCHEMA,
-            showHide + entityTypeDisplay + SCHEMA
+            showHide + "Schema"
           );
         }
       );

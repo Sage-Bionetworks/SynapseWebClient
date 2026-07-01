@@ -52,8 +52,8 @@ public class EntityPageTopViewImpl
   @Inject
   public EntityPageTopViewImpl() {
     initWidget(uiBinder.createAndBindUi(this));
-    button.setChildren("Project Support");
-    button.setStartIcon("helpChatBubble");
+    button.setChildren("Support");
+    button.setStartIcon("support");
   }
 
   @Override
