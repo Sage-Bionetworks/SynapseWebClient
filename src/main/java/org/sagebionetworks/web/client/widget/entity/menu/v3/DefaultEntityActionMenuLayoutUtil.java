@@ -20,11 +20,14 @@ public class DefaultEntityActionMenuLayoutUtil {
   private static final String ICON_COLOR = "#1C1B1F";
   private static final String ICON_BORDER_COLOR = "#9EAAB7";
   private static final String ENTITY_MENU_BUTTON_COLOR = "#4D535A";
+  private static final String ENTITY_MENU_BUTTON_BACKGROUND_COLOR =
+    "rgba(255, 255, 255, 0.6)";
 
   static SxProps entityMenuButtonSx = SxProps
     .create()
     .setBorderColor(ICON_BORDER_COLOR)
-    .setColor(ENTITY_MENU_BUTTON_COLOR);
+    .setColor(ENTITY_MENU_BUTTON_COLOR)
+    .setBackgroundColor(ENTITY_MENU_BUTTON_BACKGROUND_COLOR);
 
   static SxProps entityMenuEndIconSx = SxProps.create().setColor(ICON_COLOR);
 
@@ -79,6 +82,7 @@ public class DefaultEntityActionMenuLayoutUtil {
           )
         );
         layout.setPrimaryMenuActions(Collections.emptyList());
+        layout.setDownloadMenuVariant("contained");
         layout.setDownloadMenuActions(
           Collections.singletonList(
             Arrays.asList(
@@ -87,6 +91,7 @@ public class DefaultEntityActionMenuLayoutUtil {
             )
           )
         );
+
         break;
       case DATASETS:
         layout.setPrimaryMenuText("New...");
@@ -268,6 +273,7 @@ public class DefaultEntityActionMenuLayoutUtil {
       case file:
       case recordset:
         layout.setPrimaryMenuText(TOOLS_SUFFIX);
+        layout.setDownloadMenuVariant("contained");
         layout.setButtonActions(
           Arrays.asList(
             ActionViewProps
