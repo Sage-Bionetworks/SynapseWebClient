@@ -21,10 +21,6 @@ public class DefaultActionConfigurationUtil {
      */
     List<ActionConfiguration> configurations = Arrays.asList(
       ActionConfiguration.create(
-        Action.ADD_CONDITIONS_FOR_USE,
-        "Add Conditions for Use"
-      ),
-      ActionConfiguration.create(
         Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
         "Edit Items"
       ),
