@@ -7,7 +7,7 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >
   <bh:Div>
-    <bh:Div addStyleNames="flexcontainer-row-unless-xs margin-bottom-20">
+    <bh:Div addStyleNames="flexcontainer-row-unless-xs margin-bottom-20 flexcontainer-align-items-center">
       <bh:Div
         ui:field="headingFlexContainer"
         addStyleNames="flexcontainer-column flexcontainer-column-fill-width"
@@ -31,7 +31,7 @@
         marginRight="10"
         marginLeft="10"
       >
-        <bh:Span ui:field="subscribersContainer" addStyleNames="movedown-7" />
+        <bh:Span ui:field="subscribersContainer"  />
       </bh:Div>
       <bh:Div
         ui:field="forumSearchFlexContainer"

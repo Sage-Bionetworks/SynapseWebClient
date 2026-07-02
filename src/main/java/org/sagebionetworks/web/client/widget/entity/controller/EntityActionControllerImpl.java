@@ -691,6 +691,7 @@ public class EntityActionControllerImpl
     configureFullTextSearch();
     configureReportViolation();
     configureGridActions();
+    configureAddConditionsForUse();
 
     // These configuration methods are asynchronous
     FluentFuture fileDownloadFuture = configureFileDownload();
@@ -1150,6 +1151,17 @@ public class EntityActionControllerImpl
       return future;
     }
     return getDoneFuture(null);
+  }
+
+  private void configureAddConditionsForUse() {
+    boolean canAddConditionsForUse =
+      authenticationController.isLoggedIn() &&
+      !hasProjectAreaContext(entityBundle.getEntity(), currentArea) &&
+      Boolean.TRUE.equals(permissions.getCanChangePermissions());
+    actionMenu.setActionVisible(
+      Action.ADD_CONDITIONS_FOR_USE,
+      canAddConditionsForUse
+    );
   }
 
   public void onSelectChallengeTeam(String id) {

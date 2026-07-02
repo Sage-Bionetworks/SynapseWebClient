@@ -18,6 +18,7 @@ public class EntityActionMenuLayout {
   private Object primaryMenuEndIconSx;
   private Object menuButtonSx;
   private String downloadMenuVariant;
+  private String primaryMenuVariant;
 
   private EntityActionMenuLayout() {
     // Private constructor to force using the JsOverlay create
@@ -89,5 +90,10 @@ public class EntityActionMenuLayout {
   @JsOverlay
   public final void setDownloadMenuVariant(String downloadMenuVariant) {
     this.downloadMenuVariant = downloadMenuVariant;
+  }
+
+  @JsOverlay
+  public final void setPrimaryMenuVariant(String primaryMenuVariant) {
+    this.primaryMenuVariant = primaryMenuVariant;
   }
 }
