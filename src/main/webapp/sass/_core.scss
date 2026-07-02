@@ -13,7 +13,7 @@ $synapse-dark-text: #515359;
 $synapse-red-error: #eb5757;
 $synapse-gray-med: #dcdcdc;
 
-$entity-page-side-spacing: 40px;
+$entity-page-side-spacing: 32px;
 
 // Colors from https://www.figma.com/file/0oPm5lLSUva8kyfVNMS6FA/Synapse-Style-%26-Component-Library?node-id=77%3A1598
 $synapse-primary-color-palette: (
@@ -227,9 +227,6 @@ a:focus {
         font-size: 16px;
         line-height: 20px;
       }
-      div[role='group'] button {
-        padding: 4px 16px;
-      }
     }
 
     .projectSupport {
@@ -239,7 +236,7 @@ a:focus {
         text-transform: none;
         border-radius: 6px;
         font-weight: 540;
-        padding: 4px 12px;
+        padding: 8px 12px;
       }
     }
     .projectSupport .MuiButton-root:hover {

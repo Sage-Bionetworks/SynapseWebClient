@@ -16,8 +16,9 @@ public class EntityActionMenuLayout {
   /* Only strings that map to synapse-react-client Icons */
   private String primaryMenuEndIcon;
   private Object primaryMenuEndIconSx;
-
   private Object menuButtonSx;
+  private String downloadMenuVariant;
+  private String primaryMenuVariant;
 
   private EntityActionMenuLayout() {
     // Private constructor to force using the JsOverlay create
@@ -84,5 +85,15 @@ public class EntityActionMenuLayout {
   @JsOverlay
   public final void setMenuButtonSx(Object menuButtonSx) {
     this.menuButtonSx = menuButtonSx;
+  }
+
+  @JsOverlay
+  public final void setDownloadMenuVariant(String downloadMenuVariant) {
+    this.downloadMenuVariant = downloadMenuVariant;
+  }
+
+  @JsOverlay
+  public final void setPrimaryMenuVariant(String primaryMenuVariant) {
+    this.primaryMenuVariant = primaryMenuVariant;
   }
 }

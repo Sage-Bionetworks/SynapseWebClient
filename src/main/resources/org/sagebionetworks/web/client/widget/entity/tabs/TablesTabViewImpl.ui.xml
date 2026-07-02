@@ -21,9 +21,10 @@
       global="false"
       addStyleNames="margin-top-bottom-minus-10"
     />
-    <g:SimplePanel ui:field="tableTitlebarContainer" visible="false" />
-    <g:SimplePanel ui:field="tableMetadataContainer" visible="false" />
-
+    <bh:Div addStyleNames="entity-page-side-margins">
+      <g:SimplePanel ui:field="tableTitlebarContainer" visible="false" />
+      <g:SimplePanel ui:field="tableMetadataContainer" visible="false" />
+    </bh:Div>
     <bh:Div addStyleNames="margin-top-15 entity-page-side-margins">
       <bh:Div
         ui:field="projectLevelUI"

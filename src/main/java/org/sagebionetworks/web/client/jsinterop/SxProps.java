@@ -19,6 +19,8 @@ public class SxProps extends JsObject {
 
   public String borderColor;
 
+  public String backgroundColor;
+
   @JsOverlay
   public static SxProps create() {
     return new SxProps();
@@ -27,6 +29,12 @@ public class SxProps extends JsObject {
   @JsOverlay
   public final SxProps setBorderColor(String borderColor) {
     this.borderColor = borderColor;
+    return this;
+  }
+
+  @JsOverlay
+  public final SxProps setBackgroundColor(String backgroundColor) {
+    this.backgroundColor = backgroundColor;
     return this;
   }
 

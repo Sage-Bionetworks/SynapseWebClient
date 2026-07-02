@@ -9,8 +9,10 @@
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
   <g:FlowPanel>
-    <g:SimplePanel ui:field="dockerTitlebarContainer" />
-    <g:SimplePanel ui:field="dockerMetadataContainer" />
+    <bh:Div addStyleNames="entity-page-side-margins">
+      <g:SimplePanel ui:field="dockerTitlebarContainer" />
+      <g:SimplePanel ui:field="dockerMetadataContainer" />
+    </bh:Div>
     <g:FlowPanel addStyleNames="entity-page-side-margins">
       <MUI:Grid container="true" columnSpacing="15px">
         <MUI:Grid xs="12" md="6">
