@@ -21,19 +21,23 @@ public class BreadcrumbItem extends ReactComponentProps {
   String href;
   /* Event handler fired when the link is clicked */
   BreadcrumbItem.OnClick onClick;
+  /* The entity type of the item. Used to determine the icon to display */
+  String entityType;
 
   @JsOverlay
   public static BreadcrumbItem create(
     String text,
     boolean current,
     String href,
-    BreadcrumbItem.OnClick onClick
+    BreadcrumbItem.OnClick onClick,
+    String entityType
   ) {
     BreadcrumbItem props = new BreadcrumbItem();
     props.text = text;
     props.current = current;
     props.href = href;
     props.onClick = onClick;
+    props.entityType = entityType;
     return props;
   }
 }
