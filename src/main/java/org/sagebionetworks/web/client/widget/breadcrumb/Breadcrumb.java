@@ -41,7 +41,6 @@ public class Breadcrumb
   public void configure(EntityPath entityPath, EntityArea optionalArea) {
     view.setPresenter(this);
     List<LinkData> links = new ArrayList<>();
-    EntityType currentType = null;
     String currentPageName = null;
     if (entityPath != null) {
       List<EntityHeader> path = entityPath.getPath();
@@ -76,13 +75,11 @@ public class Breadcrumb
           }
           links.add(new LinkData(name, type, place));
         }
-        EntityHeader currentElement = path.get(path.size() - 1);
-        currentPageName = currentElement.getName();
-        currentType = EntityTypeUtils.getEntityType(currentElement);
+        currentPageName = path.get(path.size() - 1).getName();
       }
     }
     if (currentPageName != null) {
-      view.setLinksList(links, currentPageName, currentType);
+      view.setLinksList(links, currentPageName);
     } else {
       view.setLinksList(links);
     }

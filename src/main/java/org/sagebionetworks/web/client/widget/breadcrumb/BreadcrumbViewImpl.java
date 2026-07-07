@@ -36,25 +36,16 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 
   @Override
   public void setLinksList(List<LinkData> breadcrumbs) {
-    setLinksList(breadcrumbs, null, null);
+    setLinksList(breadcrumbs, null);
   }
 
   @Override
   public void setLinksList(List<LinkData> breadcrumbs, String current) {
-    setLinksList(breadcrumbs, current, null);
-  }
-
-  @Override
-  public void setLinksList(
-    List<LinkData> breadcrumbs,
-    String current,
-    EntityType currentEntityType
-  ) {
     List<BreadcrumbItem> items = breadcrumbs
       .stream()
       .map(data -> {
         String href = null;
-        String iconType = getContainerIconType(data.getEntityType());
+        String iconType = getIconType(data.getEntityType());
         if (data.getPlace() instanceof Synapse) {
           Synapse synapsePlace = (Synapse) data.getPlace();
           href =
@@ -86,10 +77,7 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
       .collect(Collectors.toList());
     // If there's a "current" item, add it to the end of the list
     if (current != null) {
-      String currentIconType = getContainerIconType(currentEntityType);
-      items.add(
-        BreadcrumbItem.create(current, true, null, null, currentIconType)
-      );
+      items.add(BreadcrumbItem.create(current, true, null, null, null));
     }
 
     EntityPageBreadcrumbsProps props = EntityPageBreadcrumbsProps.create(
@@ -104,11 +92,9 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
     container.render(element);
   }
 
-  // Only container entities (projects and folders) have icons in the breadcrumb.
-  private static String getContainerIconType(EntityType type) {
-    boolean isContainer =
-      type == EntityType.project || type == EntityType.folder;
-    return isContainer ? type.name() : null;
+  // Parent breadcrumb nodes show their entity-type icon
+  private static String getIconType(EntityType type) {
+    return type != null ? type.name() : null;
   }
 
   @Override

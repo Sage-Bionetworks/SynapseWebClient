@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.breadcrumb;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 import java.util.List;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.SynapseView;
 
 public interface BreadcrumbView extends IsWidget, SynapseView {
@@ -17,12 +16,6 @@ public interface BreadcrumbView extends IsWidget, SynapseView {
   public void setLinksList(List<LinkData> breadcrumbs);
 
   public void setLinksList(List<LinkData> breadcrumbs, String current);
-
-  public void setLinksList(
-    List<LinkData> breadcrumbs,
-    String current,
-    EntityType currentEntityType
-  );
 
   /**
    * Presenter interface
