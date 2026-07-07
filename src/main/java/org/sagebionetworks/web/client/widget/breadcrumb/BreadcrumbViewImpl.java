@@ -4,6 +4,7 @@ import com.google.gwt.user.client.ui.Widget;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.jsinterop.BreadcrumbItem;
 import org.sagebionetworks.web.client.jsinterop.EntityPageBreadcrumbsProps;
@@ -35,18 +36,25 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 
   @Override
   public void setLinksList(List<LinkData> breadcrumbs) {
-    setLinksList(breadcrumbs, null);
+    setLinksList(breadcrumbs, null, null);
   }
 
   @Override
   public void setLinksList(List<LinkData> breadcrumbs, String current) {
+    setLinksList(breadcrumbs, current, null);
+  }
+
+  @Override
+  public void setLinksList(
+    List<LinkData> breadcrumbs,
+    String current,
+    EntityType currentEntityType
+  ) {
     List<BreadcrumbItem> items = breadcrumbs
       .stream()
       .map(data -> {
         String href = null;
-        String entityType = data.getEntityType() != null
-          ? data.getEntityType().name()
-          : null;
+        String entityType = getContainerIconType(data.getEntityType());
         if (data.getPlace() instanceof Synapse) {
           Synapse synapsePlace = (Synapse) data.getPlace();
           href =
@@ -78,7 +86,8 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
       .collect(Collectors.toList());
     // If there's a "current" item, add it to the end of the list
     if (current != null) {
-      items.add(BreadcrumbItem.create(current, true, null, null, null));
+      String currentType = getContainerIconType(currentEntityType);
+      items.add(BreadcrumbItem.create(current, true, null, null, currentType));
     }
 
     EntityPageBreadcrumbsProps props = EntityPageBreadcrumbsProps.create(
@@ -91,6 +100,13 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
     );
 
     container.render(element);
+  }
+
+  // Only container entities (projects and folders) have icons in the breadcrumb.
+  private static String getContainerIconType(EntityType type) {
+    boolean isContainer =
+      type == EntityType.project || type == EntityType.folder;
+    return isContainer ? type.name() : null;
   }
 
   @Override
