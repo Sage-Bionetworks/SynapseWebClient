@@ -18,8 +18,6 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.EntityType;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -78,7 +76,6 @@ public class BreadcrumbTest {
     EntityHeader dsHeader = new EntityHeader();
     dsHeader.setId("3");
     dsHeader.setName("ds");
-    dsHeader.setType(FileEntity.class.getName());
     pathHeaders.add(dsHeader);
 
     EntityPath entityPath = new EntityPath();
@@ -88,8 +85,7 @@ public class BreadcrumbTest {
 
     breadcrumb.configure(entityPath, EntityArea.FILES);
     ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-    verify(mockView)
-      .setLinksList(captor.capture(), eq("ds"), eq(EntityType.file));
+    verify(mockView).setLinksList(captor.capture(), eq("ds"));
     List<LinkData> links = captor.getValue();
     assertNotNull(links);
     assertEquals(links.size(), 1);
