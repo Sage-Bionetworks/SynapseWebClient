@@ -4,6 +4,7 @@ import com.google.gwt.user.client.ui.Widget;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.jsinterop.BreadcrumbItem;
 import org.sagebionetworks.web.client.jsinterop.EntityPageBreadcrumbsProps;
@@ -44,6 +45,7 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
       .stream()
       .map(data -> {
         String href = null;
+        String iconType = getIconType(data.getEntityType());
         if (data.getPlace() instanceof Synapse) {
           Synapse synapsePlace = (Synapse) data.getPlace();
           href =
@@ -64,12 +66,18 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
               }
             };
         }
-        return BreadcrumbItem.create(data.getText(), false, href, clickHandler);
+        return BreadcrumbItem.create(
+          data.getText(),
+          false,
+          href,
+          clickHandler,
+          iconType
+        );
       })
       .collect(Collectors.toList());
     // If there's a "current" item, add it to the end of the list
     if (current != null) {
-      items.add(BreadcrumbItem.create(current, true, null, null));
+      items.add(BreadcrumbItem.create(current, true, null, null, null));
     }
 
     EntityPageBreadcrumbsProps props = EntityPageBreadcrumbsProps.create(
@@ -82,6 +90,11 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
     );
 
     container.render(element);
+  }
+
+  // Parent breadcrumb nodes show their entity-type icon
+  private static String getIconType(EntityType type) {
+    return type != null ? type.name() : null;
   }
 
   @Override
