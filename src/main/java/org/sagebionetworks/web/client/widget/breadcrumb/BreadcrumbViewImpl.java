@@ -54,7 +54,7 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
       .stream()
       .map(data -> {
         String href = null;
-        String entityType = getContainerIconType(data.getEntityType());
+        String iconType = getContainerIconType(data.getEntityType());
         if (data.getPlace() instanceof Synapse) {
           Synapse synapsePlace = (Synapse) data.getPlace();
           href =
@@ -80,14 +80,16 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
           false,
           href,
           clickHandler,
-          entityType
+          iconType
         );
       })
       .collect(Collectors.toList());
     // If there's a "current" item, add it to the end of the list
     if (current != null) {
-      String currentType = getContainerIconType(currentEntityType);
-      items.add(BreadcrumbItem.create(current, true, null, null, currentType));
+      String currentIconType = getContainerIconType(currentEntityType);
+      items.add(
+        BreadcrumbItem.create(current, true, null, null, currentIconType)
+      );
     }
 
     EntityPageBreadcrumbsProps props = EntityPageBreadcrumbsProps.create(
