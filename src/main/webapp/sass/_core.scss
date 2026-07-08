@@ -952,6 +952,20 @@ input[type='text'][readonly].border-none,
   margin-right: 65px;
 }
 
+.entityPageContentRow {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 24px;
+}
+.entityPageMainContent {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.entityPageSidebar {
+  flex: 0 0 320px;
+}
+
 .entity-page-side-margins {
   margin-left: $entity-page-side-spacing;
   margin-right: $entity-page-side-spacing;

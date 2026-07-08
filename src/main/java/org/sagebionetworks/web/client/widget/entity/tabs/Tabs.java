@@ -64,4 +64,8 @@ public class Tabs implements IsWidget {
   public void setNavTabsVisible(boolean visible) {
     view.setNavTabsVisible(visible);
   }
+
+  public void setEntitySidebar(String entityId, Double versionNumber) {
+    view.setEntitySidebar(entityId, versionNumber);
+  }
 }

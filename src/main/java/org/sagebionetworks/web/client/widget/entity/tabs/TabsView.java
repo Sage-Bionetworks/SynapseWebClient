@@ -8,4 +8,6 @@ public interface TabsView extends IsWidget {
   void clear();
 
   void setNavTabsVisible(boolean visible);
+
+  void setEntitySidebar(String entityId, Double versionNumber);
 }
