@@ -7,11 +7,6 @@ import com.google.gwt.user.client.ui.Widget;
 import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.NavTabs;
 import org.gwtbootstrap3.client.ui.TabContent;
-import org.sagebionetworks.web.client.jsinterop.EntitySidebarProps;
-import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
-import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class TabsViewImpl implements TabsView {
 
@@ -20,9 +15,6 @@ public class TabsViewImpl implements TabsView {
 
   @UiField
   TabContent tabContent;
-
-  @UiField
-  ReactComponent entitySidebar;
 
   public interface TabsViewImplUiBinder
     extends UiBinder<Widget, TabsViewImpl> {}
@@ -56,18 +48,5 @@ public class TabsViewImpl implements TabsView {
   @Override
   public void setNavTabsVisible(boolean visible) {
     navTabs.setVisible(visible);
-  }
-
-  @Override
-  public void setEntitySidebar(String entityId, Double versionNumber) {
-    EntitySidebarProps props = EntitySidebarProps.create(
-      entityId,
-      versionNumber
-    );
-    ReactElement component = React.createElementWithSynapseContext(
-      SRC.SynapseComponents.EntitySidebar,
-      props
-    );
-    entitySidebar.render(component);
   }
 }

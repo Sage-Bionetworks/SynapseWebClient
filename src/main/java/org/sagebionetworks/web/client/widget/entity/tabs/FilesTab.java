@@ -276,8 +276,13 @@ public class FilesTab {
     // Metadata
     boolean isFileOrFolder = isFile || isFolder;
     view.setFileFolderUIVisible(isFileOrFolder);
+    view.setEntitySidebarVisible(isFileOrFolder);
     if (isFileOrFolder) {
       metadata.configure(bundle, versionNumber, tab.getEntityActionMenu());
+      view.setEntitySidebar(
+        currentEntityId,
+        versionNumber == null ? null : versionNumber.doubleValue()
+      );
     }
     Boolean isCurrentVersion = bundle.getEntity() instanceof VersionableEntity
       ? ((VersionableEntity) bundle.getEntity()).getIsLatestVersion()

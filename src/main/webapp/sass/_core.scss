@@ -956,14 +956,24 @@ input[type='text'][readonly].border-none,
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 24px;
+  gap: 2px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
+
 .entityPageMainContent {
   flex: 1 1 auto;
   min-width: 0;
 }
+
 .entityPageSidebar {
-  flex: 0 0 320px;
+  flex: 0 0 auto;
+  @media (max-width: 768px) {
+    order: -1;
+  }
 }
 
 .entity-page-side-margins {

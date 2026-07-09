@@ -656,7 +656,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
         dockerChanged(bundle);
       }
     }
-    configureEntitySidebar(bundle, currentTargetVersionNumber);
     configureEntityCitationForTab(bundle, currentTargetVersionNumber);
     reconfigureCurrentArea();
   }
@@ -945,14 +944,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       return view.asWidget();
     }
     return null;
-  }
-
-  private void configureEntitySidebar(EntityBundle bundle, Long versionNumber) {
-    String entityId = bundle != null ? bundle.getEntity().getId() : null;
-    Double versionNum = versionNumber != null
-      ? versionNumber.doubleValue()
-      : null;
-    tabs.setEntitySidebar(entityId, versionNum);
   }
 
   private void configureEntityCitationForTab(

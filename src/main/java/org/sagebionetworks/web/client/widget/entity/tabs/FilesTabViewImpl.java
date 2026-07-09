@@ -19,8 +19,13 @@ import org.gwtbootstrap3.client.ui.ModalFooter;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.jsinterop.EntitySidebarProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.mui.Grid;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 public class FilesTabViewImpl implements FilesTabView {
@@ -89,6 +94,9 @@ public class FilesTabViewImpl implements FilesTabView {
 
   @UiField
   Div modalDialogContainer;
+
+  @UiField
+  ReactComponent entitySidebar;
 
   Widget provenanceGraphWidget, previewWidget;
   HandlerRegistration expandPreviewHandlerRegistration, expandProvHandlerRegistration;
@@ -303,5 +311,23 @@ public class FilesTabViewImpl implements FilesTabView {
   public void setAddToDownloadListWidget(IsWidget w) {
     addToDownloadListWidgetContainer.clear();
     addToDownloadListWidgetContainer.add(w);
+  }
+
+  @Override
+  public void setEntitySidebar(String entityId, Double versionNumber) {
+    EntitySidebarProps props = EntitySidebarProps.create(
+      entityId,
+      versionNumber
+    );
+    ReactElement component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.EntitySidebar,
+      props
+    );
+    entitySidebar.render(component);
+  }
+
+  @Override
+  public void setEntitySidebarVisible(boolean visible) {
+    entitySidebar.setVisible(visible);
   }
 }
