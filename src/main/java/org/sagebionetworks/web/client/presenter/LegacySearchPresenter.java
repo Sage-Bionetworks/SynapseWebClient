@@ -37,13 +37,14 @@ public class LegacySearchPresenter
   @Override
   public void start(AcceptsOneWidget panel, EventBus eventBus) {
     String token = place.toToken();
-    String normalizedToken = (token != null) ? token.toLowerCase().trim() : "";
+    String decodedToken = (token != null) ? gwt.decodeQueryString(token) : "";
+    String normalizedToken = decodedToken.toLowerCase().trim();
     Place redirect;
     if (normalizedToken.matches(WebConstants.SYNAPSE_ENTITY_ID_REGEX)) {
       redirect = new Synapse(normalizedToken);
     } else {
       String queryJson =
-        "{\"queryTerm\":[" + gwt.escapeJsonString(token) + "]}";
+        "{\"queryTerm\":[" + gwt.escapeJsonString(decodedToken) + "]}";
       String searchToken =
         "default?" +
         SearchV2Place.QUERY +
