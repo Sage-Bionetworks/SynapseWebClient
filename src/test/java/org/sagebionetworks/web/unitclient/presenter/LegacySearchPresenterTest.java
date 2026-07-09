@@ -46,6 +46,9 @@ public class LegacySearchPresenterTest {
   public void before() {
     when(mockGlobalApplicationState.getPlaceChanger())
       .thenReturn(mockPlaceChanger);
+    // Return the input unchanged for most tests (no URL encoding)
+    when(mockGwt.decodeQueryString(anyString()))
+      .thenAnswer(invocation -> invocation.getArgument(0));
     // Return the input unchanged so tests can assert on the raw JSON string
     when(mockGwt.encodeQueryString(anyString()))
       .thenAnswer(invocation -> invocation.getArgument(0));
@@ -103,6 +106,19 @@ public class LegacySearchPresenterTest {
       SearchV2Place.class
     );
     verify(mockPlaceChanger).goTo(captor.capture());
+    verify(mockGwt).encodeQueryString("{\"queryTerm\":[\"cancer genomics\"]}");
+  }
+
+  @Test
+  public void testUrlEncodedTokenIsDecodedBeforeSearch() {
+    String encodedToken = "cancer%20genomics";
+    String decodedToken = "cancer genomics";
+    when(mockGwt.decodeQueryString(encodedToken)).thenReturn(decodedToken);
+
+    startWithToken(encodedToken);
+
+    // The decoded value should be used in the query JSON, not the raw encoded token
+    verify(mockGwt).escapeJsonString(decodedToken);
     verify(mockGwt).encodeQueryString("{\"queryTerm\":[\"cancer genomics\"]}");
   }
 
