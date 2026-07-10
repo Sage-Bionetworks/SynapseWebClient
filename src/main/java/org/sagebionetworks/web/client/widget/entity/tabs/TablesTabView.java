@@ -66,4 +66,8 @@ public interface TablesTabView extends IsWidget {
   );
 
   void setVersionAlertType(AlertType alertType);
+
+  void setEntitySidebar(String entityId, Double versionNumber);
+
+  void setEntitySidebarVisible(boolean visible);
 }

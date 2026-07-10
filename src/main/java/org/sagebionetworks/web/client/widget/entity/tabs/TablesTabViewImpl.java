@@ -13,8 +13,13 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.jsinterop.EntitySidebarProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.mui.Grid;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class TablesTabViewImpl implements TablesTabView {
 
@@ -66,6 +71,9 @@ public class TablesTabViewImpl implements TablesTabView {
 
   @UiField
   Anchor helpLink;
+
+  @UiField
+  ReactComponent entitySidebar;
 
   public interface TabsViewImplUiBinder
     extends UiBinder<Widget, TablesTabViewImpl> {}
@@ -236,5 +244,23 @@ public class TablesTabViewImpl implements TablesTabView {
   @Override
   public void setVersionAlertType(AlertType alertType) {
     versionAlert.setAlertType(alertType);
+  }
+
+  @Override
+  public void setEntitySidebar(String entityId, Double versionNumber) {
+    EntitySidebarProps props = EntitySidebarProps.create(
+      entityId,
+      versionNumber
+    );
+    ReactElement component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.EntitySidebar,
+      props
+    );
+    entitySidebar.render(component);
+  }
+
+  @Override
+  public void setEntitySidebarVisible(boolean visible) {
+    entitySidebar.setVisible(visible);
   }
 }

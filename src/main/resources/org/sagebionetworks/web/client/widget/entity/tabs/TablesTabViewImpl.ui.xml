@@ -7,8 +7,8 @@
   xmlns:MUI="urn:import:org.sagebionetworks.web.client.jsinterop.mui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
->
-  <g:FlowPanel ui:field="tablesTabContainer" addStyleNames="tablesTabContent">
+>  <bh:Div addStyleNames="entityPageContentRow">
+  <g:FlowPanel ui:field="tablesTabContainer" addStyleNames="tablesTabContent entityPageMainContent">
     <g:SimplePanel ui:field="synapseAlertContainer" />
     <g:SimplePanel ui:field="tableBreadcrumbContainer" visible="false" />
     <w:FullWidthAlert
@@ -81,4 +81,6 @@
     </bh:Div>
     <g:SimplePanel ui:field="tableModifiedAndCreatedContainer" />
   </g:FlowPanel>
+      <w:ReactComponent ui:field="entitySidebar" addStyleNames="entityPageSidebar" />
+  </bh:Div>
 </ui:UiBinder>

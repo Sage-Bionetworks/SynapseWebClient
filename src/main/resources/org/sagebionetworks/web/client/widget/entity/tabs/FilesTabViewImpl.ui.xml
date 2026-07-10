@@ -8,7 +8,8 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
-  <g:FlowPanel addStyleNames="filesTabContent">
+  <bh:Div addStyleNames="entityPageContentRow">
+    <g:FlowPanel addStyleNames="filesTabContent entityPageMainContent">
     <w:LoadingSpinner
       ui:field="loading"
       size="31px"
@@ -92,5 +93,7 @@
       </g:FlowPanel>
     </bh:Div>
     <g:SimplePanel ui:field="fileModifiedAndCreatedContainer" />
-  </g:FlowPanel>
+    </g:FlowPanel>
+    <w:ReactComponent ui:field="entitySidebar" addStyleNames="entityPageSidebar" />
+  </bh:Div>
 </ui:UiBinder>

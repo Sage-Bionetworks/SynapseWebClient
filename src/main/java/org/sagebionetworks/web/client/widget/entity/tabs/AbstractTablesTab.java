@@ -400,6 +400,11 @@ public abstract class AbstractTablesTab
     tab.configureEntityActionController(bundle, isCurrentVersion, null, null);
     if (isShownInTab) {
       view.setProjectLevelUIVisible(false);
+      view.setEntitySidebarVisible(true);
+      view.setEntitySidebar(
+        entity.getId(),
+        versionNumber == null ? null : versionNumber.doubleValue()
+      );
 
       final boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 
@@ -493,6 +498,7 @@ public abstract class AbstractTablesTab
       areaToken = null;
       tableListWidget.configure(bundle, getTypesShownInList());
       view.setWikiPageVisible(false);
+      view.setEntitySidebarVisible(false);
       showProjectLevelUI();
       configureVersionAlert();
     }

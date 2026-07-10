@@ -53,4 +53,8 @@ public interface FilesTabView extends IsWidget {
   void setFilesTab(FilesTab presenter);
 
   void setAddToDownloadListWidget(IsWidget w);
+
+  void setEntitySidebar(String entityId, Double versionNumber);
+
+  void setEntitySidebarVisible(boolean visible);
 }
