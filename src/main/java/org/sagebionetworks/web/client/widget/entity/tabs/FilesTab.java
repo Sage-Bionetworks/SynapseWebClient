@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
@@ -59,6 +60,7 @@ public class FilesTab {
   GlobalApplicationState globalApplicationState;
   DiscussionThreadListWidget discussionThreadListWidget;
   ModifiedCreatedByWidget modifiedCreatedBy;
+  ProvenanceEditorWidget provenanceEditor;
 
   Map<String, String> configMap;
 
@@ -326,6 +328,17 @@ public class FilesTab {
       ) {
         provWidget = ginInjector.getProvenanceRendererV2();
         view.setProvenance(provWidget.asWidget());
+
+        final boolean canEditProvenance =
+          bundle.getPermissions().getCanCertifiedUserEdit() && isCurrentVersion;
+        if (canEditProvenance) {
+          provWidget.setOnEditProvenance(() -> {
+            ProvenanceEditorWidget editor =
+              ginInjector.getProvenanceEditorWidget();
+            editor.configure(bundle);
+            editor.show();
+          });
+        }
         provWidget.configure(configMap);
       } else {
         org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget =

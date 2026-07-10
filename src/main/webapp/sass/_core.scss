@@ -2437,6 +2437,17 @@ i.fa.small-icon {
   padding: 8px 10px;
 }
 
+.entity-title {
+  color: #515359;
+  font-size: 14px;
+  font-weight: 540;
+  line-height: 24px; /* 171.429% */
+  letter-spacing: -0.14px;
+  text-transform: uppercase;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #eceef1;
+}
+
 .highlight-title [class*='fa'] {
   font-size: 15px;
 }
