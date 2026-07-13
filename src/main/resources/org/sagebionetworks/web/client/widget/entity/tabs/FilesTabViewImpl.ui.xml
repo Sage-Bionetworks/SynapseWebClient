@@ -43,12 +43,6 @@
           <g:FlowPanel>
             <bh:Div addStyleNames="highlight-title">
               <bh:Text>Preview</bh:Text>
-              <w:HelpWidget
-                helpMarkdown="Preview shows a portion of the file content. Content is only visible when the user is logged in and has satisfied all conditions for use."
-                href="https://help.synapse.org/docs/Uploading-and-Organizing-Data-Into-Projects,-Files,-and-Folders.2048327716.html#UploadingandOrganizingDataIntoProjects,Files,andFolders-FilePreviews"
-                addStyleNames="margin-left-5"
-                placement="BOTTOM"
-              />
               <b:Anchor
                 addStyleNames="lightGreyText"
                 icon="ARROWS_ALT"
@@ -63,14 +57,8 @@
         </MUI:Grid>
         <MUI:Grid xs="12" md="6">
           <g:FlowPanel ui:field="fileProvenanceContainer">
-            <bh:Div addStyleNames="highlight-title">
-              <bh:Text>Provenance</bh:Text>
-              <w:HelpWidget
-                helpMarkdown="Provenance tracks the relationship between data, code and analytical results"
-                href="https://help.synapse.org/docs/Provenance.1972470373.html"
-                addStyleNames="margin-left-5"
-                placement="BOTTOM"
-              />
+            <bh:Div addStyleNames="entity-title">
+              <bh:Text>File Provenance</bh:Text>
               <b:Anchor
                 addStyleNames="lightGreyText"
                 icon="ARROWS_ALT"
@@ -80,7 +68,7 @@
             </bh:Div>
             <bh:Div
               ui:field="fileProvenanceGraphContainer"
-              addStyleNames="padding-15 whiteBackground"
+              addStyleNames="whiteBackground"
             />
           </g:FlowPanel>
         </MUI:Grid>

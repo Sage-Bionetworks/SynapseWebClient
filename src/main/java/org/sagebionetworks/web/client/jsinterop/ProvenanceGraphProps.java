@@ -33,6 +33,15 @@ public class ProvenanceGraphProps extends ReactComponentProps {
   @JsNullable
   OnUpdateJavaScriptObject onEdgesChangedListener;
 
+  @FunctionalInterface
+  @JsFunction
+  public interface OnEditProvenance {
+    void run();
+  }
+
+  @JsNullable
+  OnEditProvenance onEditProvenanceClicked;
+
   @JsOverlay
   public static ProvenanceGraphProps create(
     List<Reference> refs,
@@ -40,7 +49,8 @@ public class ProvenanceGraphProps extends ReactComponentProps {
     JavaScriptObject initialNodes,
     JavaScriptObject initialEdges,
     OnUpdateJavaScriptObject nodesListener,
-    OnUpdateJavaScriptObject edgesListener
+    OnUpdateJavaScriptObject edgesListener,
+    OnEditProvenance editProvenance
   ) {
     ProvenanceGraphProps props = new ProvenanceGraphProps();
     props.entityRefs = new ReferenceJsObject[refs.size()];
@@ -57,6 +67,7 @@ public class ProvenanceGraphProps extends ReactComponentProps {
     props.initialEdges = initialEdges;
     props.onNodesChangedListener = nodesListener;
     props.onEdgesChangedListener = edgesListener;
+    props.onEditProvenanceClicked = editProvenance;
     return props;
   }
 }

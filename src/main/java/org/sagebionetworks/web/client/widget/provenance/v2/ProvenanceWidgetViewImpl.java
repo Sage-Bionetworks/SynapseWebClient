@@ -17,6 +17,7 @@ public class ProvenanceWidgetViewImpl
 
   List<Reference> refs;
   String containerHeight;
+  ProvenanceGraphProps.OnEditProvenance onEditProvenance;
   // this view stores the nodes and edges from this instance.  So you can reinitialize the previous state by calling rerender on this instance!
   JavaScriptObject initialNodes;
   JavaScriptObject initialEdges;
@@ -36,9 +37,14 @@ public class ProvenanceWidgetViewImpl
       };
   }
 
-  public void configure(List<Reference> refs, String containerHeight) {
+  public void configure(
+    List<Reference> refs,
+    String containerHeight,
+    ProvenanceGraphProps.OnEditProvenance onEditProvenance
+  ) {
     this.refs = refs;
     this.containerHeight = containerHeight;
+    this.onEditProvenance = onEditProvenance;
     renderComponent();
   }
 
@@ -49,7 +55,8 @@ public class ProvenanceWidgetViewImpl
       initialNodes,
       initialEdges,
       nodesListener,
-      edgesListener
+      edgesListener,
+      onEditProvenance
     );
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.ProvenanceGraph,

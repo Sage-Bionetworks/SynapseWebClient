@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
@@ -307,6 +308,12 @@ public abstract class AbstractTablesTab
       entityBundle.getEntity()
     );
     Long newVersion = isVersionSupported ? versionNumber : null;
+    Entity entity = entityBundle.getEntity();
+    boolean isProject = entity instanceof Project;
+
+    boolean isCurrentVersion =
+      !isProject &&
+      (!(entity instanceof Table) || ((Table) entity).getIsLatestVersion());
 
     // Preserve draft flag from current URL if we're in datasets area
     boolean isDraftRequested = false;
@@ -350,6 +357,22 @@ public abstract class AbstractTablesTab
     ) {
       ProvenanceWidget provWidget = ginInjector.getProvenanceRendererV2();
       view.setProvenance(provWidget);
+
+      final boolean canEditProvenance =
+        entityBundle.getPermissions().getCanCertifiedUserEdit() &&
+        isCurrentVersion;
+      if (canEditProvenance) {
+        provWidget.setOnEditProvenance(() -> {
+          ProvenanceEditorWidget editor =
+            ginInjector.getProvenanceEditorWidget();
+          editor.configure(entityBundle);
+          editor.show();
+        });
+      } else {
+        // clear the callback to prevent stale state
+        provWidget.setOnEditProvenance(null);
+      }
+
       provWidget.configure(configMap);
     } else {
       org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget =

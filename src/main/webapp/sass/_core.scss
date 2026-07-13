@@ -52,6 +52,8 @@ $synapse-tertiary-color-palette: (
   900: #2f2814,
 );
 
+$entity-title-border-color: #eceef1;
+
 $page-header-min-height: 96px;
 $footer-height: 198px;
 
@@ -2459,6 +2461,17 @@ i.fa.small-icon {
   font-weight: 700;
   line-height: 20px;
   padding: 8px 10px;
+}
+
+.entity-title {
+  color: $synapse-dark-text;
+  font-size: 14px;
+  font-weight: 540;
+  line-height: 24px; /* 171.429% */
+  letter-spacing: -0.14px;
+  text-transform: uppercase;
+  padding-bottom: 4px;
+  border-bottom: 1px solid $entity-title-border-color;
 }
 
 .highlight-title [class*='fa'] {

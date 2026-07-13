@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.jsinterop.ProvenanceGraphProps;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -18,6 +19,13 @@ public class ProvenanceWidget implements WidgetRendererPresenter {
   private static final int DEFAULT_HEIGHT = 200;
   private ProvenanceWidgetView view;
   List<Reference> startRefs;
+  ProvenanceGraphProps.OnEditProvenance onEditProvenance;
+
+  public void setOnEditProvenance(
+    ProvenanceGraphProps.OnEditProvenance onEditProvenance
+  ) {
+    this.onEditProvenance = onEditProvenance;
+  }
 
   @Inject
   public ProvenanceWidget(ProvenanceWidgetView view) {
@@ -78,7 +86,7 @@ public class ProvenanceWidget implements WidgetRendererPresenter {
         ) +
         "px";
     }
-    view.configure(startRefs, height);
+    view.configure(startRefs, height, onEditProvenance);
   }
 
   @Override
