@@ -368,6 +368,9 @@ public abstract class AbstractTablesTab
           editor.configure(entityBundle);
           editor.show();
         });
+      } else {
+        // clear the callback to prevent stale state
+        provWidget.setOnEditProvenance(null);
       }
 
       provWidget.configure(configMap);

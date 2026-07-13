@@ -338,6 +338,9 @@ public class FilesTab {
             editor.configure(bundle);
             editor.show();
           });
+        } else {
+          // clear the callback to prevent stale state
+          provWidget.setOnEditProvenance(null);
         }
         provWidget.configure(configMap);
       } else {
