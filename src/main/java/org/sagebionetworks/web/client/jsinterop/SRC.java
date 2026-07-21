@@ -143,9 +143,6 @@ public class SRC {
     public static ReactComponentType<
       GovernanceMarkdownGithubProps
     > GovernanceMarkdownGithub;
-    public static ReactComponentType<
-      ProjectDataAvailabilityProps
-    > ProjectDataAvailability;
     public static ReactComponentType<EntityUploadModalProps> EntityUploadModal;
     public static ReactComponentType<
       CreateOrUpdateDoiModalProps

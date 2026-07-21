@@ -33,7 +33,6 @@
           <bh:Span addStyleNames="boldText">Project Storage Location</bh:Span>
           <bh:Span ui:field="uploadDestinationField" />
         </bh:Span>
-        <bh:Span ui:field="projectDataAvailabilityPanel" />
       </bh:Div>
     </g:HTMLPanel>
     <bh:Div ui:field="descriptionContainer">
