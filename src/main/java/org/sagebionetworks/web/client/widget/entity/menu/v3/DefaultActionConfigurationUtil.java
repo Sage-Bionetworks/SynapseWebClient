@@ -128,7 +128,7 @@ public class DefaultActionConfigurationUtil {
         Action.MANAGE_ACCESS_REQUIREMENTS,
         "Manage Access Requirements (ACT)"
       ),
-      ActionConfiguration.create(Action.EDIT_TABLE_DATA, "Bulk Edit"),
+      ActionConfiguration.create(Action.EDIT_TABLE_DATA, "Edit Table"),
       ActionConfiguration.create(
         Action.SHOW_PROGRAMMATIC_OPTIONS,
         "Programmatic Options"
