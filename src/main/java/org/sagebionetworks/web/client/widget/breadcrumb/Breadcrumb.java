@@ -8,10 +8,8 @@ import java.util.List;
 import javax.inject.Inject;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -51,7 +49,6 @@ public class Breadcrumb
           EntityHeader element = path.get(i);
           String name = element.getName();
           Synapse place = new Synapse(element.getId());
-          EntityType type = EntityTypeUtils.getEntityType(element);
           if (
             optionalArea == EntityArea.FILES &&
             Project.class.getName().equals(element.getType())
@@ -73,7 +70,7 @@ public class Breadcrumb
             name = DisplayConstants.TABLES;
             place.setArea(EntityArea.TABLES);
           }
-          links.add(new LinkData(name, type, place));
+          links.add(new LinkData(name, place));
         }
         currentPageName = path.get(path.size() - 1).getName();
       }

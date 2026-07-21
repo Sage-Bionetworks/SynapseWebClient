@@ -54,9 +54,6 @@ public class EntityMetadataViewImpl
   SimplePanel entityModalWidgetContainer;
 
   @UiField
-  Span projectDataAvailabilityPanel;
-
-  @UiField
   SimplePanel portalBannersContainer;
 
   PortalBannersWidget portalBannersWidget;
@@ -111,12 +108,6 @@ public class EntityMetadataViewImpl
     idField.setText(entityId);
     idField.setCopyIconVisible(true);
     portalBannersWidget.configure(entityId);
-  }
-
-  @Override
-  public void setProjectDataAvailabilityWidget(IsWidget widget) {
-    projectDataAvailabilityPanel.clear();
-    projectDataAvailabilityPanel.add(widget);
   }
 
   @Override

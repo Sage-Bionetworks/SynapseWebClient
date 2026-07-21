@@ -22,6 +22,4 @@ public interface EntityMetadataView extends IsWidget {
   void setUploadDestinationText(String text);
 
   void setDescription(String description);
-
-  void setProjectDataAvailabilityWidget(IsWidget widget);
 }
