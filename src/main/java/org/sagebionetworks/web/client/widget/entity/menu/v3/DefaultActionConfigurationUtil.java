@@ -135,7 +135,7 @@ public class DefaultActionConfigurationUtil {
       ),
       ActionConfiguration.create(
         Action.ADD_TO_DOWNLOAD_CART,
-        "Add to Download Cart"
+        "Add to Download List"
       ),
       ActionConfiguration.create(Action.DOWNLOAD_FILE, "Download File"),
       ActionConfiguration.create(Action.OPEN_EXTERNAL_FILE, "Open Link"),
