@@ -9,17 +9,11 @@ public interface EntityMetadataView extends IsWidget {
 
   void setVersionHistoryWidget(IsWidget fileHistoryWidget);
 
-  public void setDoiWidget(IsWidget doiWidget);
-
   void clear();
 
   void setEntityModalWidget(IsWidget widget);
 
   void setEntityId(String text);
-
-  void setUploadDestinationPanelVisible(boolean isVisible);
-
-  void setUploadDestinationText(String text);
 
   void setDescription(String description);
 }

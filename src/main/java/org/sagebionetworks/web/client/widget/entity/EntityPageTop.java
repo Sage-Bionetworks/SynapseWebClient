@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.EntityCitation;
+import org.sagebionetworks.web.client.widget.ProjectInfo;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
@@ -83,6 +84,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
   private final MetadataTab metadataTab;
   private final ProjectTitleBar projectTitleBar;
   private final EntityCitation entityCitation;
+  private final ProjectInfo projectInfo;
   private final EntityMetadata projectMetadata;
   private final SynapseClientAsync synapseClient;
   private final AuthenticationController authenticationController;
@@ -127,6 +129,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     Tabs tabs,
     ProjectTitleBar projectTitleBar,
     EntityCitation entityCitation,
+    ProjectInfo projectInfo,
     EntityMetadata projectMetadata,
     WikiTab wikiTab,
     FilesTab filesTab,
@@ -160,6 +163,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     this.metadataTab = metadataTab;
     this.projectTitleBar = projectTitleBar;
     this.entityCitation = entityCitation;
+    this.projectInfo = projectInfo;
     this.projectMetadata = projectMetadata;
     this.projectActionController = projectActionController;
     this.projectActionMenu = projectActionMenu;
@@ -176,6 +180,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     view.setProjectMetadata(projectMetadata.asWidget());
     view.setProjectTitleBar(projectTitleBar.asWidget());
     view.setEntityCitation(entityCitation.asWidget());
+    view.setProjectInfo(projectInfo.asWidget());
     projectActionMenu.addControllerWidget(projectActionController.asWidget());
     view.setProjectActionMenu(projectActionMenu.asWidget());
 
@@ -968,6 +973,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       ? versionNumber.doubleValue()
       : null;
     entityCitation.configure(projectId, entityId, versionNum);
+    projectInfo.configure(projectId);
   }
 
   public void configureDatasetsTab() {

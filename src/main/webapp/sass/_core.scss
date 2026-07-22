@@ -231,6 +231,10 @@ a:focus {
       }
     }
 
+    .entityCitationContainer:has(> div:empty) {
+      display: none;
+    }
+
     .projectSupport {
       .MuiButton-root {
         font-size: 16px;
@@ -247,6 +251,7 @@ a:focus {
 
     .projectMetadata {
       display: flex;
+      align-items: center;
       .projectTitle {
         > *,
         .syn-star-o,

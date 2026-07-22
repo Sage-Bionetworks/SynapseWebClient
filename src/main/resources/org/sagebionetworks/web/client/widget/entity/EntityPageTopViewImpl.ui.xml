@@ -20,7 +20,7 @@
           addStyleNames="center-block center"
         />
         <bh:Div
-          addStyleNames="projectSettings flexcontainer-row-unless-xs flexcontainer-align-items-center margin-top-20 gap-10px"
+          addStyleNames="projectSettings flexcontainer-row-unless-xs flexcontainer-align-items-center gap-10px"
         >
           <MUI:Button
             ui:field="button"
@@ -29,7 +29,8 @@
             href="https://sagebionetworks.jira.com/servicedesk/customer/portal/9"
             addStyleNames="projectSupport"
              />
-          <bh:Div ui:field="entityCitation" addStyleNames="actionMenuButtonStyle"/>
+          <bh:Div ui:field="projectInfo" addStyleNames="actionMenuButtonStyle"/>
+          <bh:Div ui:field="entityCitation" addStyleNames="actionMenuButtonStyle entityCitationContainer"/>
           <bh:Span ui:field="projectActionMenuContainer" />
         </bh:Div>
       </g:FlowPanel>

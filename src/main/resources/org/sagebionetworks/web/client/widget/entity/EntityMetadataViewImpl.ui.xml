@@ -8,32 +8,6 @@
   <g:HTMLPanel addStyleNames="entityMetadata entity-page-side-margins">
     <g:HTMLPanel ui:field="detailedMetadata">
       <g:SimplePanel ui:field="entityModalWidgetContainer" />
-      <bh:Div addStyleNames="flexcontainer-row-unless-xs gap-20px-40px">
-        <bh:Div addStyleNames="flexcontainer-column">
-          <bh:Div addStyleNames="flexcontainer-row">
-            <bh:Span
-              addStyleNames="boldText margin-right-5"
-              text="Project SynID"
-            />
-            <w:HelpWidget
-              helpMarkdown="The Synapse ID (e.g. `syn123`) is a unique identifier assigned to all content."
-              addStyleNames="margin-right-15 moveup-5"
-            />
-          </bh:Div>
-          <w:TextBoxWithCopyToClipboardWidget 
-            ui:field="idField" 
-          />
-        </bh:Div>
-        <bh:Span ui:field="doiPanel" />
-        <bh:Span
-          ui:field="uploadDestinationPanel"
-          addStyleNames="flexcontainer-column"
-          visible="false"
-        >
-          <bh:Span addStyleNames="boldText">Project Storage Location</bh:Span>
-          <bh:Span ui:field="uploadDestinationField" />
-        </bh:Span>
-      </bh:Div>
     </g:HTMLPanel>
     <bh:Div ui:field="descriptionContainer">
       <bh:Paragraph addStyleNames="boldText" ui:field="descriptionTitleText">
