@@ -73,6 +73,7 @@ public class EntityPageTopViewImpl
 
   @Override
   public void setProjectInfo(IsWidget w) {
+    projectInfo.clear();
     projectInfo.add(w);
   }
 
