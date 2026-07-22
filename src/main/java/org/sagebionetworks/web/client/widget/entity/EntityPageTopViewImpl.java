@@ -39,6 +39,9 @@ public class EntityPageTopViewImpl
   Div entityCitation;
 
   @UiField
+  Div projectInfo;
+
+  @UiField
   SimplePanel projectMetadataContainer;
 
   @UiField
@@ -64,7 +67,13 @@ public class EntityPageTopViewImpl
 
   @Override
   public void setEntityCitation(IsWidget w) {
+    entityCitation.clear();
     entityCitation.add(w);
+  }
+
+  @Override
+  public void setProjectInfo(IsWidget w) {
+    projectInfo.add(w);
   }
 
   @Override

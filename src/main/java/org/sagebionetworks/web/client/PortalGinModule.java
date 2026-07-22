@@ -145,6 +145,8 @@ import org.sagebionetworks.web.client.widget.FileHandleWidgetView;
 import org.sagebionetworks.web.client.widget.FileHandleWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerViewImpl;
+import org.sagebionetworks.web.client.widget.ProjectInfo;
+import org.sagebionetworks.web.client.widget.ProjectInfoImpl;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.RadioWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.ShareThisPage;
@@ -2440,6 +2442,9 @@ public abstract class PortalGinModule {
 
   @Binds
   abstract EntityCitation bindEntityCitation(EntityCitationImpl impl);
+
+  @Binds
+  abstract ProjectInfo bindProjectInfo(ProjectInfoImpl impl);
 
   @Binds
   abstract CsvPreview bindCsvPreview(CsvPreviewImpl impl);
