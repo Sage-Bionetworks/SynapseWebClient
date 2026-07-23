@@ -10,6 +10,10 @@ public interface ProjectTitleBarView extends IsWidget, SynapseView {
 
   void setFavoritesWidgetVisible(boolean visible);
 
+  void setVisibilityWidget(Widget visibilityWidget);
+
+  void setVisibilityWidgetVisible(boolean visible);
+
   void setTitle(String name);
 
   void setEntityType(EntityType entityType);

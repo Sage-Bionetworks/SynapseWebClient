@@ -19,15 +19,20 @@
             addStyleNames="entityIcon margin-right-10 lightGreyText flexcontainer-column"
             type="folder"
           />
+          <g:SimplePanel
+            ui:field="favoritePanel"
+            addStyleNames="flexcontainer-column margin-left-5"
+          />
           <b:Heading
             addStyleNames="pageHeaderTitle flexcontainer-column"
             ui:field="fileName"
             size="H3"
           />
           <g:SimplePanel
-            ui:field="favoritePanel"
+            ui:field="visibilityChipPanel"
             addStyleNames="flexcontainer-column margin-left-5"
           />
+
         </bh:Div>
       </bh:Div>
       <bh:Div
