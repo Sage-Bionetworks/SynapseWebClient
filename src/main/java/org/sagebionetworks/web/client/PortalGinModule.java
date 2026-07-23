@@ -145,6 +145,8 @@ import org.sagebionetworks.web.client.widget.FileHandleWidgetView;
 import org.sagebionetworks.web.client.widget.FileHandleWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerViewImpl;
+import org.sagebionetworks.web.client.widget.ProjectInfo;
+import org.sagebionetworks.web.client.widget.ProjectInfoImpl;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.RadioWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.ShareThisPage;
@@ -574,8 +576,6 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileWidgetImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileWidgetView;
 import org.sagebionetworks.web.client.widget.profile.UserProfileWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.projectdataavailability.ProjectDataAvailabilityView;
-import org.sagebionetworks.web.client.widget.projectdataavailability.ProjectDataAvailabilityViewImpl;
 import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlertView;
@@ -2423,12 +2423,6 @@ public abstract class PortalGinModule {
   abstract OneSageUtils bindOneSageUtils(OneSageUtilsImpl impl);
 
   @Binds
-  @Singleton
-  abstract ProjectDataAvailabilityView bindProjectDataAvailabilityView(
-    ProjectDataAvailabilityViewImpl impl
-  );
-
-  @Binds
   abstract SearchAnalyticsClient bindSearchAnalyticsClient(
     SearchAnalyticsClientImpl impl
   );
@@ -2448,6 +2442,9 @@ public abstract class PortalGinModule {
 
   @Binds
   abstract EntityCitation bindEntityCitation(EntityCitationImpl impl);
+
+  @Binds
+  abstract ProjectInfo bindProjectInfo(ProjectInfoImpl impl);
 
   @Binds
   abstract CsvPreview bindCsvPreview(CsvPreviewImpl impl);
