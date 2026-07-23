@@ -11,10 +11,7 @@ public class MetadataTasksPage
   public MetadataTasksPage(String projectId) {
     super(
       SRC.SynapseComponents.MetadataTasksPage,
-      MetadataTasksPageProps.create(
-        projectId,
-        "/Synapse:" + projectId + "/metadata/"
-      )
+      MetadataTasksPageProps.create(projectId, getRouterBaseName(projectId))
     );
   }
 
@@ -26,6 +23,11 @@ public class MetadataTasksPage
    */
   public void setProjectIdAndKey(String projectId, String key) {
     props.projectId = projectId;
+    props.routerBaseName = getRouterBaseName(projectId);
     props.key = key;
+  }
+
+  private static String getRouterBaseName(String projectId) {
+    return "/Synapse:" + projectId + "/metadata/";
   }
 }
