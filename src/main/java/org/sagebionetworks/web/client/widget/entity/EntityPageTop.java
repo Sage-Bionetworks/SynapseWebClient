@@ -68,7 +68,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 
   private Synapse.EntityArea area;
   private String initialAreaToken;
-  private String wikiAreaToken, tablesAreaToken, discussionAreaToken, dockerAreaToken, datasetsAreaToken;
+  private String wikiAreaToken, tablesAreaToken, discussionAreaToken, dockerAreaToken, datasetsAreaToken, metadataAreaToken;
   private Long currentTargetVersionNumber, filesVersionNumber, tablesVersionNumber, datasetsVersionNumber;
   private EntityHeader projectHeader;
 
@@ -238,6 +238,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     dockerAreaToken = null;
     discussionAreaToken = null;
     wikiAreaToken = null;
+    metadataAreaToken = null;
   }
 
   private void initTabs() {
@@ -351,6 +352,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     tablesAreaToken = null;
     discussionAreaToken = null;
     dockerAreaToken = null;
+    metadataAreaToken = null;
     this.entity = targetEntityBundle.getEntity();
     setTargetVersion(versionNumber);
 
@@ -440,7 +442,12 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
         .asTab()
         .setEntityNameAndPlace(
           projectName,
-          new Synapse(projectId, versionNumber, EntityArea.METADATA, null)
+          new Synapse(
+            projectId,
+            versionNumber,
+            EntityArea.METADATA,
+            metadataAreaToken
+          )
         );
     }
   }
@@ -600,6 +607,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       case METADATA:
         configureMetadataTab();
         tabs.showTab(metadataTab.asTab(), pushTabUrlToBrowserHistory);
+        break;
       default:
     }
     pushTabUrlToBrowserHistory = false;
@@ -927,6 +935,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
           dockerAreaToken = token;
           dockerTab.asTab().setContentStale(true);
         }
+        break;
+      case METADATA:
+        metadataAreaToken = token;
+        metadataTab.asTab().setContentStale(true);
         break;
       default:
     }
