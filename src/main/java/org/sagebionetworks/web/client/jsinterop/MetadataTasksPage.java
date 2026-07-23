@@ -11,7 +11,10 @@ public class MetadataTasksPage
   public MetadataTasksPage(String projectId) {
     super(
       SRC.SynapseComponents.MetadataTasksPage,
-      MetadataTasksPageProps.create(projectId)
+      MetadataTasksPageProps.create(
+        projectId,
+        "/Synapse:" + projectId + "/metadata/"
+      )
     );
   }
 
