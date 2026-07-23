@@ -18,8 +18,14 @@ public class MetadataTasksPage
     );
   }
 
-  public void setProjectId(String projectId) {
+  /**
+   * Updates the projectId and key props. Changing the key forces React to remount the component (rather than
+   * reconcile it), which resets any internal state -- notably the internal router's current route.
+   * <p>
+   * Does not render; callers are responsible for calling {@link #render()} once after updating props.
+   */
+  public void setProjectIdAndKey(String projectId, String key) {
     props.projectId = projectId;
-    this.render();
+    props.key = key;
   }
 }
