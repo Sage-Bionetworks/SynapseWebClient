@@ -8,11 +8,16 @@ import jsinterop.annotations.JsType;
 public class MetadataTasksPageProps extends ReactComponentProps {
 
   String projectId;
+  String routerBaseName;
 
   @JsOverlay
-  public static MetadataTasksPageProps create(String projectId) {
+  public static MetadataTasksPageProps create(
+    String projectId,
+    String routerBaseName
+  ) {
     MetadataTasksPageProps props = new MetadataTasksPageProps();
     props.projectId = projectId;
+    props.routerBaseName = routerBaseName;
     return props;
   }
 }
