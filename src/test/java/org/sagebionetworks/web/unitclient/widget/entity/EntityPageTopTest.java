@@ -974,6 +974,35 @@ public class EntityPageTopTest {
   }
 
   @Test
+  public void testConfigureWithMetadataAreaTokenIsRetainedInPlace() {
+    // SWC: deep-linking to a metadata sub-route (e.g. .../metadata/create) should not be dropped
+    // before the React component can read it from the URL.
+    Synapse.EntityArea area = EntityArea.METADATA;
+    String areaToken = "create";
+    Long versionNumber = null;
+
+    pageTop.configure(
+      mockProjectBundle,
+      versionNumber,
+      mockProjectHeader,
+      area,
+      areaToken
+    );
+
+    verify(mockMetadataTab).configure(mockProjectBundle);
+    verify(mockTabs).showTab(mockMetadataInnerTab, false);
+
+    // the tab's place must carry the area token, otherwise showTab() will rewrite the browser
+    // URL to the token-less base route, dropping "create" before the React component mounts.
+    ArgumentCaptor<Synapse> placeCaptor = ArgumentCaptor.forClass(
+      Synapse.class
+    );
+    verify(mockMetadataInnerTab)
+      .setEntityNameAndPlace(anyString(), placeCaptor.capture());
+    assertEquals(areaToken, placeCaptor.getValue().getAreaToken());
+  }
+
+  @Test
   public void testFireEntityUpdatedEvent() {
     pageTop.fireEntityUpdatedEvent();
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
