@@ -60,11 +60,6 @@ public class ProjectTitleBarViewImpl implements ProjectTitleBarView {
   }
 
   @Override
-  public void setVisibilityWidgetVisible(boolean visible) {
-    visibilityChipPanel.setVisible(visible);
-  }
-
-  @Override
   public void setTitle(String name) {
     fileName.setText(name);
   }
