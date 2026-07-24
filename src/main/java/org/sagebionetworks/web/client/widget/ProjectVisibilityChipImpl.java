@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget;
 
+import javax.inject.Inject;
 import org.sagebionetworks.web.client.jsinterop.ProjectVisibilityChipContainerProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -9,6 +10,7 @@ public class ProjectVisibilityChipImpl
   extends ReactComponent
   implements ProjectVisibilityChip {
 
+  @Inject
   public ProjectVisibilityChipImpl() {}
 
   @Override

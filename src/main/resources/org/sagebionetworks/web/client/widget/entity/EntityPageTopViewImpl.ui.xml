@@ -20,7 +20,7 @@
           addStyleNames="center-block center"
         />
         <bh:Div
-          addStyleNames="projectSettings flexcontainer-row-unless-xs flexcontainer-align-items-center gap-10px"
+          addStyleNames="projectSettings flexcontainer-row-unless-xs gap-10px "
         >
           <MUI:Button
             ui:field="button"
