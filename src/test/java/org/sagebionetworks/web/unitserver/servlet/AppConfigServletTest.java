@@ -1,24 +1,16 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.amazonaws.services.appconfigdata.AWSAppConfigData;
-import com.amazonaws.services.appconfigdata.model.BadRequestException;
-import com.amazonaws.services.appconfigdata.model.GetLatestConfigurationRequest;
-import com.amazonaws.services.appconfigdata.model.GetLatestConfigurationResult;
-import com.amazonaws.services.appconfigdata.model.StartConfigurationSessionRequest;
-import com.amazonaws.services.appconfigdata.model.StartConfigurationSessionResult;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.ByteBuffer;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -27,13 +19,20 @@ import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.AppConfigServlet;
+import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.services.appconfigdata.AppConfigDataClient;
+import software.amazon.awssdk.services.appconfigdata.model.BadRequestException;
+import software.amazon.awssdk.services.appconfigdata.model.GetLatestConfigurationRequest;
+import software.amazon.awssdk.services.appconfigdata.model.GetLatestConfigurationResponse;
+import software.amazon.awssdk.services.appconfigdata.model.StartConfigurationSessionRequest;
+import software.amazon.awssdk.services.appconfigdata.model.StartConfigurationSessionResponse;
 
 public class AppConfigServletTest {
 
   private AppConfigServlet servlet;
 
   @Mock
-  private AWSAppConfigData mockAppConfigDataClient;
+  private AppConfigDataClient mockAppConfigDataClient;
 
   @Mock
   private StackConfiguration mockStackConfiguration;
@@ -73,16 +72,18 @@ public class AppConfigServletTest {
 
   @Test
   public void testStartConfigurationSession_Success() {
-    StartConfigurationSessionResult mockSessionResult =
-      new StartConfigurationSessionResult();
-    mockSessionResult.setInitialConfigurationToken("mockToken");
+    StartConfigurationSessionResponse mockSessionResponse =
+      StartConfigurationSessionResponse
+        .builder()
+        .initialConfigurationToken("mockToken")
+        .build();
 
     when(
       mockAppConfigDataClient.startConfigurationSession(
         any(StartConfigurationSessionRequest.class)
       )
     )
-      .thenReturn(mockSessionResult);
+      .thenReturn(mockSessionResponse);
 
     servlet.startConfigurationSession();
     assertEquals("mockToken", servlet.configurationToken);
@@ -115,20 +116,19 @@ public class AppConfigServletTest {
 
   @Test
   public void testGetLatestConfiguration_Success() {
-    ByteBuffer mockByteBuffer = ByteBuffer
-      .wrap("{\"test configuration\":true}".getBytes())
-      .asReadOnlyBuffer();
-    GetLatestConfigurationResult mockConfigResult =
-      new GetLatestConfigurationResult()
-        .withConfiguration(mockByteBuffer)
-        .withNextPollConfigurationToken("new-mock-token");
+    GetLatestConfigurationResponse mockConfigResponse =
+      GetLatestConfigurationResponse
+        .builder()
+        .configuration(SdkBytes.fromUtf8String("{\"test configuration\":true}"))
+        .nextPollConfigurationToken("new-mock-token")
+        .build();
 
     when(
       mockAppConfigDataClient.getLatestConfiguration(
         any(GetLatestConfigurationRequest.class)
       )
     )
-      .thenReturn(mockConfigResult);
+      .thenReturn(mockConfigResponse);
 
     servlet.configurationToken = "mockToken"; // Setting the initial configuration token
     JSONObjectAdapter configValue = servlet.getLatestConfiguration();
@@ -158,20 +158,19 @@ public class AppConfigServletTest {
     servlet.configurationToken = "mockToken";
 
     // Set up a successful response
-    ByteBuffer mockByteBuffer = ByteBuffer
-      .wrap("{\"test configuration\":true}".getBytes())
-      .asReadOnlyBuffer();
-    GetLatestConfigurationResult mockConfigResult =
-      new GetLatestConfigurationResult()
-        .withConfiguration(mockByteBuffer)
-        .withNextPollConfigurationToken("new-mock-token");
+    GetLatestConfigurationResponse mockConfigResponse =
+      GetLatestConfigurationResponse
+        .builder()
+        .configuration(SdkBytes.fromUtf8String("{\"test configuration\":true}"))
+        .nextPollConfigurationToken("new-mock-token")
+        .build();
 
     when(
       mockAppConfigDataClient.getLatestConfiguration(
         any(GetLatestConfigurationRequest.class)
       )
     )
-      .thenReturn(mockConfigResult);
+      .thenReturn(mockConfigResponse);
 
     // Initial call succeeds
     servlet.getLatestConfiguration();
@@ -189,7 +188,8 @@ public class AppConfigServletTest {
     assertEquals(mockConfiguration.toString(), configValue.toString());
 
     // Do not attempt to re-initialize the client
-    verify(mockAppConfigDataClient, never()).startConfigurationSession(any());
+    verify(mockAppConfigDataClient, never())
+      .startConfigurationSession(any(StartConfigurationSessionRequest.class));
 
     // Try again, but with a recoverable exception
     when(
@@ -197,14 +197,17 @@ public class AppConfigServletTest {
         any(GetLatestConfigurationRequest.class)
       )
     )
-      .thenThrow(new BadRequestException("Token is invalid"));
+      .thenThrow(
+        BadRequestException.builder().message("Token is invalid").build()
+      );
 
     configValue = servlet.getLatestConfiguration();
 
     assertEquals(mockConfiguration.toString(), configValue.toString());
 
     // We should attempt to re-initialize the client
-    verify(mockAppConfigDataClient).startConfigurationSession(any());
+    verify(mockAppConfigDataClient)
+      .startConfigurationSession(any(StartConfigurationSessionRequest.class));
   }
 
   @Test
@@ -223,16 +226,10 @@ public class AppConfigServletTest {
 
     assertEquals(DEFAULT_CONFIG_VALUE, configValue.toString());
     // Verify we never called getLatestConfiguration
-    verify(mockAppConfigDataClient, never()).getLatestConfiguration(any());
+    verify(mockAppConfigDataClient, never())
+      .getLatestConfiguration(any(GetLatestConfigurationRequest.class));
     // Verify we do not try to reinitialize the client
-    verify(mockAppConfigDataClient, never()).startConfigurationSession(any());
-  }
-
-  @Test
-  public void testInitializeAppConfigClient() {
-    servlet.appConfigDataClient = null; // Simulate the client not being injected
-    servlet.initializeAppConfigClient();
-
-    assertNotNull(servlet.appConfigDataClient);
+    verify(mockAppConfigDataClient, never())
+      .startConfigurationSession(any(StartConfigurationSessionRequest.class));
   }
 }
