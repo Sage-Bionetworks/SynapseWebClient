@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.server;
 
-import com.amazonaws.services.appconfigdata.AWSAppConfigData;
-import com.amazonaws.services.kms.AWSKMS;
 import com.google.gwt.user.server.rpc.jakarta.XsrfTokenServiceServlet;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -25,6 +23,7 @@ import org.sagebionetworks.StackEncrypter;
 import org.sagebionetworks.StackEncrypterImpl;
 import org.sagebionetworks.aws.AwsClientFactory;
 import org.sagebionetworks.aws.SynapseS3Client;
+import org.sagebionetworks.aws.v2.AwsClientFactoryV2;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.AliasRedirectorServlet;
@@ -73,6 +72,8 @@ import org.sagebionetworks.web.server.servlet.filter.XFrameOptionsFilter;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2AliasServlet;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet;
 import org.sagebionetworks.web.shared.WebConstants;
+import software.amazon.awssdk.services.appconfigdata.AppConfigDataClient;
+import software.amazon.awssdk.services.kms.KmsClient;
 
 /**
  * Binds the service servlets to their paths and any other Guice binding required on the server
@@ -278,13 +279,13 @@ public class PortalServletModule extends ServletModule {
   }
 
   @Provides
-  public AWSAppConfigData provideAppConfigDataClient() {
-    return AwsClientFactory.createAppConfigClient();
+  public AppConfigDataClient provideAppConfigDataClient() {
+    return AwsClientFactoryV2.createAppConfigDataClient();
   }
 
   @Provides
-  public AWSKMS provideAWSKMSClient() {
-    return AwsClientFactory.createAmazonKeyManagementServiceClient();
+  public KmsClient provideKmsClient() {
+    return AwsClientFactoryV2.createKmsClient();
   }
 
   @Provides
