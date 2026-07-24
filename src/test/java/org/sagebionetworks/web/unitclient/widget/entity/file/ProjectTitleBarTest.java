@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.ProjectVisibilityChip;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.file.ProjectTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.ProjectTitleBarView;
@@ -37,20 +38,34 @@ public class ProjectTitleBarTest {
   @Mock
   FavoriteWidget mockFavoriteWidget;
 
+  @Mock
+  ProjectVisibilityChip mockVisibilityChip;
+
+  @Mock
+  Widget mockVisibilityWidget;
+
   Entity entity;
   String testEntityName = "Entity Name";
   String entityId = "syn123";
 
   @Before
   public void setup() {
+    when(mockVisibilityChip.asWidget()).thenReturn(mockVisibilityWidget);
     titleBar =
-      new ProjectTitleBar(mockView, mockAuthController, mockFavoriteWidget);
+      new ProjectTitleBar(
+        mockView,
+        mockAuthController,
+        mockFavoriteWidget,
+        mockVisibilityChip
+      );
     entity = new Folder();
     entity.setId(entityId);
     entity.setName(testEntityName);
     when(mockBundle.getEntity()).thenReturn(entity);
     verify(mockView).setFavoritesWidget(any());
     verify(mockFavoriteWidget).asWidget();
+    verify(mockView).setVisibilityWidget(mockVisibilityWidget);
+    verify(mockVisibilityChip).asWidget();
     when(mockAuthController.isLoggedIn()).thenReturn(true);
   }
 
@@ -62,6 +77,7 @@ public class ProjectTitleBarTest {
   @Test
   public void testConfigureLoggedIn() {
     titleBar.configure(mockBundle);
+    verify(mockVisibilityChip).configure(entityId);
     verify(mockView).setFavoritesWidgetVisible(true);
     verify(mockView).setTitle(testEntityName);
     verify(mockView).setEntityType(EntityType.folder);
@@ -74,6 +90,7 @@ public class ProjectTitleBarTest {
     entity.setId(entityId);
     when(mockBundle.getEntity()).thenReturn(entity);
     titleBar.configure(mockBundle);
+    verify(mockVisibilityChip).configure(entityId);
     verify(mockView).setFavoritesWidgetVisible(false);
     verify(mockView).setEntityType(EntityType.table);
   }

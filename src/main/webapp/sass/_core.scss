@@ -54,6 +54,10 @@ $synapse-tertiary-color-palette: (
 
 $entity-title-border-color: #eceef1;
 
+$star-unfavorited-border-color: #9eaab7;
+
+$page-header-title-color: #f9f9fa;
+
 $page-header-min-height: 96px;
 $footer-height: 198px;
 
@@ -72,13 +76,6 @@ $full-root-panel-height: calc(100vh - #{$footer-height});
   -webkit-box-shadow: $boxshadow;
   -moz-box-shadow: $boxshadow;
   box-shadow: $boxshadow;
-}
-
-@mixin synapse-blue-triangles-bg() {
-  background: transparent
-    url('https://s3.amazonaws.com/static.synapse.org/images/SynapseLoginPageBackground.svg')
-    no-repeat;
-  background-size: cover;
 }
 
 @mixin transparent-button() {
@@ -201,11 +198,13 @@ a:focus {
   #rootPanel .pageHeader {
     padding: 24px $entity-page-side-spacing;
     min-height: $page-header-min-height;
-    @include synapse-blue-triangles-bg;
+    background-color: $synapse-blue;
     h3.pageHeaderTitle {
-      color: white;
+      color: $page-header-title-color;
+      font-weight: 600;
+      line-height: 32px;
       a {
-        color: white;
+        color: $page-header-title-color;
       }
     }
 
@@ -252,9 +251,9 @@ a:focus {
     .projectMetadata {
       display: flex;
       align-items: center;
+      gap: 16px;
       .projectTitle {
         > *,
-        .syn-star-o,
         .syn-question-circle,
         .entityIcon,
         a:not(.btn) {
@@ -262,6 +261,9 @@ a:focus {
           table {
             color: $synapse-dark-text;
           }
+        }
+        .syn-star-o {
+          color: $star-unfavorited-border-color;
         }
         .portal-banners-widget {
           a:not(.btn) {
@@ -280,6 +282,7 @@ a:focus {
       }
       .projectSettings {
         @media (min-width: 1200px) {
+          justify-content: center;
           margin-left: auto;
         }
       }
@@ -2090,6 +2093,10 @@ input[type='text'].padding-0 {
     gap: 10px;
   }
 
+  .gap-16px {
+    gap: 16px;
+  }
+
   .flexcontainer-row {
     display: -webkit-flex;
     display: flex;
@@ -2106,6 +2113,18 @@ input[type='text'].padding-0 {
       display: flex;
       flex-direction: column;
       flex-wrap: nowrap;
+      gap: 20px;
+    }
+  }
+
+  .flexcontainer-row-unless-md {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    @media (max-width: 1024px) {
+      display: flex;
+      flex-direction: column;
       gap: 20px;
     }
   }

@@ -22,6 +22,9 @@ public class ProjectTitleBarViewImpl implements ProjectTitleBarView {
   SimplePanel favoritePanel;
 
   @UiField
+  SimplePanel visibilityChipPanel;
+
+  @UiField
   EntityTypeIconImpl entityIcon;
 
   @UiField
@@ -48,6 +51,12 @@ public class ProjectTitleBarViewImpl implements ProjectTitleBarView {
   @Override
   public void setFavoritesWidgetVisible(boolean visible) {
     favoritePanel.setVisible(visible);
+  }
+
+  @Override
+  public void setVisibilityWidget(Widget visibilityWidget) {
+    visibilityChipPanel.addStyleName("inline-block");
+    visibilityChipPanel.setWidget(visibilityWidget);
   }
 
   @Override

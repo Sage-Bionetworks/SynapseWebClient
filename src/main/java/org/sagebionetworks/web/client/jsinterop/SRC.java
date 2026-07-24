@@ -24,6 +24,9 @@ public class SRC {
     public static ReactComponentType<DiscussionThreadProps> DiscussionThread;
     public static ReactComponentType<ShareThisPageProps> ShareThisPage;
     public static ReactComponentType<EntityCitationProps> EntityCitation;
+    public static ReactComponentType<
+      ProjectVisibilityChipContainerProps
+    > ProjectVisibilityChip;
     public static ReactComponentType<ProjectInfoProps> ProjectInfo;
     public static ReactComponentType<EntitySidebarProps> EntitySidebar;
     public static ReactComponentType<CsvPreviewProps> CsvPreview;
