@@ -254,14 +254,16 @@ a:focus {
       gap: 16px;
       .projectTitle {
         > *,
-        .syn-star-o,
         .syn-question-circle,
         .entityIcon,
         a:not(.btn) {
-          color: $star-unfavorited-border-color;
+          color: white;
           table {
             color: $synapse-dark-text;
           }
+        }
+        .syn-star-o {
+          color: $star-unfavorited-border-color;
         }
         .portal-banners-widget {
           a:not(.btn) {
