@@ -1,12 +1,5 @@
 package org.sagebionetworks.web.server.servlet;
 
-import com.amazonaws.services.appconfigdata.AWSAppConfigData;
-import com.amazonaws.services.appconfigdata.model.BadRequestException;
-import com.amazonaws.services.appconfigdata.model.GetLatestConfigurationRequest;
-import com.amazonaws.services.appconfigdata.model.GetLatestConfigurationResult;
-import com.amazonaws.services.appconfigdata.model.InternalServerException;
-import com.amazonaws.services.appconfigdata.model.StartConfigurationSessionRequest;
-import com.amazonaws.services.appconfigdata.model.StartConfigurationSessionResult;
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
 import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 import com.google.inject.Inject;
@@ -15,22 +8,25 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.sagebionetworks.StackConfiguration;
-import org.sagebionetworks.aws.AwsClientFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.shared.WebConstants;
+import software.amazon.awssdk.services.appconfigdata.AppConfigDataClient;
+import software.amazon.awssdk.services.appconfigdata.model.BadRequestException;
+import software.amazon.awssdk.services.appconfigdata.model.GetLatestConfigurationRequest;
+import software.amazon.awssdk.services.appconfigdata.model.GetLatestConfigurationResponse;
+import software.amazon.awssdk.services.appconfigdata.model.InternalServerException;
+import software.amazon.awssdk.services.appconfigdata.model.StartConfigurationSessionRequest;
+import software.amazon.awssdk.services.appconfigdata.model.StartConfigurationSessionResponse;
 
 public class AppConfigServlet extends HttpServlet {
 
-  public AWSAppConfigData appConfigDataClient;
+  public AppConfigDataClient appConfigDataClient;
   public Supplier<JSONObjectAdapter> configSupplier;
   public String configurationToken;
   private StackConfiguration stackConfiguration;
@@ -43,7 +39,7 @@ public class AppConfigServlet extends HttpServlet {
 
   @Inject
   public AppConfigServlet(
-    AWSAppConfigData appConfigDataClient,
+    AppConfigDataClient appConfigDataClient,
     StackConfiguration stackConfiguration
   ) {
     this.appConfigDataClient = appConfigDataClient;
@@ -57,9 +53,6 @@ public class AppConfigServlet extends HttpServlet {
   }
 
   public void initializeAppConfigClient() {
-    if (appConfigDataClient == null) {
-      appConfigDataClient = AwsClientFactory.createAppConfigClient();
-    }
     startConfigurationSession();
     initializeConfigSupplier();
   }
@@ -69,19 +62,21 @@ public class AppConfigServlet extends HttpServlet {
       String stack = stackConfiguration.getStack();
       String stackInstance = stackConfiguration.getStackInstance();
       StartConfigurationSessionRequest sessionRequest =
-        new StartConfigurationSessionRequest()
-          .withApplicationIdentifier(
+        StartConfigurationSessionRequest
+          .builder()
+          .applicationIdentifier(
             stack + "-" + stackInstance + "-portal-AppConfigApp"
           )
-          .withEnvironmentIdentifier(
+          .environmentIdentifier(
             stack + "-" + stackInstance + "-portal-environment"
           )
-          .withConfigurationProfileIdentifier(
+          .configurationProfileIdentifier(
             stack + "-" + stackInstance + "-portal-configurations"
-          );
-      StartConfigurationSessionResult sessionResponse =
+          )
+          .build();
+      StartConfigurationSessionResponse sessionResponse =
         appConfigDataClient.startConfigurationSession(sessionRequest);
-      configurationToken = sessionResponse.getInitialConfigurationToken();
+      configurationToken = sessionResponse.initialConfigurationToken();
     } catch (Exception e) {
       logger.log(Level.WARNING, "Error starting configuration session", e);
       configurationToken = null;
@@ -124,16 +119,16 @@ public class AppConfigServlet extends HttpServlet {
         return getLastConfigValueOrDefault();
       }
       GetLatestConfigurationRequest latestConfigRequest =
-        new GetLatestConfigurationRequest()
-          .withConfigurationToken(configurationToken);
-      GetLatestConfigurationResult latestConfigResponse =
+        GetLatestConfigurationRequest
+          .builder()
+          .configurationToken(configurationToken)
+          .build();
+      GetLatestConfigurationResponse latestConfigResponse =
         appConfigDataClient.getLatestConfiguration(latestConfigRequest);
-      configurationToken = latestConfigResponse.getNextPollConfigurationToken();
-      ByteBuffer readOnlyConfigData = latestConfigResponse
-        .getConfiguration()
-        .asReadOnlyBuffer();
-      CharBuffer charBuffer = StandardCharsets.UTF_8.decode(readOnlyConfigData);
-      String newConfigString = charBuffer.toString();
+      configurationToken = latestConfigResponse.nextPollConfigurationToken();
+      String newConfigString = latestConfigResponse
+        .configuration()
+        .asUtf8String();
 
       if (!newConfigString.isEmpty()) {
         lastConfigValue = new JSONObjectAdapterImpl(newConfigString);
@@ -185,7 +180,7 @@ public class AppConfigServlet extends HttpServlet {
   public void destroy() {
     if (appConfigDataClient != null) {
       try {
-        appConfigDataClient.shutdown();
+        appConfigDataClient.close();
       } catch (Exception e) {
         logger.log(Level.SEVERE, "Failed to shutdown AppConfigDataClient", e);
       }
