@@ -24,6 +24,7 @@ public class SRC {
     public static ReactComponentType<DiscussionThreadProps> DiscussionThread;
     public static ReactComponentType<ShareThisPageProps> ShareThisPage;
     public static ReactComponentType<EntityCitationProps> EntityCitation;
+    public static ReactComponentType<ProjectInfoProps> ProjectInfo;
     public static ReactComponentType<EntitySidebarProps> EntitySidebar;
     public static ReactComponentType<CsvPreviewProps> CsvPreview;
     public static ReactComponentType<
@@ -143,9 +144,6 @@ public class SRC {
     public static ReactComponentType<
       GovernanceMarkdownGithubProps
     > GovernanceMarkdownGithub;
-    public static ReactComponentType<
-      ProjectDataAvailabilityProps
-    > ProjectDataAvailability;
     public static ReactComponentType<EntityUploadModalProps> EntityUploadModal;
     public static ReactComponentType<
       CreateOrUpdateDoiModalProps

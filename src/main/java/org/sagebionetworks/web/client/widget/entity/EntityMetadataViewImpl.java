@@ -11,9 +11,7 @@ import com.google.gwt.user.client.ui.Widget;
 import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.widget.PortalBannersWidget;
-import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 
 public class EntityMetadataViewImpl
   extends Composite
@@ -30,19 +28,7 @@ public class EntityMetadataViewImpl
   HTMLPanel detailedMetadata;
 
   @UiField
-  TextBoxWithCopyToClipboardWidget idField;
-
-  @UiField
-  Span doiPanel;
-
-  @UiField
   Div fileHistoryContainer;
-
-  @UiField
-  Span uploadDestinationPanel;
-
-  @UiField
-  Span uploadDestinationField;
 
   @UiField
   Div descriptionContainer;
@@ -52,9 +38,6 @@ public class EntityMetadataViewImpl
 
   @UiField
   SimplePanel entityModalWidgetContainer;
-
-  @UiField
-  Span projectDataAvailabilityPanel;
 
   @UiField
   SimplePanel portalBannersContainer;
@@ -69,22 +52,6 @@ public class EntityMetadataViewImpl
   }
 
   @Override
-  public void setDoiWidget(IsWidget doiWidget) {
-    doiPanel.clear();
-    doiPanel.add(doiWidget);
-  }
-
-  @Override
-  public void setUploadDestinationPanelVisible(boolean isVisible) {
-    uploadDestinationPanel.setVisible(isVisible);
-  }
-
-  @Override
-  public void setUploadDestinationText(String text) {
-    uploadDestinationField.setText(text);
-  }
-
-  @Override
   public void setDescriptionVisible(boolean visible) {
     descriptionContainer.setVisible(visible);
   }
@@ -96,10 +63,7 @@ public class EntityMetadataViewImpl
   }
 
   @Override
-  public void clear() {
-    uploadDestinationField.setText("");
-    uploadDestinationPanel.setVisible(false);
-  }
+  public void clear() {}
 
   @Override
   public void setDetailedMetadataVisible(boolean visible) {
@@ -108,15 +72,7 @@ public class EntityMetadataViewImpl
 
   @Override
   public void setEntityId(String entityId) {
-    idField.setText(entityId);
-    idField.setCopyIconVisible(true);
     portalBannersWidget.configure(entityId);
-  }
-
-  @Override
-  public void setProjectDataAvailabilityWidget(IsWidget widget) {
-    projectDataAvailabilityPanel.clear();
-    projectDataAvailabilityPanel.add(widget);
   }
 
   @Override

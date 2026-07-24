@@ -61,6 +61,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.EntityCitation;
+import org.sagebionetworks.web.client.widget.ProjectInfo;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
@@ -192,6 +193,9 @@ public class EntityPageTopTest {
   EntityCitation mockEntityCitation;
 
   @Mock
+  ProjectInfo mockProjectInfo;
+
+  @Mock
   SynapseJavascriptClient mockSynapseJavascriptClient;
 
   @Mock
@@ -260,6 +264,7 @@ public class EntityPageTopTest {
         mockTabs,
         mockProjectTitleBar,
         mockEntityCitation,
+        mockProjectInfo,
         mockProjectMetadata,
         mockWikiTab,
         mockFilesTab,
