@@ -37,17 +37,12 @@ public class FeatureFlagConfig {
 
   public boolean isFeatureEnabled(FeatureFlagKey feature) {
     try {
-      JSONValue value = config.get(feature.getKey());
-      if (value != null && value.isBoolean() != null) {
-        // Explicit true/false: flag overrides experimental mode
-        // true  → always enabled
-        // false → always disabled, even in experimental mode
-        return value.isBoolean().booleanValue();
-      }
+      return (
+        DisplayUtils.isInTestWebsite(cookieProvider) ||
+        config.get(feature.getKey()).isBoolean().booleanValue()
+      );
     } catch (Exception e) {
-      // fall through to experimental mode check
+      return DisplayUtils.isInTestWebsite(cookieProvider);
     }
-    // null/undefined: follow experimental mode
-    return DisplayUtils.isInTestWebsite(cookieProvider);
   }
 }

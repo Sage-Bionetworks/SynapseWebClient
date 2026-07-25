@@ -52,26 +52,10 @@ public class FeatureFlagConfigTest {
 
   @Test
   public void testFeatureDisabledButExperimentalModeEnabled() {
-    // false flag value disables the feature even when experimental mode is on
     when(mockCookieProvider.getCookie(eq("SynapseTestWebsite")))
       .thenReturn("true");
     when(mockJsonObject.get(FeatureFlagKey.TEST_FLAG_ONLY.getKey()))
       .thenReturn(JSONBoolean.getInstance(false));
-    featureFlagConfig =
-      new FeatureFlagConfig(mockJsonObject, mockCookieProvider);
-
-    assertFalse(
-      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.TEST_FLAG_ONLY)
-    );
-  }
-
-  @Test
-  public void testFeatureNullValueExperimentalModeEnabled() {
-    // null/undefined flag value still follows experimental mode
-    when(mockCookieProvider.getCookie(eq("SynapseTestWebsite")))
-      .thenReturn("true");
-    when(mockJsonObject.get(FeatureFlagKey.TEST_FLAG_ONLY.getKey()))
-      .thenReturn(null);
     featureFlagConfig =
       new FeatureFlagConfig(mockJsonObject, mockCookieProvider);
 
