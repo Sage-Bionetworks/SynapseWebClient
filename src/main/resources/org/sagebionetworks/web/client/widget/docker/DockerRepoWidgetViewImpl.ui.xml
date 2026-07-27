@@ -17,7 +17,7 @@
       <MUI:Grid container="true" columnSpacing="15px">
         <MUI:Grid xs="12" md="6">
           <b:Panel addStyleNames="margin-bottom-15">
-            <bh:Div addStyleNames="highlight-title">
+            <bh:Div addStyleNames="entity-title">
               <bh:Text text="Docker Pull Command" />
             </bh:Div>
             <b:PanelBody addStyleNames="margin-15">
@@ -32,14 +32,8 @@
         </MUI:Grid>
         <MUI:Grid xs="12" md="6">
           <g:FlowPanel addStyleNames="margin-bottom-15">
-            <bh:Div addStyleNames="highlight-title">
+            <bh:Div addStyleNames="entity-title">
               <bh:Text>Tags</bh:Text>
-              <w:HelpWidget
-                helpMarkdown="An image name is made up of slash-separated name components, optionally prefixed by a registry hostname."
-                href="https://docs.docker.com/engine/reference/commandline/tag/"
-                addStyleNames="margin-left-5"
-                placement="BOTTOM"
-              />
             </bh:Div>
             <bh:Div
               addStyleNames="padding-15"
@@ -57,16 +51,13 @@
             ui:field="provenancePanel"
             addStyleNames="margin-bottom-15"
           >
-            <bh:Div addStyleNames="highlight-title">
+            <bh:Div addStyleNames="entity-title">
               <bh:Text>Provenance</bh:Text>
-              <w:HelpWidget
-                helpMarkdown="Provenance tracks the relationship between data, code and analytical results"
-                href="https://help.synapse.org/docs/Provenance.1972470373.html"
-                addStyleNames="margin-left-5"
-                placement="BOTTOM"
-              />
             </bh:Div>
-            <bh:Div ui:field="dockerRepoProvenanceContainer" />
+            <bh:Div
+              ui:field="dockerRepoProvenanceContainer"
+              addStyleNames="contentSectionContainer"
+            />
           </g:FlowPanel>
         </MUI:Grid>
       </MUI:Grid>

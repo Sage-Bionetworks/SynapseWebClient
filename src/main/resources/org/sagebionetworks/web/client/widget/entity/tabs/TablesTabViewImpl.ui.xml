@@ -61,18 +61,12 @@
         <MUI:Grid container="true">
           <MUI:Grid xs="12" ui:field="provenanceContainer">
             <g:FlowPanel addStyleNames="margin-bottom-15 margin-top-15">
-              <bh:Div addStyleNames="highlight-title">
+              <bh:Div addStyleNames="entity-title">
                 <bh:Text>Provenance</bh:Text>
-                <w:HelpWidget
-                  helpMarkdown="Provenance tracks the relationship between data, code and analytical results"
-                  href="https://help.synapse.org/docs/Provenance.1972470373.html"
-                  addStyleNames="margin-left-5"
-                  placement="BOTTOM"
-                />
               </bh:Div>
               <bh:Div
                 ui:field="provenanceContainerHighlightBox"
-                addStyleNames="margin-top-10 margin-bottom-10"
+                addStyleNames="margin-bottom-10 contentSectionContainer"
               />
             </g:FlowPanel>
           </MUI:Grid>

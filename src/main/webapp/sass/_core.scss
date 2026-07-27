@@ -1878,6 +1878,12 @@ h6 {
   background-color: #f9f9f9;
 }
 
+.contentSectionContainer,
+#rootPanel .contentSectionContainer {
+  background-color: #f9f9f9;
+  padding: 15px;
+}
+
 .highlight-reply,
 #rootPanel .highlight-reply {
   background-color: #fcf7e8;
