@@ -36,6 +36,14 @@ public class DefaultEntityActionMenuLayoutUtil {
     .setColor("error.main")
     .setFontWeight(700L);
 
+  static SxProps downloadMenuTextStyle = SxProps
+    .create()
+    .setColor("#3B4046")
+    .setFontSize("14px")
+    .setFontWeight(540L)
+    .setLineHeight("20px")
+    .setLetterSpacing("-0.07px");
+
   public static EntityActionMenuLayout getLayout(
     Synapse.EntityArea entityArea
   ) {
@@ -86,8 +94,18 @@ public class DefaultEntityActionMenuLayoutUtil {
         layout.setDownloadMenuActions(
           Collections.singletonList(
             Arrays.asList(
-              ActionViewProps.create(Action.ADD_TO_DOWNLOAD_CART),
-              ActionViewProps.create(Action.SHOW_PROGRAMMATIC_OPTIONS)
+              ActionViewProps.create(
+                Action.ADD_TO_DOWNLOAD_CART,
+                null,
+                downloadMenuTextStyle,
+                null
+              ),
+              ActionViewProps.create(
+                Action.SHOW_PROGRAMMATIC_OPTIONS,
+                null,
+                downloadMenuTextStyle,
+                null
+              )
             )
           )
         );
@@ -240,8 +258,18 @@ public class DefaultEntityActionMenuLayoutUtil {
         layout.setDownloadMenuActions(
           Collections.singletonList(
             Arrays.asList(
-              ActionViewProps.create(Action.ADD_TO_DOWNLOAD_CART),
-              ActionViewProps.create(Action.SHOW_PROGRAMMATIC_OPTIONS)
+              ActionViewProps.create(
+                Action.ADD_TO_DOWNLOAD_CART,
+                null,
+                downloadMenuTextStyle,
+                null
+              ),
+              ActionViewProps.create(
+                Action.SHOW_PROGRAMMATIC_OPTIONS,
+                null,
+                downloadMenuTextStyle,
+                null
+              )
             )
           )
         );
@@ -298,17 +326,32 @@ public class DefaultEntityActionMenuLayoutUtil {
           )
         );
         layout.setDownloadMenuActions(
-          Arrays.asList(
+          Collections.singletonList(
             Arrays.asList(
-              ActionViewProps.create(Action.DOWNLOAD_FILE),
+              ActionViewProps.create(
+                Action.DOWNLOAD_FILE,
+                null,
+                downloadMenuTextStyle,
+                null
+              ),
               ActionViewProps.create(
                 Action.OPEN_EXTERNAL_FILE,
-                "openInNewWindow"
+                "openInNewWindow",
+                downloadMenuTextStyle,
+                null
+              ),
+              ActionViewProps.create(
+                Action.ADD_TO_DOWNLOAD_CART,
+                null,
+                downloadMenuTextStyle,
+                null
+              ),
+              ActionViewProps.create(
+                Action.SHOW_PROGRAMMATIC_OPTIONS,
+                null,
+                downloadMenuTextStyle,
+                null
               )
-            ),
-            Arrays.asList(
-              ActionViewProps.create(Action.ADD_TO_DOWNLOAD_CART),
-              ActionViewProps.create(Action.SHOW_PROGRAMMATIC_OPTIONS)
             )
           )
         );

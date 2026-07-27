@@ -111,6 +111,13 @@ public class FileDownloadHandlerWidget
     dataFileHandle = getFileHandle();
     s3 = null;
 
+    boolean isFileEntity = bundle.getEntity() instanceof FileEntity;
+    boolean hasUnmetAccessRequirements =
+      restrictionInformation.getHasUnmetAccessRequirement();
+    actionMenu.setDownloadMenuShowConditionalNote(
+      isFileEntity && hasUnmetAccessRequirements
+    );
+
     if (restrictionInformation.getHasUnmetAccessRequirement()) {
       // if in alpha, send to access requirements
       view.setIsDirectDownloadLink(

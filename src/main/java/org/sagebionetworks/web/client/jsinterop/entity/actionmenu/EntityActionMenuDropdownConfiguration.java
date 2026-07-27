@@ -11,6 +11,7 @@ public class EntityActionMenuDropdownConfiguration {
   /* Only strings that map to synapse-react-client Icons */
   private String tooltipText;
   private boolean disabled;
+  private boolean showConditionalNote;
 
   @JsOverlay
   public static EntityActionMenuDropdownConfiguration create(
@@ -54,5 +55,15 @@ public class EntityActionMenuDropdownConfiguration {
   @JsOverlay
   public final void setDisabled(boolean disabled) {
     this.disabled = disabled;
+  }
+
+  @JsOverlay
+  public final boolean isShowConditionalNote() {
+    return showConditionalNote;
+  }
+
+  @JsOverlay
+  public final void setShowConditionalNote(boolean showConditionalNote) {
+    this.showConditionalNote = showConditionalNote;
   }
 }

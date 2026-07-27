@@ -21,6 +21,14 @@ public class SxProps extends JsObject {
 
   public String backgroundColor;
 
+  public String fontSize;
+
+  public String fontStyle;
+
+  public String lineHeight;
+
+  public String letterSpacing;
+
   @JsOverlay
   public static SxProps create() {
     return new SxProps();
@@ -47,6 +55,30 @@ public class SxProps extends JsObject {
   @JsOverlay
   public final SxProps setFontWeight(long fontWeight) {
     this.fontWeight = fontWeight;
+    return this;
+  }
+
+  @JsOverlay
+  public final SxProps setFontSize(String fontSize) {
+    this.fontSize = fontSize;
+    return this;
+  }
+
+  @JsOverlay
+  public final SxProps setFontStyle(String fontStyle) {
+    this.fontStyle = fontStyle;
+    return this;
+  }
+
+  @JsOverlay
+  public final SxProps setLineHeight(String lineHeight) {
+    this.lineHeight = lineHeight;
+    return this;
+  }
+
+  @JsOverlay
+  public final SxProps setLetterSpacing(String letterSpacing) {
+    this.letterSpacing = letterSpacing;
     return this;
   }
 }
