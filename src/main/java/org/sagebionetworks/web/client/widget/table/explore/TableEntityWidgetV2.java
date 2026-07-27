@@ -344,6 +344,7 @@ public class TableEntityWidgetV2
     }
     this.actionMenu.setActionVisible(
         Action.EDIT_TABLE_DATA,
+        canEditResults &&
         QueryResultEditorWidget.isTableTypeQueryResultEditable(tableType)
       );
   }
