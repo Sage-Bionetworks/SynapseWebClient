@@ -92,10 +92,12 @@ public class EntityActionMenuImpl implements EntityActionMenu {
   }
 
   @Override
-  public void setDownloadMenuShowConditionalNote(boolean showConditionalNote) {
+  public void setDownloadMenuShowFileAccessRequestNotice(
+    boolean showFileAccessRequestNotice
+  ) {
     dropdownMenuConfigurations
       .getDownloadMenuConfiguration()
-      .setShowConditionalNote(showConditionalNote);
+      .setShowFileAccessRequestNotice(showFileAccessRequestNotice);
     synchronizeView();
   }
 
@@ -143,7 +145,7 @@ public class EntityActionMenuImpl implements EntityActionMenu {
     this.actionConfigurations.forEach((key, value) -> value.setVisible(false));
     dropdownMenuConfigurations
       .getDownloadMenuConfiguration()
-      .setShowConditionalNote(false);
+      .setShowFileAccessRequestNotice(false);
     synchronizeView();
   }
 

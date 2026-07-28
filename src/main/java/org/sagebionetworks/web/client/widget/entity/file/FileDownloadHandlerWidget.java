@@ -114,7 +114,7 @@ public class FileDownloadHandlerWidget
     boolean isFileEntity = bundle.getEntity() instanceof FileEntity;
     boolean hasUnmetAccessRequirements =
       restrictionInformation.getHasUnmetAccessRequirement();
-    actionMenu.setDownloadMenuShowConditionalNote(
+    actionMenu.setDownloadMenuShowFileAccessRequestNotice(
       isFileEntity && hasUnmetAccessRequirements
     );
 
