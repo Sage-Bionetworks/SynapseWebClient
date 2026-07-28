@@ -15,7 +15,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.ClickableDiv;
-import org.sagebionetworks.web.client.widget.OrientationBanner;
 
 public class TabViewImpl implements TabView {
 
@@ -41,7 +40,7 @@ public class TabViewImpl implements TabView {
   Anchor anchor;
 
   @Inject
-  public TabViewImpl(OrientationBanner orientationBanner) {
+  public TabViewImpl() {
     // empty constructor, you can include this widget in the ui xml
     TabViewImplUiBinder binder = GWT.create(TabViewImplUiBinder.class);
     widget = binder.createAndBindUi(this);
