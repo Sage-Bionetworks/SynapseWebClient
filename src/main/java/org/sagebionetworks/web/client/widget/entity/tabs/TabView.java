@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import org.gwtbootstrap3.client.ui.TabPane;
@@ -11,22 +10,7 @@ public interface TabView extends IsWidget {
 
   void updateHref(Synapse place);
 
-  void configure(
-    String tabTitle,
-    String iconName,
-    String helpMarkdown,
-    String helpLink
-  );
-
-  void configureOrientationBanner(
-    String name,
-    String title,
-    String text,
-    String primaryButtonText,
-    ClickHandler primaryButtonClickHandler,
-    String secondaryButtonText,
-    String secondaryButtonHref
-  );
+  void configure(String tabTitle);
 
   void setContent(Widget content);
 
