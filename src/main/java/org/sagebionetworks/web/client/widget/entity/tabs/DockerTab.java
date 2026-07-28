@@ -43,22 +43,7 @@ public class DockerTab implements DockerTabView.Presenter {
   public DockerTab(Tab tab, PortalGinInjector ginInjector) {
     this.tab = tab;
     this.ginInjector = ginInjector;
-    tab.configure(
-      DOCKER_TAB_TITLE,
-      "docker",
-      "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.",
-      WebConstants.DOCS_URL + "Synapse-Docker-Registry.2011037752.html",
-      EntityArea.DOCKER
-    );
-    tab.configureOrientationBanner(
-      "Docker",
-      "Getting Started With Docker",
-      "The Synapse Docker Registry provides a space for Synapse users to store and distribute their Docker images per Synapse project.",
-      null,
-      null,
-      "Learn More About Docker",
-      "https://help.synapse.org/docs/Synapse-Docker-Registry.2011037752.html"
-    );
+    tab.configure(DOCKER_TAB_TITLE, EntityArea.DOCKER);
   }
 
   public void lazyInject() {

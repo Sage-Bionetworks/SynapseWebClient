@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,37 +67,11 @@ public class Tab implements TabView.Presenter {
       };
   }
 
-  public void configure(
-    String tabTitle,
-    String iconName,
-    String helpMarkdown,
-    String helpLink,
-    EntityArea area
-  ) {
+  public void configure(String tabTitle, EntityArea area) {
     this.tabTitle = tabTitle;
-    view.configure(tabTitle, iconName, helpMarkdown, helpLink);
+    view.configure(tabTitle);
     onClickCallbacks = new ArrayList<CallbackP<Tab>>();
     this.area = area;
-  }
-
-  public void configureOrientationBanner(
-    String name,
-    String title,
-    String text,
-    String primaryButtonText,
-    ClickHandler primaryButtonClickHandler,
-    String secondaryButtonText,
-    String secondaryButtonHref
-  ) {
-    view.configureOrientationBanner(
-      name,
-      title,
-      text,
-      primaryButtonText,
-      primaryButtonClickHandler,
-      secondaryButtonText,
-      secondaryButtonHref
-    );
   }
 
   public void setContent(Widget widget) {

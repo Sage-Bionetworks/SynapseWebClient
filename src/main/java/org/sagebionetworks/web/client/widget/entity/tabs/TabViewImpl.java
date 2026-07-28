@@ -6,20 +6,15 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.ListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
-import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.ClickableDiv;
-import org.sagebionetworks.web.client.widget.HelpWidget;
-import org.sagebionetworks.web.client.widget.IconSvg;
-import org.sagebionetworks.web.client.widget.OrientationBanner;
 
 public class TabViewImpl implements TabView {
 
@@ -29,13 +24,8 @@ public class TabViewImpl implements TabView {
   @UiField
   TabPane tabPane;
 
-  HelpWidget helpWidget;
-
   @UiField
   ListItem tabListItem;
-
-  @UiField
-  SimplePanel orientationBannerPanel;
 
   @UiField
   Div contentDiv;
@@ -48,19 +38,12 @@ public class TabViewImpl implements TabView {
   Widget widget;
   ClickHandler tabClickedHandler;
   Anchor anchor;
-  OrientationBanner orientationBanner;
 
   @Inject
-  public TabViewImpl(
-    HelpWidget helpWidget,
-    OrientationBanner orientationBanner
-  ) {
+  public TabViewImpl() {
     // empty constructor, you can include this widget in the ui xml
     TabViewImplUiBinder binder = GWT.create(TabViewImplUiBinder.class);
     widget = binder.createAndBindUi(this);
-    this.helpWidget = helpWidget;
-    helpWidget.setAddStyleNames("margin-left-5");
-    this.orientationBanner = orientationBanner;
     tabClickedHandler =
       new ClickHandler() {
         @Override
@@ -79,44 +62,13 @@ public class TabViewImpl implements TabView {
   }
 
   @Override
-  public void configureOrientationBanner(
-    String name,
-    String title,
-    String text,
-    String primaryButtonText,
-    ClickHandler primaryButtonClickHandler,
-    String secondaryButtonText,
-    String secondaryButtonHref
-  ) {
-    orientationBannerPanel.clear();
-    orientationBanner.configure(
-      name,
-      title,
-      text,
-      primaryButtonText,
-      primaryButtonClickHandler,
-      secondaryButtonText,
-      secondaryButtonHref
-    );
-    orientationBannerPanel.setWidget(orientationBanner.asWidget());
-  }
-
-  @Override
   public void setContent(Widget content) {
     contentDiv.clear();
     contentDiv.add(content);
   }
 
   @Override
-  public void configure(
-    String tabTitle,
-    String iconName,
-    String helpMarkdown,
-    String helpLink
-  ) {
-    helpWidget.setHelpMarkdown(helpMarkdown);
-    helpWidget.setHref(helpLink);
-    helpWidget.setPlacement(Placement.BOTTOM);
+  public void configure(String tabTitle) {
     tabItem.clear();
     anchor = new Anchor();
     anchor.add(new InlineHTML(tabTitle));
@@ -125,12 +77,8 @@ public class TabViewImpl implements TabView {
     ClickableDiv fp = new ClickableDiv();
     fp.addClickHandler(tabClickedHandler);
     fp.addStyleName("margin-right-5 displayInline");
-    IconSvg icon = new IconSvg();
-    icon.configure(iconName, null);
-    fp.add(icon);
     fp.add(anchor);
     tabItem.add(fp);
-    tabItem.add(helpWidget.asWidget());
   }
 
   @Override

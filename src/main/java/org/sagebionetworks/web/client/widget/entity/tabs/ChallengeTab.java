@@ -46,22 +46,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
     this.authenticationController = authenticationController;
     this.globalApplicationState = globalApplicationState;
     this.popupUtils = popupUtils;
-    tab.configure(
-      "Challenge",
-      "challenge",
-      "Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.",
-      "https://help.synapse.org/docs/Challenges.1985184148.html",
-      EntityArea.CHALLENGE
-    );
-    tab.configureOrientationBanner(
-      "Challenges",
-      "Getting Started With Your Challenges",
-      "Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.",
-      null,
-      null,
-      "Learn More About Challenges",
-      "https://help.synapse.org/docs/Challenges.1985184148.html"
-    );
+    tab.configure("Challenge", EntityArea.CHALLENGE);
   }
 
   public void lazyInject() {

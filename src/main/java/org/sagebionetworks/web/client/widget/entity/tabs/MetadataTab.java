@@ -15,13 +15,7 @@ public class MetadataTab {
     this.tab = tab;
     this.view = view;
 
-    tab.configure(
-      "Tasks and Actions",
-      "tasks",
-      "Track what needs attention and open Curator to add or update metadata.",
-      null,
-      EntityArea.METADATA
-    );
+    tab.configure("Tasks and Actions", EntityArea.METADATA);
     tab.setContent(this.view.asWidget());
   }
 

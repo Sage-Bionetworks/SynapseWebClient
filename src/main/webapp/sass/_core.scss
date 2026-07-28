@@ -403,7 +403,7 @@ end sticky footer
   }
   .nav-tabs > li.active > a,
   #rootPanel .nav-tabs > li > a:hover {
-    box-shadow: inset 0 -4px 0 $synapse-green;
+    box-shadow: inset 0 -3px 0 $synapse-green;
     background-color: unset;
     border-color: transparent;
     text-decoration: none;
@@ -413,8 +413,8 @@ end sticky footer
     display: flex;
     flex-wrap: wrap;
     > li > a {
-      height: 50px;
-      padding: 15px 2px;
+      height: 36px;
+      padding: 4px 2px;
     }
   }
   @media (min-width: 768px) {
@@ -2579,20 +2579,11 @@ i.fa.small-icon {
 .entity-tab,
 .finder-tab {
   font-size: 16px;
-  font-weight: 700;
   color: #22252a;
-  letter-spacing: 1px;
   white-space: nowrap;
-}
-
-.entity-tab svg {
-  color: #71767f;
-  margin-right: 5px;
-  margin-top: -2px;
-}
-.entity-tab.active svg,
-.entity-tab:hover svg {
-  color: $synapse-green;
+  font-weight: 450;
+  line-height: 28px; /* 175% */
+  letter-spacing: -0.08px;
 }
 
 @media (max-width: 991px) {
@@ -2608,7 +2599,7 @@ i.fa.small-icon {
     }
   }
   .entity-tab {
-    margin-right: 50px;
+    margin-right: 48px;
   }
   .finder-tab {
     width: 200px;
