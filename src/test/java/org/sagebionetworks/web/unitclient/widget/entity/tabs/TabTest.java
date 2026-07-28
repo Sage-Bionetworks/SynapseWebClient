@@ -101,9 +101,8 @@ public class TabTest {
     // and configure
     String tabTitle = "TestTab";
     Widget content = null;
-    tab.configure(tabTitle, "file", "help markdown", "link", EntityArea.FILES);
-    verify(mockView)
-      .configure(eq(tabTitle), eq("file"), anyString(), anyString());
+    tab.configure(tabTitle, EntityArea.FILES);
+    verify(mockView).configure(eq(tabTitle));
     tab.setContent(content);
     verify(mockView).setContent(content);
   }
