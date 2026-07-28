@@ -10,7 +10,7 @@ public class SxProps extends JsObject {
 
   public String color;
 
-  public long fontWeight;
+  public int fontWeight;
 
   public String mt;
 
@@ -53,7 +53,7 @@ public class SxProps extends JsObject {
   }
 
   @JsOverlay
-  public final SxProps setFontWeight(long fontWeight) {
+  public final SxProps setFontWeight(int fontWeight) {
     this.fontWeight = fontWeight;
     return this;
   }

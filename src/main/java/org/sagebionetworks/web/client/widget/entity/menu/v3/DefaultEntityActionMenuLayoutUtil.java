@@ -34,13 +34,13 @@ public class DefaultEntityActionMenuLayoutUtil {
   static SxProps deleteTextStyle = SxProps
     .create()
     .setColor("error.main")
-    .setFontWeight(700L);
+    .setFontWeight(700);
 
   static SxProps downloadMenuTextStyle = SxProps
     .create()
     .setColor("#3B4046")
     .setFontSize("14px")
-    .setFontWeight(540L)
+    .setFontWeight(540)
     .setLineHeight("20px")
     .setLetterSpacing("-0.07px");
 
