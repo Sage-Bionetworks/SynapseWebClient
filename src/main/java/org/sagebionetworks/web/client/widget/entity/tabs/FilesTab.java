@@ -251,6 +251,11 @@ public class FilesTab {
       titleBar.configure(bundle, tab.getEntityActionMenu());
 
       previewWidget.configure(bundle);
+      discussionThreadListWidget.setOnViewForumClickedCallback(() ->
+        globalApplicationState
+          .getPlaceChanger()
+          .goTo(new Synapse(projectEntityId, null, EntityArea.DISCUSSION, null))
+      );
       discussionThreadListWidget.configure(currentEntityId, null, null);
       view.setDiscussionText(currentEntity.getName());
     }

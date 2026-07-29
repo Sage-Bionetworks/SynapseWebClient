@@ -56,7 +56,7 @@
             </bh:Div>
             <bh:Div
               ui:field="dockerRepoProvenanceContainer"
-              addStyleNames="contentSectionContainer"
+              addStyleNames="contentSectionContainer padding-15"
             />
           </g:FlowPanel>
         </MUI:Grid>
