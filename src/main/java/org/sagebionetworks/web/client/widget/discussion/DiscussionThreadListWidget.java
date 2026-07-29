@@ -190,6 +190,7 @@ public class DiscussionThreadListWidget
 
   public void clear() {
     view.clearSort();
+    view.setNoThreadsFoundVisible(false);
     loadMoreWidgetContainer.clear();
     threadId2Widget.clear();
   }

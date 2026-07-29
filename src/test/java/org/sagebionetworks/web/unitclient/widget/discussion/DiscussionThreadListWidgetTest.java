@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -350,7 +351,7 @@ public class DiscussionThreadListWidgetTest {
       .configure(any(DiscussionThreadBundle.class));
     verify(mockEmptyListCallback).invoke(anyBoolean());
     verify(mockView).setThreadHeaderVisible(true);
-    verify(mockView).setNoThreadsFoundVisible(false);
+    verify(mockView, atLeastOnce()).setNoThreadsFoundVisible(false);
     verify(mockThreadsContainer).setIsMore(false);
 
     // test scroll to thread, rpc failure
