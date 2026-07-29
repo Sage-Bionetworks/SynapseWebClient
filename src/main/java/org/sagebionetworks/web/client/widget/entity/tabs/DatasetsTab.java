@@ -41,23 +41,7 @@ public class DatasetsTab extends AbstractTablesTab {
     this.tab = tab;
     this.ginInjector = ginInjector;
     this.featureFlagConfig = featureFlagConfig;
-    String help = DATASETS_AND_COLLECTIONS_HELP;
-    tab.configure(
-      DisplayConstants.DATASETS,
-      "dataset",
-      help,
-      DATASETS_HELP_URL,
-      EntityArea.DATASETS
-    );
-    tab.configureOrientationBanner(
-      "Datasets",
-      "Getting Started With Datasets",
-      "Use Datasets to produce and distribute an immutable set of files found across one or more Projects or Folders.",
-      null,
-      null,
-      "Learn More About Datasets",
-      "https://help.synapse.org/docs/Datasets.2611281979.html"
-    );
+    tab.configure(DisplayConstants.DATASETS, EntityArea.DATASETS);
   }
 
   @Override

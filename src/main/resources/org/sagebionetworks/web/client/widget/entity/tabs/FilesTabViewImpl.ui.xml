@@ -41,7 +41,7 @@
       >
         <MUI:Grid xs="12" md="6" ui:field="filePreviewContainer">
           <g:FlowPanel>
-            <bh:Div addStyleNames="highlight-title">
+            <bh:Div addStyleNames="entity-title">
               <bh:Text>Preview</bh:Text>
               <b:Anchor
                 addStyleNames="lightGreyText"
@@ -50,7 +50,7 @@
                 pull="RIGHT"
               />
             </bh:Div>
-            <bh:Div addStyleNames="padding-15 whiteBackground">
+            <bh:Div addStyleNames="contentSectionContainer">
               <bh:Div ui:field="filePreviewWidgetContainer" addStyleNames="file-preview-video-container" />
             </bh:Div>
           </g:FlowPanel>
@@ -66,18 +66,19 @@
                 pull="RIGHT"
               />
             </bh:Div>
-            <bh:Div
-              ui:field="fileProvenanceGraphContainer"
-              addStyleNames="whiteBackground"
-            />
+            <bh:Div addStyleNames="contentSectionContainer">
+              <bh:Div
+                ui:field="fileProvenanceGraphContainer"
+              />
+            </bh:Div>
           </g:FlowPanel>
         </MUI:Grid>
       </MUI:Grid>
       <g:FlowPanel ui:field="discussionContainer" addStyleNames="margin-top-10">
-        <bh:Div addStyleNames="highlight-title">
+        <bh:Div addStyleNames="entity-title">
           <bh:Text ui:field="discussionText" />
         </bh:Div>
-        <bh:Div ui:field="discussionThreadsContainer" />
+          <bh:Div ui:field="discussionThreadsContainer" />
       </g:FlowPanel>
     </bh:Div>
     <g:SimplePanel ui:field="fileModifiedAndCreatedContainer" />

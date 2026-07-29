@@ -19,7 +19,6 @@
       />
     </b:ListItem>
     <b:TabPane ui:field="tabPane" active="true" addStyleNames="tab-background">
-      <g:SimplePanel ui:field="orientationBannerPanel" />
       <bh:Div ui:field="contentDiv" />
     </b:TabPane>
   </bh:Div>

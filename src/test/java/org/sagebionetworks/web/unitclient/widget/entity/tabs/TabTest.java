@@ -101,9 +101,8 @@ public class TabTest {
     // and configure
     String tabTitle = "TestTab";
     Widget content = null;
-    tab.configure(tabTitle, "file", "help markdown", "link", EntityArea.FILES);
-    verify(mockView)
-      .configure(eq(tabTitle), eq("file"), anyString(), anyString());
+    tab.configure(tabTitle, EntityArea.FILES);
+    verify(mockView).configure(eq(tabTitle));
     tab.setContent(content);
     verify(mockView).setContent(content);
   }
@@ -114,7 +113,7 @@ public class TabTest {
     boolean isCurrentVersion = false;
     String wikiPageKey = null;
 
-    tab.configure("Files", "file", "help markdown", "link", EntityArea.FILES);
+    tab.configure("Files", EntityArea.FILES);
     tab.configureEntityActionController(
       mockEntityBundle,
       isCurrentVersion,
@@ -140,7 +139,7 @@ public class TabTest {
     String entityName = "one project to rule them all";
     String entityId = "syn123";
     Synapse place = new Synapse(entityId);
-    tab.configure("Files", "file", "help markdown", "link", EntityArea.FILES);
+    tab.configure("Files", EntityArea.FILES);
     tab.setEntityNameAndPlace(entityName, place);
     verify(mockSynapseJSNIUtils)
       .setPageTitle(entityName + " - " + entityId + " - Files");
@@ -214,7 +213,7 @@ public class TabTest {
 
   @Test
   public void testOnTabClicked() {
-    tab.configure("TestTab", "file", "help markdown", "link", EntityArea.FILES);
+    tab.configure("TestTab", EntityArea.FILES);
     tab.addTabClickedCallback(mockOnClickCallback);
 
     tab.onTabClicked();
@@ -225,7 +224,7 @@ public class TabTest {
   @Test
   public void testOnTabClickedWhileEditing() {
     when(mockGlobalAppState.isEditing()).thenReturn(true);
-    tab.configure("TestTab", "file", "help markdown", "link", EntityArea.FILES);
+    tab.configure("TestTab", EntityArea.FILES);
     tab.addTabClickedCallback(mockOnClickCallback);
 
     tab.onTabClicked();
