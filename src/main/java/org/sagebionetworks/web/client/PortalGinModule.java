@@ -135,6 +135,8 @@ import org.sagebionetworks.web.client.widget.CreateTableFromCsvDialog;
 import org.sagebionetworks.web.client.widget.CreateTableFromCsvDialogImpl;
 import org.sagebionetworks.web.client.widget.CsvPreview;
 import org.sagebionetworks.web.client.widget.CsvPreviewImpl;
+import org.sagebionetworks.web.client.widget.DiscussionEmpty;
+import org.sagebionetworks.web.client.widget.DiscussionEmptyImpl;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTesterImpl;
 import org.sagebionetworks.web.client.widget.EntityCitation;
@@ -2444,6 +2446,9 @@ public abstract class PortalGinModule {
 
   @Binds
   abstract EntityCitation bindEntityCitation(EntityCitationImpl impl);
+
+  @Binds
+  abstract DiscussionEmpty bindDiscussionEmpty(DiscussionEmptyImpl impl);
 
   @Binds
   abstract ProjectVisibilityChip bindProjectVisibilityChip(

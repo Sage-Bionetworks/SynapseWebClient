@@ -39,6 +39,7 @@ public class DiscussionThreadListWidget
   private String forumId;
   private CallbackP<Boolean> emptyListCallback;
   private CallbackP<DiscussionThreadBundle> threadIdClickedCallback;
+  private Callback onViewForumClickedCallback;
   Set<String> moderatorIds;
   private DiscussionFilter filter;
   private String entityId;
@@ -189,6 +190,7 @@ public class DiscussionThreadListWidget
 
   public void clear() {
     view.clearSort();
+    view.setNoThreadsFoundVisible(false);
     loadMoreWidgetContainer.clear();
     threadId2Widget.clear();
   }
@@ -197,6 +199,19 @@ public class DiscussionThreadListWidget
     CallbackP<DiscussionThreadBundle> threadIdClickedCallback
   ) {
     this.threadIdClickedCallback = threadIdClickedCallback;
+  }
+
+  public void setOnViewForumClickedCallback(
+    Callback onViewForumClickedCallback
+  ) {
+    this.onViewForumClickedCallback = onViewForumClickedCallback;
+    view.setViewForumEmptyStateEnabled(onViewForumClickedCallback != null);
+  }
+
+  public void onViewForumClicked() {
+    if (onViewForumClickedCallback != null) {
+      onViewForumClickedCallback.invoke();
+    }
   }
 
   @Override

@@ -12,6 +12,7 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.web.client.jsinterop.mui.Grid;
+import org.sagebionetworks.web.client.widget.DiscussionEmpty;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortingListener;
 
@@ -46,16 +47,26 @@ public class DiscussionThreadListWidgetViewImpl
   Div threadHeader;
 
   @UiField
-  Span noThreadsFound;
+  Div noThreadsFoundContainer;
+
+  @UiField
+  Span noThreadsFoundText;
+
+  private boolean viewForumEmptyStateEnabled = false;
 
   Widget widget;
   private DiscussionThreadListWidget presenter;
 
+  private final DiscussionEmpty discussionEmpty;
+
   private final Binder binder = GWT.create(Binder.class);
 
   @Inject
-  public DiscussionThreadListWidgetViewImpl() {
+  public DiscussionThreadListWidgetViewImpl(DiscussionEmpty discussionEmpty) {
+    this.discussionEmpty = discussionEmpty;
     widget = binder.createAndBindUi(this);
+    discussionEmpty.configure(() -> presenter.onViewForumClicked());
+    noThreadsFoundContainer.add(discussionEmpty);
 
     SortingListener onSortRepliesClick = headerName -> {
       clearSort();
@@ -118,7 +129,13 @@ public class DiscussionThreadListWidgetViewImpl
 
   @Override
   public void setNoThreadsFoundVisible(boolean visible) {
-    noThreadsFound.setVisible(visible);
+    noThreadsFoundContainer.setVisible(visible && viewForumEmptyStateEnabled);
+    noThreadsFoundText.setVisible(visible && !viewForumEmptyStateEnabled);
+  }
+
+  @Override
+  public void setViewForumEmptyStateEnabled(boolean enabled) {
+    this.viewForumEmptyStateEnabled = enabled;
   }
 
   @Override

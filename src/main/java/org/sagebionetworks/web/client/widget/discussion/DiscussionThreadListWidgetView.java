@@ -11,8 +11,6 @@ public interface DiscussionThreadListWidgetView extends IsWidget {
 
   void setThreadCountAlert(Widget w);
 
-  // void setViewForumCallback(CallbackP<String> callback);
-
   void setPresenter(DiscussionThreadListWidget presenter);
 
   void setAlert(Widget w);
@@ -20,6 +18,8 @@ public interface DiscussionThreadListWidgetView extends IsWidget {
   void setThreadHeaderVisible(boolean visible);
 
   void setNoThreadsFoundVisible(boolean visible);
+
+  void setViewForumEmptyStateEnabled(boolean enabled);
 
   void setThreadsContainer(IsWidget container);
 
