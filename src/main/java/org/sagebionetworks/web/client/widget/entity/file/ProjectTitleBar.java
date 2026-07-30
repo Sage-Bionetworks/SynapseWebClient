@@ -7,6 +7,8 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.EntityTypeUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.ProjectVisibilityChip;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -24,13 +26,17 @@ public class ProjectTitleBar implements SynapseWidgetPresenter {
     ProjectTitleBarView view,
     AuthenticationController authenticationController,
     FavoriteWidget favWidget,
-    ProjectVisibilityChip visibilityChip
+    ProjectVisibilityChip visibilityChip,
+    FeatureFlagConfig featureFlagConfig
   ) {
     this.view = view;
     this.authenticationController = authenticationController;
     this.favWidget = favWidget;
     this.visibilityChip = visibilityChip;
     view.setVisibilityWidget(visibilityChip.asWidget());
+    view.setVisibilityChipVisible(
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.PROJECT_VISIBILITY_CHIP)
+    );
     view.setFavoritesWidget(favWidget.asWidget());
   }
 
