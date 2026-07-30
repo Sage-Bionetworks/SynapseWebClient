@@ -11,6 +11,7 @@ public class EntityActionMenuDropdownConfiguration {
   /* Only strings that map to synapse-react-client Icons */
   private String tooltipText;
   private boolean disabled;
+  private boolean showFileAccessRequestNotice;
 
   @JsOverlay
   public static EntityActionMenuDropdownConfiguration create(
@@ -54,5 +55,17 @@ public class EntityActionMenuDropdownConfiguration {
   @JsOverlay
   public final void setDisabled(boolean disabled) {
     this.disabled = disabled;
+  }
+
+  @JsOverlay
+  public final boolean isShowFileAccessRequestNotice() {
+    return showFileAccessRequestNotice;
+  }
+
+  @JsOverlay
+  public final void setShowFileAccessRequestNotice(
+    boolean showFileAccessRequestNotice
+  ) {
+    this.showFileAccessRequestNotice = showFileAccessRequestNotice;
   }
 }

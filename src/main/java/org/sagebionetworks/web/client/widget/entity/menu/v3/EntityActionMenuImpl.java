@@ -92,6 +92,16 @@ public class EntityActionMenuImpl implements EntityActionMenu {
   }
 
   @Override
+  public void setDownloadMenuShowFileAccessRequestNotice(
+    boolean showFileAccessRequestNotice
+  ) {
+    dropdownMenuConfigurations
+      .getDownloadMenuConfiguration()
+      .setShowFileAccessRequestNotice(showFileAccessRequestNotice);
+    synchronizeView();
+  }
+
+  @Override
   public void setActionTooltipText(Action action, String tooltipText) {
     actionConfigurations.get(action).setTooltipText(tooltipText);
     synchronizeView();
@@ -133,6 +143,9 @@ public class EntityActionMenuImpl implements EntityActionMenu {
   @Override
   public void hideAllActions() {
     this.actionConfigurations.forEach((key, value) -> value.setVisible(false));
+    dropdownMenuConfigurations
+      .getDownloadMenuConfiguration()
+      .setShowFileAccessRequestNotice(false);
     synchronizeView();
   }
 

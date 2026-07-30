@@ -47,6 +47,14 @@ public interface EntityActionMenu extends IsWidget, ActionListener {
   void setDownloadMenuTooltipText(String tooltipText);
 
   /**
+   * Controls whether the file access request notice should be shown in the download menu.
+   * Should be true only when the entity is a file and has unmet access requirements.
+   */
+  void setDownloadMenuShowFileAccessRequestNotice(
+    boolean showFileAccessRequestNotice
+  );
+
+  /**
    * Set the tooltip text shown on the action.
    * @param tooltipText the text to show. Empty string or null will remove the tooltip.
    */
