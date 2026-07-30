@@ -54,6 +54,11 @@ public class ProjectTitleBarViewImpl implements ProjectTitleBarView {
   }
 
   @Override
+  public void setVisibilityChipVisible(boolean visible) {
+    visibilityChipPanel.setVisible(visible);
+  }
+
+  @Override
   public void setVisibilityWidget(Widget visibilityWidget) {
     visibilityChipPanel.addStyleName("inline-block");
     visibilityChipPanel.setWidget(visibilityWidget);

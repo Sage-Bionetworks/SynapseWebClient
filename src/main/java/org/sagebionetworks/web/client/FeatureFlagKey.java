@@ -43,6 +43,9 @@ public enum FeatureFlagKey {
   // If enabled, show the SRC 'EntityTreeTable' for the "file browser"
   ENTITY_TREE_TABLE("ENTITY_TREE_TABLE"),
 
+  // If enabled, show the visibility chip on the project title bar
+  PROJECT_VISIBILITY_CHIP("PROJECT_VISIBILITY_CHIP"),
+
   // Last flag is used only for tests
   TEST_FLAG_ONLY("TEST_FLAG_ONLY");
 

@@ -15,6 +15,8 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.ProjectVisibilityChip;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
@@ -44,6 +46,9 @@ public class ProjectTitleBarTest {
   @Mock
   Widget mockVisibilityWidget;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   Entity entity;
   String testEntityName = "Entity Name";
   String entityId = "syn123";
@@ -56,7 +61,8 @@ public class ProjectTitleBarTest {
         mockView,
         mockAuthController,
         mockFavoriteWidget,
-        mockVisibilityChip
+        mockVisibilityChip,
+        mockFeatureFlagConfig
       );
     entity = new Folder();
     entity.setId(entityId);
@@ -65,6 +71,9 @@ public class ProjectTitleBarTest {
     verify(mockView).setFavoritesWidget(any());
     verify(mockFavoriteWidget).asWidget();
     verify(mockView).setVisibilityWidget(mockVisibilityWidget);
+    verify(mockView).setVisibilityChipVisible(false);
+    verify(mockFeatureFlagConfig)
+      .isFeatureEnabled(FeatureFlagKey.PROJECT_VISIBILITY_CHIP);
     verify(mockVisibilityChip).asWidget();
     when(mockAuthController.isLoggedIn()).thenReturn(true);
   }
