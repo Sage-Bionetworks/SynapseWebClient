@@ -3,3 +3,8 @@ minimumReleaseAgeExclude:
   - '@sage-bionetworks/*'
   - 'synapse-react-client'
   - 'markdown-it-synapse'
+  - 'axios'
+  - 'form-data'
+  - 'shell-quote'
+  - 'immutable'
+  - 'brace-expansion'

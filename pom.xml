@@ -601,6 +601,31 @@
         <artifactId>guice-servlet</artifactId>
         <version>${guiceVersion}</version>
       </dependency>
+      <!-- Security: force patched transitive dependency versions -->
+      <!-- jettison CVE-2022-45685, CVE-2022-45693, CVE-2023-1436 (HIGH) -->
+      <dependency>
+        <groupId>org.codehaus.jettison</groupId>
+        <artifactId>jettison</artifactId>
+        <version>1.5.4</version>
+      </dependency>
+      <!-- commons-beanutils CVE-2019-10086 (HIGH) -->
+      <dependency>
+        <groupId>commons-beanutils</groupId>
+        <artifactId>commons-beanutils</artifactId>
+        <version>1.9.4</version>
+      </dependency>
+      <!-- xerces CVE-2022-23437 -->
+      <dependency>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
+        <version>2.12.2</version>
+      </dependency>
+      <!-- ion-java CVE-2024-21634 (HIGH) -->
+      <dependency>
+        <groupId>software.amazon.ion</groupId>
+        <artifactId>ion-java</artifactId>
+        <version>1.11.0</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
@@ -748,7 +773,7 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-core</artifactId>
-      <version>1.12.501</version>
+      <version>1.12.768</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -909,10 +934,11 @@
       <version>0.9.6.sb</version>
     </dependency>
 
+    <!-- Replaced unmaintained nekohtml (CVE-2022-24839, HIGH) with maintained fork -->
     <dependency>
-      <groupId>net.sourceforge.nekohtml</groupId>
-      <artifactId>nekohtml</artifactId>
-      <version>1.9.22</version>
+      <groupId>net.sourceforge.htmlunit</groupId>
+      <artifactId>neko-htmlunit</artifactId>
+      <version>2.55.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.james</groupId>
