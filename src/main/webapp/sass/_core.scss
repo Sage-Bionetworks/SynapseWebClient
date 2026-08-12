@@ -58,7 +58,7 @@ $star-unfavorited-border-color: #9eaab7;
 
 $page-header-title-color: #f9f9fa;
 
-$page-header-min-height: 96px;
+$page-header-min-height: 52px;
 $footer-height: 198px;
 
 $full-root-panel-height: calc(100vh - #{$footer-height});
@@ -196,7 +196,7 @@ a:focus {
     padding: 0px 43px 40px 43px;
   }
   #rootPanel .pageHeader {
-    padding: 24px $entity-page-side-spacing;
+    padding: 10px 32px;
     min-height: $page-header-min-height;
     background-color: $synapse-blue;
     h3.pageHeaderTitle {
@@ -414,7 +414,11 @@ end sticky footer
     flex-wrap: wrap;
     > li > a {
       height: 36px;
-      padding: 4px 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 2px;
+      border-top: none;
     }
   }
   @media (min-width: 768px) {
