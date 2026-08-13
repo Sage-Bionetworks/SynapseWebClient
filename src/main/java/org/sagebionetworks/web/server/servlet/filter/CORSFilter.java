@@ -22,6 +22,14 @@ public class CORSFilter extends OncePerRequestFilter {
     "Access-Control-Allow-Origin";
   public static final String ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER =
     "Access-Control-Allow-Credentials";
+  public static final String ACCESS_CONTROL_EXPOSE_HEADERS_HEADER =
+    "Access-Control-Expose-Headers";
+  // Cache/validation headers that client-side forensics (e.g. CDN chunk-load
+  // diagnostics) need to read via fetch() Response.headers - without this,
+  // the browser silently withholds them from cross-origin JS even though
+  // they're present on the wire.
+  public static final String EXPOSED_HEADERS =
+    "Age, X-Cache, ETag, Content-Encoding, Content-Length";
 
   // DNS Records pulled from: https://github.com/Sage-Bionetworks/Synapse-Stack-Builder/tree/develop/src/main/resources/templates/dns
   // Note that not all records need to have an explicitly-allowed origin; the subdomains in this list need only be the sites that should persist authentication state between *.synapse.org sites.
@@ -121,6 +129,7 @@ public class CORSFilter extends OncePerRequestFilter {
     }
 
     response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, allowOrigin);
+    response.addHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, EXPOSED_HEADERS);
     if (
       request.getHeader("Access-Control-Request-Method") != null &&
       "OPTIONS".equals(request.getMethod())

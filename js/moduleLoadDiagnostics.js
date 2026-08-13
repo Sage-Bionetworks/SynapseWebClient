@@ -86,6 +86,9 @@ function safeHeader(res, name) {
  * Re-fetch the failing module two ways and capture forensic detail.
  * `force-cache` reflects what the browser had cached (the suspect copy);
  * `reload` bypasses the cache to capture the authoritative current copy.
+ * These run SEQUENTIALLY (force-cache first) to ensure the 'network' call does
+ * not populate the cached version, overwriting the stale version we hope to
+ * capture.
  */
 async function inspectModule(url) {
   const probe = async init => {
@@ -112,10 +115,8 @@ async function inspectModule(url) {
     }
   }
 
-  const [cached, network] = await Promise.all([
-    probe('force-cache'),
-    probe('reload'),
-  ])
+  const cached = await probe('force-cache')
+  const network = await probe('reload')
   return { cached, network }
 }
 
