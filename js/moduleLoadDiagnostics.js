@@ -24,6 +24,16 @@ const MAX_REPORTS = 25
 const seen = new Set()
 let reportCount = 0
 
+// Chunk load/link failures are usually transient (bad cache entry, edge
+// glitch) - a page reload reliably picks up a clean copy (this mirrors
+// Vite's own documented handling of vite:preloadError, and the existing
+// GWT runAsync-failure reload in Portal.java). Cap attempts per tab so a
+// genuinely broken deploy doesn't reload every affected session forever;
+// past the cap, surface a visible fallback instead of looping silently.
+const MAX_RELOAD_ATTEMPTS = 3
+const RELOAD_COUNT_KEY = 'swcModuleReloadCount'
+let hasAttemptedRecoveryThisLoad = false
+
 window.__swcModuleLoadErrors = window.__swcModuleLoadErrors || []
 
 /** Regexes that identify a lazy-module load/link failure (across browsers). */
@@ -76,6 +86,9 @@ function safeHeader(res, name) {
  * Re-fetch the failing module two ways and capture forensic detail.
  * `force-cache` reflects what the browser had cached (the suspect copy);
  * `reload` bypasses the cache to capture the authoritative current copy.
+ * These run SEQUENTIALLY (force-cache first) to ensure the 'network' call does
+ * not populate the cached version, overwriting the stale version we hope to
+ * capture.
  */
 async function inspectModule(url) {
   const probe = async init => {
@@ -102,10 +115,8 @@ async function inspectModule(url) {
     }
   }
 
-  const [cached, network] = await Promise.all([
-    probe('force-cache'),
-    probe('reload'),
-  ])
+  const cached = await probe('force-cache')
+  const network = await probe('reload')
   return { cached, network }
 }
 
@@ -172,6 +183,65 @@ function report(kind, message, stack) {
   }
 }
 
+function getReloadCount() {
+  try {
+    return parseInt(sessionStorage.getItem(RELOAD_COUNT_KEY), 10) || 0
+  } catch {
+    return 0
+  }
+}
+
+function showReloadBanner() {
+  try {
+    if (document.getElementById('swc-module-load-banner')) return
+    const banner = document.createElement('div')
+    banner.id = 'swc-module-load-banner'
+    banner.setAttribute(
+      'style',
+      'position:fixed;top:0;left:0;right:0;z-index:2147483647;' +
+        'background:#b71c1c;color:#fff;font:14px/1.4 sans-serif;' +
+        'padding:10px 16px;text-align:center;',
+    )
+    const text = document.createElement('span')
+    text.textContent = 'Part of this page failed to load.'
+    const button = document.createElement('button')
+    button.textContent = 'Refresh to try again'
+    button.setAttribute(
+      'style',
+      'margin-left:8px;padding:4px 10px;cursor:pointer;' +
+        'border:1px solid #fff;background:transparent;color:#fff;border-radius:4px;',
+    )
+    button.addEventListener('click', () => window.location.reload())
+    banner.appendChild(text)
+    banner.appendChild(button)
+    ;(document.body || document.documentElement).appendChild(banner)
+  } catch {
+    /* diagnostics must never break the app */
+  }
+}
+
+/**
+ * Attempt to self-heal from a preload failure by reloading, bounded by
+ * MAX_RELOAD_ATTEMPTS per tab session. At most one attempt is spent per
+ * page load, even if several chunks fail together in the same load.
+ */
+function attemptRecovery() {
+  try {
+    if (hasAttemptedRecoveryThisLoad) return
+    hasAttemptedRecoveryThisLoad = true
+
+    const count = getReloadCount()
+    if (count >= MAX_RELOAD_ATTEMPTS) {
+      showReloadBanner()
+      return
+    }
+    sessionStorage.setItem(RELOAD_COUNT_KEY, String(count + 1))
+    window.location.reload()
+  } catch {
+    /* diagnostics must never break the app */
+  }
+}
+
 function install() {
   try {
     // Vite fires this when a dynamically imported chunk fails to load/preload.
@@ -182,6 +252,7 @@ function install() {
         (err && err.message) || String(err) || 'vite:preloadError',
         err && err.stack,
       )
+      attemptRecovery()
     })
 
     // Module instantiation/link failures surface as a global error event.
