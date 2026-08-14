@@ -221,21 +221,43 @@ function showReloadBanner() {
 }
 
 /**
+ * Report the recovery outcome to GTM so GA4 can measure whether the reload
+ * actually resolves incidents (vs. exhausting the cap into a visible
+ * banner) - separate from the raw error-volume signal, which only reflects
+ * how often the underlying bug occurs, not whether this mitigation works.
+ */
+function pushRecoveryEvent(outcome, attempt, url) {
+  try {
+    window.dataLayer = window.dataLayer || []
+    window.dataLayer.push({
+      event: 'swc_module_load_recovery',
+      swcModuleRecovery: { outcome, attempt, url },
+    })
+  } catch {
+    /* diagnostics must never break the app */
+  }
+}
+
+/**
  * Attempt to self-heal from a preload failure by reloading, bounded by
  * MAX_RELOAD_ATTEMPTS per tab session. At most one attempt is spent per
  * page load, even if several chunks fail together in the same load.
  */
-function attemptRecovery() {
+function attemptRecovery(message) {
   try {
     if (hasAttemptedRecoveryThisLoad) return
     hasAttemptedRecoveryThisLoad = true
 
+    const url = extractUrl(message)
     const count = getReloadCount()
     if (count >= MAX_RELOAD_ATTEMPTS) {
+      pushRecoveryEvent('banner_shown', count, url)
       showReloadBanner()
       return
     }
-    sessionStorage.setItem(RELOAD_COUNT_KEY, String(count + 1))
+    const attempt = count + 1
+    sessionStorage.setItem(RELOAD_COUNT_KEY, String(attempt))
+    pushRecoveryEvent('reloaded', attempt, url)
     window.location.reload()
   } catch {
     /* diagnostics must never break the app */
@@ -247,12 +269,10 @@ function install() {
     // Vite fires this when a dynamically imported chunk fails to load/preload.
     window.addEventListener('vite:preloadError', event => {
       const err = event && (event.payload || event.detail)
-      report(
-        'vite:preloadError',
-        (err && err.message) || String(err) || 'vite:preloadError',
-        err && err.stack,
-      )
-      attemptRecovery()
+      const message =
+        (err && err.message) || String(err) || 'vite:preloadError'
+      report('vite:preloadError', message, err && err.stack)
+      attemptRecovery(message)
     })
 
     // Module instantiation/link failures surface as a global error event.
