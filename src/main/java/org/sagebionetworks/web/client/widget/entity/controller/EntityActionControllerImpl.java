@@ -939,9 +939,26 @@ public class EntityActionControllerImpl
           public void onSuccess(
             @Nullable RestrictionInformationResponse restrictionInformation
           ) {
+            boolean hasUnmetAccessRequirement =
+              restrictionInformation != null &&
+              Boolean.TRUE.equals(
+                restrictionInformation.getHasUnmetAccessRequirement()
+              );
+            boolean enableDownloadMenu =
+              canDownload ||
+              (authenticationController.isLoggedIn() &&
+                hasUnmetAccessRequirement);
+            actionMenu.setDownloadMenuEnabled(enableDownloadMenu);
             ginInjector
               .getFileDownloadHandlerWidget()
               .configure(actionMenu, entityBundle, restrictionInformation);
+            if (hasUnmetAccessRequirement && !isExternalFileHandle) {
+              actionMenu.setActionEnabled(Action.DOWNLOAD_FILE, false);
+              actionMenu.setActionHref(Action.DOWNLOAD_FILE, null); // make non-clickable when unmet AR
+            } else {
+              actionMenu.setActionEnabled(Action.DOWNLOAD_FILE, true);
+              actionMenu.setActionTooltipText(Action.DOWNLOAD_FILE, null);
+            }
           }
 
           @Override
