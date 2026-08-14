@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 import elemental2.dom.Blob;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
@@ -27,8 +26,6 @@ public interface SynapseJSNIUtils {
   );
 
   public String getRawFileHandleUrl(String fileHandleId);
-
-  public void fetchAsBlobUrl(String url, AsyncCallback<String> callback);
 
   public int randomNextInt();
 

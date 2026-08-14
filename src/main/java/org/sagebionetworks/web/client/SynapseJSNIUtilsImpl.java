@@ -396,23 +396,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 
   @Override
-  public native void fetchAsBlobUrl(
-    String url,
-    com.google.gwt.user.client.rpc.AsyncCallback<String> callback
-  ) /*-{
-		fetch(url, {credentials: 'same-origin'})
-			.then(function(r) { return r.blob(); })
-			.then(function(blob) {
-				var objectUrl = URL.createObjectURL(blob);
-				callback.@com.google.gwt.user.client.rpc.AsyncCallback::onSuccess(*)(objectUrl);
-			})
-			['catch'](function(e) {
-				var ex = @java.lang.RuntimeException::new(Ljava/lang/String;)(e.message || String(e));
-				callback.@com.google.gwt.user.client.rpc.AsyncCallback::onFailure(*)(ex);
-			});
-	}-*/;
-
-  @Override
   public void consoleLog(String message) {
     _consoleLog(message);
   }
