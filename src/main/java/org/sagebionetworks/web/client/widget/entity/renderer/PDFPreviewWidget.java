@@ -71,7 +71,7 @@ public class PDFPreviewWidget implements IsWidget {
         final int height = view.getParentOffsetHeight() > 0
           ? view.getParentOffsetHeight()
           : DEFAULT_HEIGHT_PX;
-        fetchAsBlobUrl(
+        jsniUtils.fetchAsBlobUrl(
           url,
           new AsyncCallback<String>() {
             @Override
@@ -98,20 +98,4 @@ public class PDFPreviewWidget implements IsWidget {
       );
     }
   }
-
-  private static native void fetchAsBlobUrl(
-    String url,
-    AsyncCallback<String> callback
-  ) /*-{
-		fetch(url, {credentials: 'same-origin'})
-			.then(function(r) { return r.blob(); })
-			.then(function(blob) {
-				var objectUrl = URL.createObjectURL(blob);
-				callback.@com.google.gwt.user.client.rpc.AsyncCallback::onSuccess(*)(objectUrl);
-			})
-			['catch'](function(e) {
-				var ex = @java.lang.RuntimeException::new(Ljava/lang/String;)(e.message || String(e));
-				callback.@com.google.gwt.user.client.rpc.AsyncCallback::onFailure(*)(ex);
-			});
-	}-*/;
 }

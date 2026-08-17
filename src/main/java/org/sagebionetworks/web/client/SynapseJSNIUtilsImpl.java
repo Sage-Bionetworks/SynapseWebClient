@@ -9,6 +9,7 @@ import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window.Location;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 import elemental2.dom.Blob;
 import javax.inject.Inject;
@@ -109,6 +110,27 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
       fileHandleId
     );
   }
+
+  @Override
+  public void fetchAsBlobUrl(String url, AsyncCallback<String> callback) {
+    _fetchAsBlobUrl(url, callback);
+  }
+
+  private static native void _fetchAsBlobUrl(
+    String url,
+    AsyncCallback<String> callback
+  ) /*-{
+		fetch(url, {credentials: 'same-origin'})
+			.then(function(r) { return r.blob(); })
+			.then(function(blob) {
+				var objectUrl = URL.createObjectURL(blob);
+				callback.@com.google.gwt.user.client.rpc.AsyncCallback::onSuccess(*)(objectUrl);
+			})
+			['catch'](function(e) {
+				var ex = @java.lang.RuntimeException::new(Ljava/lang/String;)(e.message || String(e));
+				callback.@com.google.gwt.user.client.rpc.AsyncCallback::onFailure(*)(ex);
+			});
+	}-*/;
 
   @Override
   public String getAccessTokenCookieUrl() {
