@@ -805,53 +805,6 @@ public class EntityActionControllerImpl
           );
         } else {
           actionMenu.setDownloadMenuTooltipText(NO_PERMISSION_TO_DOWNLOAD);
-          // Queue up request to identify reasons why the file cannot be downloaded, and update the tooltip when the request finishes.
-          getSynapseJavascriptClient()
-            .getActionsRequiredForEntityDownload(entity.getId())
-            .addCallback(
-              new FutureCallback<ActionRequiredList>() {
-                @Override
-                public void onSuccess(@Nullable ActionRequiredList result) {
-                  if (result != null) {
-                    StringBuilder downloadMenuTooltipText = new StringBuilder(
-                      NO_PERMISSION_TO_DOWNLOAD
-                    );
-                    // There may be multiple actions of the same class, but we only want to show one message for each type
-                    // Get the unique set of action classes.
-                    Set<
-                      Class<
-                        ? extends org.sagebionetworks.repo.model.download.Action
-                      >
-                    > uniqueClasses = result
-                      .getActions()
-                      .stream()
-                      .map(
-                        org.sagebionetworks.repo.model.download.Action::getClass
-                      )
-                      .collect(Collectors.toSet());
-
-                    for (Class<
-                      ? extends org.sagebionetworks.repo.model.download.Action
-                    > clazz : uniqueClasses) {
-                      downloadMenuTooltipText
-                        .append("\n\n")
-                        .append(
-                          getTooltipTextForRequiredActionForDownload(clazz)
-                        );
-                    }
-                    actionMenu.setDownloadMenuTooltipText(
-                      downloadMenuTooltipText.toString()
-                    );
-                  }
-                }
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  view.showErrorMessage(caught.getMessage());
-                }
-              },
-              directExecutor()
-            );
         }
       }
 
@@ -939,9 +892,34 @@ public class EntityActionControllerImpl
           public void onSuccess(
             @Nullable RestrictionInformationResponse restrictionInformation
           ) {
+            boolean hasUnmetAccessRequirement =
+              restrictionInformation != null &&
+              Boolean.TRUE.equals(
+                restrictionInformation.getHasUnmetAccessRequirement()
+              );
+            // SWC-7923: When an unmet access requirement is what blocks the download, the user can
+            // still add the file to their download list, so re-enable the menu that was disabled
+            // above.
+            if (!canDownload && isUserAuthenticated) {
+              if (hasUnmetAccessRequirement) {
+                actionMenu.setDownloadMenuEnabled(true);
+                actionMenu.setDownloadMenuTooltipText("");
+              } else {
+                // Only fetch and append blocking reasons when the menu remains disabled.
+                appendRequiredActionsToDownloadMenuTooltip();
+              }
+            }
+
             ginInjector
               .getFileDownloadHandlerWidget()
               .configure(actionMenu, entityBundle, restrictionInformation);
+            if (hasUnmetAccessRequirement && !isExternalFileHandle) {
+              actionMenu.setActionEnabled(Action.DOWNLOAD_FILE, false);
+              actionMenu.setActionHref(Action.DOWNLOAD_FILE, null); // make non-clickable when unmet AR
+            } else {
+              // Reset, in case the previously configured entity had an unmet access requirement.
+              actionMenu.setActionEnabled(Action.DOWNLOAD_FILE, true);
+            }
           }
 
           @Override
@@ -953,6 +931,53 @@ public class EntityActionControllerImpl
       );
     }
     return restrictionInformationFuture;
+  }
+
+  /**
+   * Identify the reasons why the current file cannot be downloaded, and append them to the download
+   * menu tooltip when the request finishes.
+   */
+  private void appendRequiredActionsToDownloadMenuTooltip() {
+    getSynapseJavascriptClient()
+      .getActionsRequiredForEntityDownload(entity.getId())
+      .addCallback(
+        new FutureCallback<ActionRequiredList>() {
+          @Override
+          public void onSuccess(@Nullable ActionRequiredList result) {
+            if (result != null) {
+              StringBuilder downloadMenuTooltipText = new StringBuilder(
+                NO_PERMISSION_TO_DOWNLOAD
+              );
+              // There may be multiple actions of the same class, but we only want to show one message for each type
+              // Get the unique set of action classes.
+              Set<
+                Class<? extends org.sagebionetworks.repo.model.download.Action>
+              > uniqueClasses = result
+                .getActions()
+                .stream()
+                .map(org.sagebionetworks.repo.model.download.Action::getClass)
+                .collect(Collectors.toSet());
+
+              for (Class<
+                ? extends org.sagebionetworks.repo.model.download.Action
+              > clazz : uniqueClasses) {
+                downloadMenuTooltipText
+                  .append("\n\n")
+                  .append(getTooltipTextForRequiredActionForDownload(clazz));
+              }
+              actionMenu.setDownloadMenuTooltipText(
+                downloadMenuTooltipText.toString()
+              );
+            }
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            view.showErrorMessage(caught.getMessage());
+          }
+        },
+        directExecutor()
+      );
   }
 
   private FluentFuture<Void> configureContainerDownload() {

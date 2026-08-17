@@ -4876,6 +4876,66 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
+  public void testConfigureFileDownloadWithUnmetAccessRequirement() {
+    entityBundle.setEntity(new FileEntity());
+    entityBundle.getPermissions().setCanDownload(false);
+    when(mockRestrictionInformation.getHasUnmetAccessRequirement())
+      .thenReturn(true);
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    // Initially disabled from canDownload=false, then enabled so that the user can open the menu to
+    // add the file to their download list and see the access request notice.
+    verify(mockActionMenu).setDownloadMenuEnabled(false);
+    verify(mockActionMenu).setDownloadMenuEnabled(true);
+    verify(mockActionMenu).setDownloadMenuTooltipText("");
+    verify(mockSynapseJavascriptClient, never())
+      .getActionsRequiredForEntityDownload(any());
+
+    verify(mockActionMenu).setActionEnabled(Action.DOWNLOAD_FILE, false);
+    verify(mockActionMenu).setActionHref(Action.DOWNLOAD_FILE, null);
+
+    verify(mockActionMenu, never())
+      .setActionEnabled(eq(Action.ADD_TO_DOWNLOAD_CART), anyBoolean());
+
+    verify(mockFileDownloadHandlerWidget)
+      .configure(mockActionMenu, entityBundle, mockRestrictionInformation);
+  }
+
+  @Test
+  public void testConfigureFileDownloadWithUnmetAccessRequirementUnauthenticated() {
+    entityBundle.setEntity(new FileEntity());
+    entityBundle.getPermissions().setCanDownload(false);
+    when(mockRestrictionInformation.getHasUnmetAccessRequirement())
+      .thenReturn(true);
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    // An anonymous user cannot add the file to a download list, so the menu remains disabled.
+    verify(mockActionMenu).setDownloadMenuEnabled(false);
+    verify(mockActionMenu, never()).setDownloadMenuEnabled(true);
+    verify(mockActionMenu)
+      .setDownloadMenuTooltipText("You need to log in to download this file.");
+  }
+
+  @Test
   public void testAddFileToDownloadCartHandlerSuccess() {
     FileEntity file = new FileEntity();
     file.setId(entityId);
