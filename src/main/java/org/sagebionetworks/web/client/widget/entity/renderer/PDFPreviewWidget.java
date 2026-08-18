@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.web.client.ClientProperties.MB;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import javax.inject.Inject;
@@ -13,8 +14,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 public class PDFPreviewWidget implements IsWidget {
 
-  public static final String PDF_JS_VIEWER_PREFIX =
-    "/pdf.js/web/viewer.html?file=";
   private IFrameView view;
   private SynapseJSNIUtils jsniUtils;
   private GWTWrapper gwt;
@@ -69,14 +68,25 @@ public class PDFPreviewWidget implements IsWidget {
           fha.getAssociateObjectType(),
           fha.getFileHandleId()
         );
-        StringBuilder siteUrl = new StringBuilder();
-        siteUrl.append(PDF_JS_VIEWER_PREFIX);
-        siteUrl.append(gwt.encodeQueryString(url));
-        int height = view.getParentOffsetHeight();
-        if (height <= 0) {
-          height = DEFAULT_HEIGHT_PX;
-        }
-        view.configure(siteUrl.toString(), height);
+        final int height = view.getParentOffsetHeight() > 0
+          ? view.getParentOffsetHeight()
+          : DEFAULT_HEIGHT_PX;
+        jsniUtils.fetchAsBlobUrl(
+          url,
+          new AsyncCallback<String>() {
+            @Override
+            public void onSuccess(String blobUrl) {
+              view.configure(blobUrl, height);
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+              view.showError(
+                "Failed to load PDF preview: " + caught.getMessage()
+              );
+            }
+          }
+        );
       }
     } else {
       view.showError(

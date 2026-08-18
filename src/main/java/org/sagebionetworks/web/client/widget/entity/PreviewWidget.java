@@ -333,7 +333,7 @@ public class PreviewWidget
         view.setPreviewWidget(tiffPreviewWidget);
         break;
       case PDF:
-        // use pdf.js to view
+        // use browser to view PDF (use local blob URL so the file is rendered inline)
         PDFPreviewWidget pdfPreviewWidget = ginInjector.getPDFPreviewWidget();
         pdfPreviewWidget.configure(
           bundle.getEntity().getId(),
