@@ -43,7 +43,7 @@
     "react-plotly.js": "^2.6.0",
     "sass": "^1.102.0",
     "spark-md5": "^3.0.2",
-    "synapse-react-client": "4.0.33",
+    "synapse-react-client": "4.0.34",
     "xss": "^1.0.15"
   },
   "devDependencies": {
