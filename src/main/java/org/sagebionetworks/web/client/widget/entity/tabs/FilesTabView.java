@@ -36,8 +36,6 @@ public interface FilesTabView extends IsWidget {
 
   void setPreviewVisible(boolean visible);
 
-  void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
-
   void setRefreshAlert(Widget w);
 
   void clearRefreshAlert();

@@ -38,8 +38,6 @@ public interface TablesTabView extends IsWidget {
 
   void setSynapseAlert(Widget w);
 
-  void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
-
   void setProvenance(IsWidget w);
 
   void setTableUIVisible(boolean visible);

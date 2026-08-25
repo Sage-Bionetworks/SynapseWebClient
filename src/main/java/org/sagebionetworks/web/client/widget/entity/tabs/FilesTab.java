@@ -29,7 +29,6 @@ import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
-import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -59,7 +58,6 @@ public class FilesTab {
   SynapseClientAsync synapseClient;
   GlobalApplicationState globalApplicationState;
   DiscussionThreadListWidget discussionThreadListWidget;
-  ModifiedCreatedByWidget modifiedCreatedBy;
   ProvenanceEditorWidget provenanceEditor;
 
   Map<String, String> configMap;
@@ -100,7 +98,6 @@ public class FilesTab {
       this.synapseClient = ginInjector.getSynapseClientAsync();
       fixServiceEntryPoint(synapseClient);
       this.globalApplicationState = ginInjector.getGlobalApplicationState();
-      this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
       this.discussionThreadListWidget =
         ginInjector.getDiscussionThreadListWidget();
       this.addToDownloadListWidget = ginInjector.getAddToDownloadListV2();
@@ -114,7 +111,6 @@ public class FilesTab {
       view.setMetadata(metadata.asWidget());
       view.setWikiPage(wikiPageWidget.asWidget());
       view.setSynapseAlert(synAlert.asWidget());
-      view.setModifiedCreatedBy(modifiedCreatedBy);
       view.setDiscussionThreadListWidget(discussionThreadListWidget.asWidget());
       view.setAddToDownloadListWidget(addToDownloadListWidget.asWidget());
       view.setFilesTab(this);
@@ -158,7 +154,6 @@ public class FilesTab {
       view.clearRefreshAlert();
       breadcrumb.clear();
       view.setProvenanceVisible(false);
-      modifiedCreatedBy.setVisible(false);
       view.setDiscussionThreadListWidgetVisible(false);
       filesBrowser.clear();
     }
@@ -345,8 +340,6 @@ public class FilesTab {
         provWidget.configure(configMap);
       }
     }
-    // Created By and Modified By
-    modifiedCreatedBy.configure(currentEntity.getId(), versionNumber);
 
     // Wiki Page
     boolean isWikiPageVisible = !isProject;

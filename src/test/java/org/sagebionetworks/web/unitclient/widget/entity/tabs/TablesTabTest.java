@@ -57,7 +57,6 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
-import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
@@ -145,9 +144,6 @@ public class TablesTabTest {
   @Mock
   WikiPageWidget mockWikiPageWidget;
 
-  @Mock
-  ModifiedCreatedByWidget mockModifiedCreatedBy;
-
   @Captor
   ArgumentCaptor<CallbackP> callbackPCaptor;
 
@@ -222,8 +218,6 @@ public class TablesTabTest {
     when(mockPortalGinInjector.getQueryTokenProvider())
       .thenReturn(mockQueryTokenProvider);
     when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
-    when(mockPortalGinInjector.getModifiedCreatedByWidget())
-      .thenReturn(mockModifiedCreatedBy);
     when(mockPortalGinInjector.getProvenanceRenderer())
       .thenReturn(mockProvenanceWidget);
     when(mockPortalGinInjector.getGlobalApplicationState())
@@ -344,7 +338,6 @@ public class TablesTabTest {
         mockActionMenuWidget
       );
     verify(mockView).setTableEntityWidget(any());
-    verify(mockModifiedCreatedBy).configure(tableEntityId, version);
     verify(mockProvenanceWidget).configure(mapCaptor.capture());
     // verify configuration
     Map<String, String> provConfig = mapCaptor.getValue();
@@ -362,7 +355,6 @@ public class TablesTabTest {
     verify(mockView).setTableListVisible(false);
     verify(mockView).setTitlebarVisible(true);
     verify(mockView).clearTableEntityWidget();
-    verify(mockModifiedCreatedBy).setVisible(false);
     verify(mockView).setWikiPage(any());
     verify(mockView).setWikiPageVisible(true);
     verify(mockView).setVersionAlertVisible(false);
@@ -393,14 +385,11 @@ public class TablesTabTest {
 
     tab.setProject(projectEntityId, mockProjectEntityBundle, null);
     tab.configure(mockProjectEntityBundle, version, areaToken);
-    verify(mockModifiedCreatedBy, Mockito.never())
-      .configure(anyString(), anyLong());
     verify(mockView).setEntityMetadataVisible(false);
     verify(mockView).setBreadcrumbVisible(false);
     verify(mockView).setTableListVisible(true);
     verify(mockView).setTitlebarVisible(false);
     verify(mockView).clearTableEntityWidget();
-    verify(mockModifiedCreatedBy).setVisible(false);
     verify(mockView).setTableUIVisible(false);
     verify(mockView, never()).setTableUIVisible(true);
     verify(mockView).setWikiPageVisible(false);
@@ -439,13 +428,11 @@ public class TablesTabTest {
     verify(mockView).setTableListVisible(false);
     verify(mockView).setTitlebarVisible(true);
     verify(mockView).clearTableEntityWidget();
-    verify(mockModifiedCreatedBy).setVisible(false);
     verify(mockView).setTableUIVisible(true);
     verify(mockView).setProjectLevelUIVisible(false);
     verify(mockBreadcrumb).configure(any(), eq(EntityArea.TABLES));
     verify(mockTitleBar)
       .configure(mockSearchIndexEntityBundle, mockActionMenuWidget);
-    verify(mockModifiedCreatedBy).configure(searchIndexEntityId, null);
     verify(mockView).setWikiPageVisible(false);
     verify(mockView).setVersionAlertVisible(false);
     // TableEntityWidgetV2 should NOT be used for SearchIndex
@@ -611,7 +598,6 @@ public class TablesTabTest {
     verify(mockView).setTableListVisible(false);
     verify(mockView).setTitlebarVisible(false);
     verify(mockView).clearTableEntityWidget();
-    verify(mockModifiedCreatedBy).setVisible(false);
     verify(mockView).setTableUIVisible(false);
   }
 
