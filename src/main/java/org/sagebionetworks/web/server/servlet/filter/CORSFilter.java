@@ -30,6 +30,14 @@ public class CORSFilter extends OncePerRequestFilter {
   // they're present on the wire.
   public static final String EXPOSED_HEADERS =
     "Age, X-Cache, ETag, Content-Encoding, Content-Length";
+  // Enables moduleLoadDiagnostics.js to capture size fields (decodedBodySize,
+  // encodedBodySize, transferSize) on cross-origin requests.
+  //
+  // Deliberately NOT sent on every response. `Timing-Allow-Origin: *` lets any
+  // origin read a resource's transferred/encoded size even when the CORS check
+  // denied it the body. This is public info for static assets.
+  public static final String TIMING_ALLOW_ORIGIN_HEADER = "Timing-Allow-Origin";
+  public static final String STATIC_ASSET_PATH_SEGMENT = "/generated/";
 
   // DNS Records pulled from: https://github.com/Sage-Bionetworks/Synapse-Stack-Builder/tree/develop/src/main/resources/templates/dns
   // Note that not all records need to have an explicitly-allowed origin; the subdomains in this list need only be the sites that should persist authentication state between *.synapse.org sites.
@@ -115,6 +123,16 @@ public class CORSFilter extends OncePerRequestFilter {
     return false;
   }
 
+  /**
+   * Whether this request is for build output rather than an application endpoint. Covers both
+   * `/generated/vite/...` and the redirector's `/Portal/cdn/generated/vite/...`, since a lazily loaded
+   * chunk is requested at both.
+   */
+  static boolean isStaticAssetRequest(HttpServletRequest request) {
+    String uri = request.getRequestURI();
+    return uri != null && uri.toLowerCase().contains(STATIC_ASSET_PATH_SEGMENT);
+  }
+
   @Override
   protected void doFilterInternal(
     HttpServletRequest request,
@@ -130,6 +148,9 @@ public class CORSFilter extends OncePerRequestFilter {
 
     response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, allowOrigin);
     response.addHeader(ACCESS_CONTROL_EXPOSE_HEADERS_HEADER, EXPOSED_HEADERS);
+    if (isStaticAssetRequest(request)) {
+      response.addHeader(TIMING_ALLOW_ORIGIN_HEADER, DEFAULT_ALLOW_ORIGIN);
+    }
     if (
       request.getHeader("Access-Control-Request-Method") != null &&
       "OPTIONS".equals(request.getMethod())

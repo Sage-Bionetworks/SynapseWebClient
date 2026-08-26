@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitserver.filter;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -10,6 +11,7 @@ import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ACCESS_CO
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.DEFAULT_ALLOW_ORIGIN;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.SYNAPSE_ORG_SUFFIX;
+import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.TIMING_ALLOW_ORIGIN_HEADER;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -150,5 +152,48 @@ public class CORSFilterTest {
     // and Access-Control-Allow-Credentials is not added to the response
     verify(mockResponse, never())
       .addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
+  }
+
+  @Test
+  public void testTimingAllowOriginSetOnStaticAssets()
+    throws ServletException, IOException {
+    // SWC-7865/SWC-7954: client-side chunk-load diagnostics read cross-origin
+    // PerformanceResourceTiming size fields, which silently read as 0 without
+    // this header.
+    when(mockRequest.getRequestURI())
+      .thenReturn("/generated/vite/assets/main-D2GRFy7k.js");
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockResponse)
+      .addHeader(TIMING_ALLOW_ORIGIN_HEADER, DEFAULT_ALLOW_ORIGIN);
+  }
+
+  @Test
+  public void testTimingAllowOriginSetOnAssetsBehindTheCdnRedirector()
+    throws ServletException, IOException {
+    // A lazily loaded chunk is requested at both URLs, so both need the header
+    // for the diagnostics to see a duplicate fetch.
+    when(mockRequest.getRequestURI())
+      .thenReturn("/Portal/cdn/generated/vite/assets/main-D2GRFy7k.js");
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockResponse)
+      .addHeader(TIMING_ALLOW_ORIGIN_HEADER, DEFAULT_ALLOW_ORIGIN);
+  }
+
+  @Test
+  public void testTimingAllowOriginNotSetOnApplicationEndpoints()
+    throws ServletException, IOException {
+    // `Timing-Allow-Origin: *` lets any origin read a response's size even when
+    // the CORS check denied it the body, so on an authenticated endpoint it
+    // must not be present.
+    when(mockRequest.getRequestURI()).thenReturn("/Portal/synapseclient");
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockResponse, never())
+      .addHeader(eq(TIMING_ALLOW_ORIGIN_HEADER), anyString());
   }
 }
