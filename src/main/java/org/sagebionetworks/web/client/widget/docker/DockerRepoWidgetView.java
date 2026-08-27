@@ -21,6 +21,4 @@ public interface DockerRepoWidgetView {
   void setModifiedCreatedBy(IsWidget widget);
 
   void setDockerCommitListWidget(Widget widget);
-
-  void setProvenanceWidgetVisible(boolean visible);
 }

@@ -20,8 +20,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
-import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
@@ -117,7 +115,6 @@ public class TeamViewImpl extends Composite implements TeamView {
   private GWTWrapper gwt;
   private BigTeamBadge bigTeamBadge;
   private CookieProvider cookieProvider;
-  private FeatureFlagConfig featureFlagConfig;
 
   private final TeamViewImplUiBinder binder = GWT.create(
     TeamViewImplUiBinder.class
@@ -129,15 +126,13 @@ public class TeamViewImpl extends Composite implements TeamView {
     Header headerWidget,
     GWTWrapper gwt,
     BigTeamBadge bigTeamBadge,
-    CookieProvider cookieProvider,
-    FeatureFlagConfig featureFlagConfig
+    CookieProvider cookieProvider
   ) {
     initWidget(binder.createAndBindUi(this));
     this.headerWidget = headerWidget;
     this.gwt = gwt;
     this.bigTeamBadge = bigTeamBadge;
     this.cookieProvider = cookieProvider;
-    this.featureFlagConfig = featureFlagConfig;
     setDropdownHandlers();
     headerWidget.configure();
     teamBadgeContainer.clear();
@@ -234,12 +229,7 @@ public class TeamViewImpl extends Composite implements TeamView {
   @Override
   public void showMemberMenuItems() {
     leaveTeamItem.setVisible(true);
-    // TODO: remove next line to take out of alpha mode
-    teamProjectsItem.setVisible(
-      featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.VIEW_ASSOCIATED_PROJECTS
-      )
-    );
+    teamProjectsItem.setVisible(true);
 
     toolsMenu.setVisible(true);
   }
@@ -249,12 +239,7 @@ public class TeamViewImpl extends Composite implements TeamView {
     deleteTeamItem.setVisible(true);
     editTeamItem.setVisible(true);
     inviteMemberItem.setVisible(true);
-    // TODO: remove next line to take out of alpha mode
-    teamProjectsItem.setVisible(
-      featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.VIEW_ASSOCIATED_PROJECTS
-      )
-    );
+    teamProjectsItem.setVisible(true);
 
     toolsMenu.setVisible(true);
   }
@@ -324,11 +309,6 @@ public class TeamViewImpl extends Composite implements TeamView {
   public void setMap(Widget w) {
     mapPanel.clear();
     mapPanel.add(w);
-  }
-
-  @Override
-  public void setShowMapVisible(boolean visible) {
-    showMapLink.setVisible(visible);
   }
 
   @Override

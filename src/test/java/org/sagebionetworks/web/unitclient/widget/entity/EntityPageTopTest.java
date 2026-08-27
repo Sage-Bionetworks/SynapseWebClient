@@ -13,7 +13,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.FeatureFlagKey.METADATA_TAB;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -46,7 +45,6 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -226,9 +224,6 @@ public class EntityPageTopTest {
   EntityHeader mockProjectEntityHeader;
 
   @Mock
-  FeatureFlagConfig mockFeatureFlagConfig;
-
-  @Mock
   ListCurationTaskResponse mockCurationTaskList;
 
   @Mock
@@ -281,7 +276,6 @@ public class EntityPageTopTest {
         mockGlobalApplicationState,
         entityId2BundleCache,
         mockEventBus,
-        mockFeatureFlagConfig,
         mockAuthenticationController
       );
     AsyncMockStubber
@@ -304,7 +298,6 @@ public class EntityPageTopTest {
     when(mockProjectBundle.getAccessControlList()).thenReturn(mockACL);
     when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
       .thenReturn("true");
-    when(mockFeatureFlagConfig.isFeatureEnabled(any())).thenReturn(true);
     EntityPath path = new EntityPath();
     path.setPath(Collections.singletonList(mockProjectEntityHeader));
     when(mockProjectEntityHeader.getType()).thenReturn(Project.class.getName());
@@ -1515,23 +1508,6 @@ public class EntityPageTopTest {
 
     // verify we did not change place, but instead reconfigured for target entity under the same project
     verify(mockPlaceChanger, never()).goTo(newPlace);
-  }
-
-  @Test
-  public void testHideMetadataTabWhenFeatureDisabled() {
-    when(mockFeatureFlagConfig.isFeatureEnabled(METADATA_TAB))
-      .thenReturn(false);
-    Synapse.EntityArea area = null;
-    String areaToken = null;
-    Long versionNumber = null;
-    pageTop.configure(
-      mockProjectBundle,
-      versionNumber,
-      mockProjectHeader,
-      area,
-      areaToken
-    );
-    verify(mockMetadataInnerTab, never()).setTabListItemVisible(true);
   }
 
   @Test

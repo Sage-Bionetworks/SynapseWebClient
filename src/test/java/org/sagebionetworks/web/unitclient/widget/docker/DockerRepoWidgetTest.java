@@ -17,7 +17,6 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
@@ -72,9 +71,6 @@ public class DockerRepoWidgetTest {
   @Mock
   EventBus mockEventBus;
 
-  @Mock
-  FeatureFlagConfig mockFeatureFlagConfig;
-
   DockerRepoWidget dockerRepoWidget;
   String entityId = "syn123";
   String repoName = "dockerRepoName";
@@ -98,8 +94,7 @@ public class DockerRepoWidgetTest {
         mockModifiedCreatedBy,
         mockDockerCommitListWidget,
         mockCookieProvider,
-        mockEventBus,
-        mockFeatureFlagConfig
+        mockEventBus
       );
     when(mockEntity.getId()).thenReturn(entityId);
     when(mockEntity.getRepositoryName()).thenReturn(repoName);
@@ -140,7 +135,6 @@ public class DockerRepoWidgetTest {
     verify(mockDockerTitleBar).configure(mockEntityBundle, mockActionWidget);
     verify(mockModifiedCreatedBy).configure(entityId, null);
     verify(mockDockerCommitListWidget).configure(entityId, false);
-    verify(mockView).setProvenanceWidgetVisible(false);
   }
 
   @SuppressWarnings("unchecked")

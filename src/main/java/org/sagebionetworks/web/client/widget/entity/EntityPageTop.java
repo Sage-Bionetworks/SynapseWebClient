@@ -27,8 +27,6 @@ import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
-import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -96,7 +94,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
   private final PlaceChanger placeChanger;
   private final CookieProvider cookies;
   private final EventBus eventBus;
-  private final FeatureFlagConfig featureFlagConfig;
   private final EntityId2BundleCache entityId2BundleCache;
   public boolean pushTabUrlToBrowserHistory = false;
   public static final EntityBundleRequest ALL_PARTS_REQUEST =
@@ -146,7 +143,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     GlobalApplicationState globalAppState,
     EntityId2BundleCache entityId2BundleCache,
     EventBus eventBus,
-    FeatureFlagConfig featureFlagConfig,
     AuthenticationController authenticationController
   ) {
     this.view = view;
@@ -172,7 +168,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     this.placeChanger = globalAppState.getPlaceChanger();
     this.entityId2BundleCache = entityId2BundleCache;
     this.eventBus = eventBus;
-    this.featureFlagConfig = featureFlagConfig;
     this.authenticationController = authenticationController;
 
     initTabs();
@@ -764,10 +759,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       getTabVisibilityCallback(EntityArea.CHALLENGE, challengeTab.asTab())
     );
 
-    if (
-      this.authenticationController.isLoggedIn() &&
-      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.METADATA_TAB)
-    ) {
+    if (this.authenticationController.isLoggedIn()) {
       synapseJavascriptClient.getCurationTasks(
         new ListCurationTaskRequest().setProjectId(projectHeader.getId()),
         new AsyncCallback<ListCurationTaskResponse>() {

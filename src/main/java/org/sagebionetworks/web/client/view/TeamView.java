@@ -65,8 +65,6 @@ public interface TeamView extends IsWidget, SynapseView {
 
   void showMapModal();
 
-  void setShowMapVisible(boolean visible);
-
   void setManageAccessVisible(boolean visible);
 
   void setCommandsVisible(boolean visible);

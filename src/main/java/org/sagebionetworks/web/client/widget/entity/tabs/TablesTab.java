@@ -9,7 +9,6 @@ import org.sagebionetworks.repo.model.search.table.SearchIndex;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -29,13 +28,11 @@ public class TablesTab extends AbstractTablesTab {
   public TablesTab(
     Tab tab,
     PortalGinInjector ginInjector,
-    FeatureFlagConfig featureFlagConfig,
     SynapseJSNIUtils jsniUtils
   ) {
-    super(tab, ginInjector, featureFlagConfig, jsniUtils);
+    super(tab, ginInjector, jsniUtils);
     this.tab = tab;
     this.ginInjector = ginInjector;
-    this.featureFlagConfig = featureFlagConfig;
     tab.configure(DisplayConstants.TABLES, EntityArea.TABLES);
   }
 

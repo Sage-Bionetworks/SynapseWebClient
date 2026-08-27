@@ -82,8 +82,6 @@ import javax.inject.Inject;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
-import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
@@ -102,17 +100,14 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 
   PortalGinInjector ginInjector;
   JSONObjectAdapter adapter;
-  FeatureFlagConfig featureFlagConfig;
 
   @Inject
   public WidgetRegistrarImpl(
     PortalGinInjector ginInjector,
-    JSONObjectAdapter adapter,
-    FeatureFlagConfig featureFlagConfig
+    JSONObjectAdapter adapter
   ) {
     this.ginInjector = ginInjector;
     this.adapter = adapter;
-    this.featureFlagConfig = featureFlagConfig;
     initWithKnownWidgets();
   }
 
@@ -330,15 +325,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
     } else if (contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
       presenter = ginInjector.getReferenceRenderer();
     } else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
-      if (
-        featureFlagConfig.isFeatureEnabled(
-          FeatureFlagKey.PROVENANCE_V2_VISUALIZATION
-        )
-      ) {
-        presenter = ginInjector.getProvenanceRendererV2();
-      } else {
-        presenter = ginInjector.getProvenanceRenderer();
-      }
+      presenter = ginInjector.getProvenanceRendererV2();
     } else if (
       contentTypeKey.equals(IMAGE_CONTENT_TYPE) ||
       contentTypeKey.equals(IMAGE_LINK_EDITOR_CONTENT_TYPE)

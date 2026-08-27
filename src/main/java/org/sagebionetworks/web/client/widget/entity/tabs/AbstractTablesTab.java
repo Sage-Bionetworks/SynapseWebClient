@@ -28,8 +28,6 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
-import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -108,7 +106,6 @@ public abstract class AbstractTablesTab
   WikiPageWidget wikiPageWidget;
   Long latestSnapshotVersionNumber;
   SynapseJavascriptClient jsClient;
-  FeatureFlagConfig featureFlagConfig;
   SynapseJSNIUtils jsniUtils;
   boolean isDraftRequested;
 
@@ -127,12 +124,10 @@ public abstract class AbstractTablesTab
   public AbstractTablesTab(
     Tab tab,
     PortalGinInjector ginInjector,
-    FeatureFlagConfig featureFlagConfig,
     SynapseJSNIUtils jsniUtils
   ) {
     this.tab = tab;
     this.ginInjector = ginInjector;
-    this.featureFlagConfig = featureFlagConfig;
     this.jsniUtils = jsniUtils;
   }
 
@@ -350,36 +345,24 @@ public abstract class AbstractTablesTab
       WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY,
       DisplayUtils.createEntityVersionString(entityId, newVersion)
     );
-    if (
-      featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.PROVENANCE_V2_VISUALIZATION
-      )
-    ) {
-      ProvenanceWidget provWidget = ginInjector.getProvenanceRendererV2();
-      view.setProvenance(provWidget);
+    ProvenanceWidget provWidget = ginInjector.getProvenanceRendererV2();
+    view.setProvenance(provWidget);
 
-      final boolean canEditProvenance =
-        entityBundle.getPermissions().getCanCertifiedUserEdit() &&
-        isCurrentVersion;
-      if (canEditProvenance) {
-        provWidget.setOnEditProvenance(() -> {
-          ProvenanceEditorWidget editor =
-            ginInjector.getProvenanceEditorWidget();
-          editor.configure(entityBundle);
-          editor.show();
-        });
-      } else {
-        // clear the callback to prevent stale state
-        provWidget.setOnEditProvenance(null);
-      }
-
-      provWidget.configure(configMap);
+    final boolean canEditProvenance =
+      entityBundle.getPermissions().getCanCertifiedUserEdit() &&
+      isCurrentVersion;
+    if (canEditProvenance) {
+      provWidget.setOnEditProvenance(() -> {
+        ProvenanceEditorWidget editor = ginInjector.getProvenanceEditorWidget();
+        editor.configure(entityBundle);
+        editor.show();
+      });
     } else {
-      org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget =
-        ginInjector.getProvenanceRenderer();
-      view.setProvenance(provWidget);
-      provWidget.configure(configMap);
+      // clear the callback to prevent stale state
+      provWidget.setOnEditProvenance(null);
     }
+
+    provWidget.configure(configMap);
     version = newVersion;
   }
 

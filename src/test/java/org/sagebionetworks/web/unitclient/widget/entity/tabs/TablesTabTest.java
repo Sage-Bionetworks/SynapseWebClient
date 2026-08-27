@@ -45,7 +45,6 @@ import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -67,7 +66,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.AbstractTablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
@@ -181,9 +180,6 @@ public class TablesTabTest {
   @Mock
   SynapseJavascriptClient mockJsClient;
 
-  @Mock
-  FeatureFlagConfig mockFeatureFlagConfig;
-
   @Captor
   ArgumentCaptor<Map<String, String>> mapCaptor;
 
@@ -196,12 +192,7 @@ public class TablesTabTest {
   @Before
   public void setUp() {
     tab =
-      new TablesTab(
-        mockTab,
-        mockPortalGinInjector,
-        mockFeatureFlagConfig,
-        mockJsniUtils
-      ) {
+      new TablesTab(mockTab, mockPortalGinInjector, mockJsniUtils) {
         @Override
         protected com.google.gwt.user.client.ui.IsWidget createSearchIndexWidget(
           String entityId,
@@ -224,7 +215,7 @@ public class TablesTabTest {
     when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
     when(mockPortalGinInjector.getModifiedCreatedByWidget())
       .thenReturn(mockModifiedCreatedBy);
-    when(mockPortalGinInjector.getProvenanceRenderer())
+    when(mockPortalGinInjector.getProvenanceRendererV2())
       .thenReturn(mockProvenanceWidget);
     when(mockPortalGinInjector.getGlobalApplicationState())
       .thenReturn(mockGlobalApplicationState);

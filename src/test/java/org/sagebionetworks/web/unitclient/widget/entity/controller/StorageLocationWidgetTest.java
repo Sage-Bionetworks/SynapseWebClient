@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -33,8 +34,6 @@ import org.sagebionetworks.repo.model.project.ExternalGoogleCloudStorageLocation
 import org.sagebionetworks.repo.model.project.ExternalObjectStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
-import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
@@ -79,9 +78,6 @@ public class StorageLocationWidgetTest {
   @Mock
   EventBus mockEventBus;
 
-  @Mock
-  FeatureFlagConfig mockFeatureFlagConfig;
-
   @Captor
   ArgumentCaptor<StorageLocationSetting> locationSettingCaptor;
 
@@ -89,12 +85,6 @@ public class StorageLocationWidgetTest {
 
   @Before
   public void setup() {
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS
-      )
-    )
-      .thenReturn(false);
     widget =
       new StorageLocationWidget(
         mockView,
@@ -103,8 +93,7 @@ public class StorageLocationWidgetTest {
         mockSynAlert,
         mockSynapseProperties,
         mockCookies,
-        mockEventBus,
-        mockFeatureFlagConfig
+        mockEventBus
       );
     folder = new Folder();
     folder.setId("syn420");
@@ -175,7 +164,7 @@ public class StorageLocationWidgetTest {
     widget.getStorageLocationSetting();
     // should remain set to the default config
     verify(mockView).setLoading(false);
-    verify(mockView).setS3StsVisible(false);
+    verify(mockView).setS3StsVisible(true);
     verifyNoMoreInteractions(mockView);
   }
 
@@ -211,12 +200,6 @@ public class StorageLocationWidgetTest {
 
   @Test
   public void testGetStorageLocationSettingExternalS3() {
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS
-      )
-    )
-      .thenReturn(true);
     ExternalS3UploadDestination entityStorageLocationSetting =
       new ExternalS3UploadDestination();
     String baseKey = "key";
@@ -254,27 +237,8 @@ public class StorageLocationWidgetTest {
       .getDefaultUploadDestination(anyString(), any(AsyncCallback.class));
     widget.getStorageLocationSetting();
     verify(mockView).selectExternalS3Storage();
-    verify(mockView).setS3StsVisible(true);
+    verify(mockView, times(2)).setS3StsVisible(true);
     verify(mockView).setS3StsEnabled(true);
-  }
-
-  // This test can be deleted once STS is out of alpha mode
-  @Test
-  public void testS3StsNotEnabledNotInAlpha() {
-    ExternalS3UploadDestination entityStorageLocationSetting =
-      new ExternalS3UploadDestination();
-    entityStorageLocationSetting.setBanner("");
-    entityStorageLocationSetting.setBucket("");
-    entityStorageLocationSetting.setBaseKey("");
-    entityStorageLocationSetting.setStsEnabled(false);
-    AsyncMockStubber
-      .callSuccessWith(entityStorageLocationSetting)
-      .when(mockJsClient)
-      .getDefaultUploadDestination(anyString(), any(AsyncCallback.class));
-    widget.getStorageLocationSetting();
-    verify(mockView).selectExternalS3Storage();
-    verify(mockView).setS3StsVisible(false);
-    verify(mockView).setS3StsEnabled(false);
   }
 
   @Test

@@ -612,11 +612,6 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testConfigureWithTableEntity() {
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
-
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -693,11 +688,6 @@ public class EntityActionControllerImplTest {
     permissions.setCanDelete(canDelete);
     permissions.setCanChangePermissions(canChangePermission);
 
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
-
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -740,11 +730,6 @@ public class EntityActionControllerImplTest {
     boolean isCurrentVersion = true;
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
-
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
 
     controller.configure(
       mockActionMenu,
@@ -806,11 +791,6 @@ public class EntityActionControllerImplTest {
     permissions.setCanDelete(canDelete);
     permissions.setCanChangePermissions(canChangePermission);
 
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
-
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -865,11 +845,6 @@ public class EntityActionControllerImplTest {
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
-
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -923,11 +898,6 @@ public class EntityActionControllerImplTest {
     boolean isCurrentVersion = true;
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
-
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
 
     controller.configure(
       mockActionMenu,
@@ -990,11 +960,6 @@ public class EntityActionControllerImplTest {
     permissions.setCanDelete(canDelete);
     permissions.setCanChangePermissions(canChangePermission);
 
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
-
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1050,11 +1015,6 @@ public class EntityActionControllerImplTest {
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
-
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1108,11 +1068,6 @@ public class EntityActionControllerImplTest {
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
-
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1163,11 +1118,6 @@ public class EntityActionControllerImplTest {
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
-
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1217,11 +1167,6 @@ public class EntityActionControllerImplTest {
     entityBundle.setEntity(mockMaterializedView);
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
-
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1277,11 +1222,6 @@ public class EntityActionControllerImplTest {
     permissions.setCanDelete(canDelete);
     permissions.setCanChangePermissions(canChangePermission);
 
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
-
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1330,11 +1270,6 @@ public class EntityActionControllerImplTest {
     entityBundle.setEntity(mockVirtualTable);
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
-
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1390,11 +1325,6 @@ public class EntityActionControllerImplTest {
     permissions.setCanDelete(canDelete);
     permissions.setCanChangePermissions(canChangePermission);
 
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
-
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1440,10 +1370,6 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testDisableFullTextSearch() {
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-    )
-      .thenReturn(true);
     ((TableEntity) entityBundle.getEntity()).setIsSearchEnabled(true);
     controller.configure(
       mockActionMenu,
