@@ -37,9 +37,6 @@ public class TablesTabViewImpl implements TablesTabView {
   SimplePanel tableWidgetContainer;
 
   @UiField
-  SimplePanel tableModifiedAndCreatedContainer;
-
-  @UiField
   SimplePanel tableListWidgetContainer;
 
   @UiField
@@ -172,11 +169,6 @@ public class TablesTabViewImpl implements TablesTabView {
   @Override
   public void setTitlebarVisible(boolean visible) {
     tableTitlebarContainer.setVisible(visible);
-  }
-
-  @Override
-  public void setModifiedCreatedBy(IsWidget modifiedCreatedBy) {
-    tableModifiedAndCreatedContainer.setWidget(modifiedCreatedBy);
   }
 
   @Override

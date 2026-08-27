@@ -57,9 +57,6 @@ public class FilesTabViewImpl implements FilesTabView {
   Div fileProvenanceGraphContainer;
 
   @UiField
-  SimplePanel fileModifiedAndCreatedContainer;
-
-  @UiField
   SimplePanel fileBreadcrumbContainer;
 
   @UiField
@@ -264,11 +261,6 @@ public class FilesTabViewImpl implements FilesTabView {
   @Override
   public void setFileTitlebarVisible(boolean visible) {
     fileTitlebarContainer.setVisible(visible);
-  }
-
-  @Override
-  public void setModifiedCreatedBy(IsWidget modifiedCreatedBy) {
-    fileModifiedAndCreatedContainer.setWidget(modifiedCreatedBy);
   }
 
   @Override

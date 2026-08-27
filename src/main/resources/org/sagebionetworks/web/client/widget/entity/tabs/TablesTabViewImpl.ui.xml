@@ -73,7 +73,6 @@
         </MUI:Grid>
       </g:FlowPanel>
     </bh:Div>
-    <g:SimplePanel ui:field="tableModifiedAndCreatedContainer" />
   </g:FlowPanel>
       <w:ReactComponent ui:field="entitySidebar" addStyleNames="entityPageSidebar" />
   </bh:Div>

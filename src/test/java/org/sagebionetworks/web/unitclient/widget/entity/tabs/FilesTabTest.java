@@ -44,7 +44,6 @@ import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
-import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
@@ -142,9 +141,6 @@ public class FilesTabTest {
   CallbackP<String> mockEntitySelectedCallback;
 
   @Mock
-  ModifiedCreatedByWidget mockModifiedCreatedBy;
-
-  @Mock
   EntityRefreshAlert mockEntityRefreshAlert;
 
   @Mock
@@ -213,8 +209,6 @@ public class FilesTabTest {
     when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
     when(mockPortalGinInjector.getGlobalApplicationState())
       .thenReturn(mockGlobalApplicationState);
-    when(mockPortalGinInjector.getModifiedCreatedByWidget())
-      .thenReturn(mockModifiedCreatedBy);
     when(mockPortalGinInjector.getDiscussionThreadListWidget())
       .thenReturn(mockDiscussionThreadListWidget);
     when(mockPortalGinInjector.getSynapseJavascriptClient())
@@ -302,7 +296,6 @@ public class FilesTabTest {
     // show project info
     verify(mockView, times(2)).setProvenanceVisible(false);
     verify(mockView).clearRefreshAlert();
-    verify(mockModifiedCreatedBy).configure(projectEntityId, version);
     verify(mockView).setFileBrowserVisible(true);
     verify(mockFilesBrowser).configure(projectEntityId);
     verify(mockFilesBrowser)
@@ -367,7 +360,6 @@ public class FilesTabTest {
     verify(mockBreadcrumb).configure(any(), eq(EntityArea.FILES));
 
     verify(mockView).setProvenanceVisible(true);
-    verify(mockModifiedCreatedBy).configure(fileEntityId, version);
     verify(mockView).setWikiPageWidgetVisible(true);
 
     verify(mockView, times(2)).setFileBrowserVisible(false);
@@ -423,7 +415,6 @@ public class FilesTabTest {
     verify(mockBreadcrumb).configure(any(), eq(EntityArea.FILES));
 
     verify(mockView, times(2)).setProvenanceVisible(false);
-    verify(mockModifiedCreatedBy).configure(folderEntityId, null);
     verify(mockView).setWikiPageWidgetVisible(true);
 
     verify(mockView).setFileBrowserVisible(true);
@@ -470,7 +461,6 @@ public class FilesTabTest {
     verify(mockView).setFileBrowserVisible(false);
     verify(mockBreadcrumb).clear();
     verify(mockView).setProvenanceVisible(false);
-    verify(mockModifiedCreatedBy).setVisible(false);
     verify(mockView).setDiscussionThreadListWidgetVisible(false);
     verify(mockView).clearRefreshAlert();
   }
