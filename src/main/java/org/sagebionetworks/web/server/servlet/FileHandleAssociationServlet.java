@@ -111,19 +111,31 @@ public class FileHandleAssociationServlet extends HttpServlet {
           )
         ) {
           // cache for a long time, and send the bytes back
-          InputStream in = null;
-          OutputStream out = null;
-          try {
-            response.setHeader(
-              "Cache-Control",
-              "max-age=" + GWTAllCacheFilter.CACHE_TIME_SECONDS
-            );
-            in = resolvedUrl.openStream();
-            out = response.getOutputStream();
+          response.setHeader(
+            "Cache-Control",
+            "max-age=" + GWTAllCacheFilter.CACHE_TIME_SECONDS
+          );
+          try (
+            InputStream in = resolvedUrl.openStream();
+            OutputStream out = response.getOutputStream()
+          ) {
             IOUtils.copy(in, out);
-          } finally {
-            IOUtils.closeQuietly(in);
-            IOUtils.closeQuietly(out);
+          }
+        } else if (
+          FileHandleAssociateType.DataAccessRequestAttachment.equals(
+            fha.getAssociateObjectType()
+          )
+        ) {
+          // SWC-7960: Stream DUC PDFs same-origin so an iframe preview isn't blocked by CORS on the S3 hop.
+          response.setContentType("application/pdf");
+          response.setHeader("Content-Disposition", "inline");
+          // PDF contains identifying information, so don't cache it
+          response.setHeader("Cache-Control", "private, no-store");
+          try (
+            InputStream in = resolvedUrl.openStream();
+            OutputStream out = response.getOutputStream()
+          ) {
+            IOUtils.copy(in, out);
           }
         } else {
           response.sendRedirect(resolvedUrl.toString());

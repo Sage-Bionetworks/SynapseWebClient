@@ -1,9 +1,14 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -11,8 +16,12 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +37,7 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
+import org.sagebionetworks.web.server.servlet.filter.GWTAllCacheFilter;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 
@@ -58,6 +68,8 @@ public class FileHandleAssociationServletTest {
   String fileHandleId = "333";
   String sessionToken = "fake";
   URL resolvedUrl, rawFileUrl;
+  File tempStreamedFile;
+  byte[] tempStreamedBytes;
 
   @Before
   public void setup()
@@ -97,6 +109,51 @@ public class FileHandleAssociationServletTest {
     when(mockRequest.getCookies()).thenReturn(cookies);
 
     SynapseClientBaseTest.setupTestEndpoints();
+  }
+
+  @After
+  public void teardown() {
+    if (tempStreamedFile != null && tempStreamedFile.exists()) {
+      tempStreamedFile.delete();
+    }
+  }
+
+  /**
+   * Configure {@link #mockSynapse#getFileURL} to return a file:// URL pointing at a temp file with
+   * the given contents, so that the servlet can actually stream real bytes without any network
+   * dependency. Also captures bytes written to {@link #responseOutputStream} into
+   * {@code capturedResponseBytes}.
+   */
+  private ByteArrayOutputStream stubStreamingUrlAndCaptureResponse(
+    byte[] contents
+  ) throws IOException, SynapseException {
+    tempStreamedFile = File.createTempFile("fha-servlet-test-", ".bin");
+    try (FileOutputStream fos = new FileOutputStream(tempStreamedFile)) {
+      fos.write(contents);
+    }
+    tempStreamedBytes = contents;
+    URL fileUrl = tempStreamedFile.toURI().toURL();
+    when(mockSynapse.getFileURL(any(FileHandleAssociation.class)))
+      .thenReturn(fileUrl);
+
+    ByteArrayOutputStream captured = new ByteArrayOutputStream();
+    doAnswer(invocation -> {
+        byte[] buf = invocation.getArgument(0);
+        int off = invocation.getArgument(1);
+        int len = invocation.getArgument(2);
+        captured.write(buf, off, len);
+        return null;
+      })
+      .when(responseOutputStream)
+      .write(any(byte[].class), anyInt(), anyInt());
+    doAnswer(invocation -> {
+        byte[] buf = invocation.getArgument(0);
+        captured.write(buf);
+        return null;
+      })
+      .when(responseOutputStream)
+      .write(any(byte[].class));
+    return captured;
   }
 
   @Test
@@ -163,5 +220,77 @@ public class FileHandleAssociationServletTest {
     verify(mockResponse).sendRedirect(captor.capture());
     String v = captor.getValue();
     assertTrue(v.contains("Error:"));
+  }
+
+  @Test
+  public void testDoGetUserProfileAttachmentStreamsAndCaches()
+    throws Exception {
+    when(
+      mockRequest.getParameter(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY)
+    )
+      .thenReturn(FileHandleAssociateType.UserProfileAttachment.toString());
+    byte[] payload = "profile-image-bytes".getBytes();
+    ByteArrayOutputStream captured = stubStreamingUrlAndCaptureResponse(
+      payload
+    );
+
+    servlet.doGet(mockRequest, mockResponse);
+
+    // No redirect on the streaming path.
+    verify(mockResponse, never()).sendRedirect(anyString());
+    // Long-lived cache header for public profile/team attachments.
+    verify(mockResponse)
+      .setHeader(
+        eq("Cache-Control"),
+        eq("max-age=" + GWTAllCacheFilter.CACHE_TIME_SECONDS)
+      );
+    assertArrayEquals(payload, captured.toByteArray());
+  }
+
+  @Test
+  public void testDoGetDataAccessRequestAttachmentStreamsAsPdf()
+    throws Exception {
+    when(
+      mockRequest.getParameter(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY)
+    )
+      .thenReturn(
+        FileHandleAssociateType.DataAccessRequestAttachment.toString()
+      );
+    byte[] payload = "%PDF-1.4 fake duc contents".getBytes();
+    ByteArrayOutputStream captured = stubStreamingUrlAndCaptureResponse(
+      payload
+    );
+
+    servlet.doGet(mockRequest, mockResponse);
+
+    // SWC-7960: served same-origin as inline PDF so an iframe can preview it.
+    verify(mockResponse, never()).sendRedirect(anyString());
+    verify(mockResponse).setContentType("application/pdf");
+    verify(mockResponse).setHeader("Content-Disposition", "inline");
+    // PDF contains identifying information; must not be cached.
+    verify(mockResponse).setHeader("Cache-Control", "private, no-store");
+    assertArrayEquals(payload, captured.toByteArray());
+  }
+
+  @Test
+  public void testDoGetDataAccessRequestAttachmentErrorRedirects()
+    throws Exception {
+    when(
+      mockRequest.getParameter(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY)
+    )
+      .thenReturn(
+        FileHandleAssociateType.DataAccessRequestAttachment.toString()
+      );
+    when(mockSynapse.getFileURL(any(FileHandleAssociation.class)))
+      .thenThrow(new SynapseForbiddenException("nope"));
+
+    servlet.doGet(mockRequest, mockResponse);
+
+    // Same failure handling as all other branches: redirect to error place.
+    ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+    verify(mockResponse).sendRedirect(captor.capture());
+    assertTrue(captor.getValue().contains("Error:"));
+    // Nothing PDF-specific should have been set when the URL lookup failed.
+    verify(mockResponse, never()).setContentType(anyString());
   }
 }
