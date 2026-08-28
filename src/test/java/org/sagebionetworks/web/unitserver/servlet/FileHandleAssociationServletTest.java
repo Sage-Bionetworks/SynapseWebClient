@@ -268,20 +268,22 @@ public class FileHandleAssociationServletTest {
 
     servlet.doGet(mockRequest, mockResponse);
 
-    // SWC-7960: served same-origin so an iframe can preview it.
+    // SWC-7960: PDF is on the safe-inline whitelist so it renders in an iframe preview.
     verify(mockResponse, never()).sendRedirect(anyString());
     verify(mockResponse).setContentType("application/pdf");
     verify(mockResponse).setHeader("Content-Disposition", "inline");
+    verify(mockResponse).setHeader("X-Content-Type-Options", "nosniff");
     // Contents may include identifying information; must not be stored anywhere.
     verify(mockResponse).setHeader("Cache-Control", "no-store");
     assertArrayEquals(payload, captured.toByteArray());
   }
 
   @Test
-  public void testDoGetDataAccessRequestAttachmentForwardsNonPdfContentType()
+  public void testDoGetDataAccessRequestAttachmentForcesDownloadForNonInlineType()
     throws Exception {
-    // A traditional (non-eDUC) DUC could be uploaded as e.g. plain text or DOCX; the servlet must
-    // forward whatever Content-Type the upstream file handle URL reports, not hardcode PDF.
+    // A traditional (non-eDUC) DUC could be uploaded as DOCX, plain text, HTML, SVG, etc. Serving
+    // arbitrary user-uploaded content inline from the app origin would enable stored XSS, so any
+    // type outside the safe-inline whitelist must be forced to download.
     when(
       mockRequest.getParameter(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY)
     )
@@ -297,8 +299,6 @@ public class FileHandleAssociationServletTest {
     servlet.doGet(mockRequest, mockResponse);
 
     verify(mockResponse, never()).sendRedirect(anyString());
-    // ".txt" resolves to text/plain via the JDK's content-type map, standing in for whatever
-    // Content-Type S3 would echo back from the presigned URL.
     ArgumentCaptor<String> contentTypeCaptor = ArgumentCaptor.forClass(
       String.class
     );
@@ -308,9 +308,54 @@ public class FileHandleAssociationServletTest {
       contentTypeCaptor.getValue(),
       contentTypeCaptor.getValue().startsWith("text/plain")
     );
-    verify(mockResponse).setHeader("Content-Disposition", "inline");
+    // Not on the inline whitelist → force download.
+    verify(mockResponse).setHeader("Content-Disposition", "attachment");
+    verify(mockResponse).setHeader("X-Content-Type-Options", "nosniff");
     verify(mockResponse).setHeader("Cache-Control", "no-store");
     assertArrayEquals(payload, captured.toByteArray());
+  }
+
+  @Test
+  public void testIsSafeToDisplayInline() {
+    // Whitelisted types.
+    assertTrue(
+      FileHandleAssociationServlet.isSafeToDisplayInline("application/pdf")
+    );
+    assertTrue(FileHandleAssociationServlet.isSafeToDisplayInline("image/png"));
+    assertTrue(
+      FileHandleAssociationServlet.isSafeToDisplayInline("image/jpeg")
+    );
+    assertTrue(FileHandleAssociationServlet.isSafeToDisplayInline("image/gif"));
+    assertTrue(
+      FileHandleAssociationServlet.isSafeToDisplayInline("image/webp")
+    );
+    // Case- and parameter-tolerant.
+    assertTrue(
+      FileHandleAssociationServlet.isSafeToDisplayInline(
+        "Application/PDF; charset=binary"
+      )
+    );
+    // SVG is XML and can execute JS — must not be inline.
+    assertTrue(
+      !FileHandleAssociationServlet.isSafeToDisplayInline("image/svg+xml")
+    );
+    assertTrue(
+      !FileHandleAssociationServlet.isSafeToDisplayInline("text/html")
+    );
+    assertTrue(
+      !FileHandleAssociationServlet.isSafeToDisplayInline(
+        "application/xhtml+xml"
+      )
+    );
+    assertTrue(
+      !FileHandleAssociationServlet.isSafeToDisplayInline("text/plain")
+    );
+    assertTrue(
+      !FileHandleAssociationServlet.isSafeToDisplayInline(
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      )
+    );
+    assertTrue(!FileHandleAssociationServlet.isSafeToDisplayInline(null));
   }
 
   @Test

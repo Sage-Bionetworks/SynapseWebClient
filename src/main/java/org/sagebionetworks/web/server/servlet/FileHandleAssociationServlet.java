@@ -130,12 +130,18 @@ public class FileHandleAssociationServlet extends HttpServlet {
           // SWC-7960: Stream Data Access Request attachments (eDUCs, traditional DUCs, IRB
           // approvals, etc.) same-origin so an iframe preview isn't blocked by CORS on the S3 hop.
           URLConnection connection = resolvedUrl.openConnection();
-          // Forward the upstream Content-Type so DOCX / images / PDF are all served correctly.
           String upstreamContentType = connection.getContentType();
           if (upstreamContentType != null) {
             response.setContentType(upstreamContentType);
           }
-          response.setHeader("Content-Disposition", "inline");
+          // Serving user-uploaded content same-origin: only allow inline preview for types we know
+          // can't script (PDF and raster images); everything else is forced to download to prevent
+          // stored XSS via an uploaded HTML/SVG file.
+          String disposition = isSafeToDisplayInline(upstreamContentType)
+            ? "inline"
+            : "attachment";
+          response.setHeader("Content-Disposition", disposition);
+          response.setHeader("X-Content-Type-Options", "nosniff");
           // Attachments may contain identifying information; never store.
           response.setHeader("Cache-Control", "no-store");
           try (
@@ -188,5 +194,33 @@ public class FileHandleAssociationServlet extends HttpServlet {
     String base =
       url.substring(0, url.length() - uri.length() + ctx.length()) + "/";
     return base;
+  }
+
+  /**
+   * Whitelist of Content-Types considered safe to render inline in the browser when serving
+   * user-uploaded content from the app's own origin. Deliberately excludes SVG (can execute JS),
+   * HTML, XML, and everything else — those must be forced to download.
+   */
+  public static boolean isSafeToDisplayInline(String contentType) {
+    if (contentType == null) {
+      return false;
+    }
+    // Strip parameters like "; charset=..." and normalize.
+    String type = contentType.toLowerCase();
+    int semi = type.indexOf(';');
+    if (semi >= 0) {
+      type = type.substring(0, semi);
+    }
+    type = type.trim();
+    switch (type) {
+      case "application/pdf":
+      case "image/png":
+      case "image/jpeg":
+      case "image/gif":
+      case "image/webp":
+        return true;
+      default:
+        return false;
+    }
   }
 }
