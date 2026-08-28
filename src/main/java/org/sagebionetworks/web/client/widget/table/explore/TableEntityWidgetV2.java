@@ -37,7 +37,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.DatasetEditorProps;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
-import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
@@ -48,7 +47,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.PreflightControll
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
-import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -128,7 +126,6 @@ public class TableEntityWidgetV2
   EntityActionMenu actionMenu;
   PreflightController preflightController;
   SessionStorage sessionStorage;
-  private EntityAccessControlListModalWidget aclModal;
   private PopupUtilsView popupUtils;
   EventBus eventBus;
   private final CreateGridSessionDialog createGridSessionDialog;
@@ -441,10 +438,6 @@ public class TableEntityWidgetV2
             }
           };
 
-        OnViewSharingSettingsHandler onViewSharingSettingsHandler =
-          entityId -> {
-            onViewSharingSettingsClicked(entityId);
-          };
         JSONObjectAdapter adapter = ginInjector
           .getJSONObjectAdapter()
           .createNew();
@@ -456,7 +449,6 @@ public class TableEntityWidgetV2
             adapter.toJSONString(),
             onQueryChange,
             onQueryResultBundleChange,
-            onViewSharingSettingsHandler,
             hideSqlEditorControl
           );
         } catch (JSONObjectAdapterException e) {
@@ -702,17 +694,5 @@ public class TableEntityWidgetV2
    */
   public QueryResultBundle getCurrentQueryResultBundle() {
     return currentQueryResultBundle;
-  }
-
-  private EntityAccessControlListModalWidget getAccessControlListModalWidget() {
-    if (aclModal == null) {
-      aclModal = ginInjector.getEntityAccessControlListModalWidget();
-    }
-    return aclModal;
-  }
-
-  public void onViewSharingSettingsClicked(String benefactorEntityId) {
-    getAccessControlListModalWidget().configure(benefactorEntityId, () -> {});
-    getAccessControlListModalWidget().setOpen(true);
   }
 }

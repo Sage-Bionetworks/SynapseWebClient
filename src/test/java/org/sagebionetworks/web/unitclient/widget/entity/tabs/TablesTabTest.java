@@ -209,8 +209,6 @@ public class TablesTabTest {
     when(mockPortalGinInjector.getQueryTokenProvider())
       .thenReturn(mockQueryTokenProvider);
     when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
-    when(mockPortalGinInjector.getModifiedCreatedByWidget())
-      .thenReturn(mockModifiedCreatedBy);
     when(mockPortalGinInjector.getProvenanceRendererV2())
       .thenReturn(mockProvenanceWidget);
     when(mockPortalGinInjector.getGlobalApplicationState())

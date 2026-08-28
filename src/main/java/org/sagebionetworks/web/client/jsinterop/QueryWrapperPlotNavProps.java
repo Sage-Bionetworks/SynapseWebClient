@@ -21,12 +21,6 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
     void run(String newQueryResultBundleJson);
   }
 
-  @FunctionalInterface
-  @JsFunction
-  public interface OnViewSharingSettingsHandler {
-    void onViewSharingSettingsClicked(String benefactorEntityId);
-  }
-
   String name;
   String initQueryJson;
   String sql;
@@ -36,9 +30,6 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
 
   @JsNullable
   OnQueryResultBundleCallback onQueryResultBundleChange;
-
-  @JsNullable
-  OnViewSharingSettingsHandler onViewSharingSettingsClicked;
 
   @JsNullable
   boolean shouldDeepLink;
@@ -75,7 +66,6 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
     String initQueryJson,
     OnQueryCallback onQueryChange,
     OnQueryResultBundleCallback onQueryResultBundleChange,
-    OnViewSharingSettingsHandler onViewSharingSettingsClicked,
     boolean hideSqlEditorControl,
     Boolean defaultShowPlots,
     Boolean defaultShowSearchBox,
@@ -91,7 +81,6 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
     props.hideSqlEditorControl = hideSqlEditorControl;
     props.onQueryChange = onQueryChange;
     props.onQueryResultBundleChange = onQueryResultBundleChange;
-    props.onViewSharingSettingsClicked = onViewSharingSettingsClicked;
     if (tableConfiguration != null) {
       props.tableConfiguration = tableConfiguration;
     }

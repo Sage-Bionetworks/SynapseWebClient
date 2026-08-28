@@ -4,7 +4,6 @@ import org.sagebionetworks.web.client.jsinterop.CardConfiguration;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
-import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -18,7 +17,6 @@ public class QueryWrapperPlotNav extends ReactComponent {
     String initQueryJson,
     OnQueryCallback onQueryChange,
     OnQueryResultBundleCallback onQueryResultBundleChange,
-    OnViewSharingSettingsHandler onViewSharingSettingsHandler,
     boolean hideSqlEditorControl,
     Boolean defaultShowPlots,
     Boolean defaultShowSearchBox,
@@ -33,7 +31,6 @@ public class QueryWrapperPlotNav extends ReactComponent {
       initQueryJson,
       onQueryChange,
       onQueryResultBundleChange,
-      onViewSharingSettingsHandler,
       hideSqlEditorControl,
       defaultShowPlots,
       defaultShowSearchBox,

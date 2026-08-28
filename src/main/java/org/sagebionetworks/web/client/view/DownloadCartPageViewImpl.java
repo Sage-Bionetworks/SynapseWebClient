@@ -15,7 +15,6 @@ public class DownloadCartPageViewImpl implements DownloadCartPageView {
   ReactComponent container;
 
   private Header headerWidget;
-  private Presenter presenter;
 
   @Inject
   public DownloadCartPageViewImpl(Header headerWidget) {
@@ -24,17 +23,10 @@ public class DownloadCartPageViewImpl implements DownloadCartPageView {
   }
 
   @Override
-  public void setPresenter(Presenter presenter) {
-    this.presenter = presenter;
-  }
-
-  @Override
   public void render() {
     Window.scrollTo(0, 0); // scroll user to top of page
     headerWidget.configure();
-    DownloadCartPageProps props = DownloadCartPageProps.create(entityId -> {
-      presenter.onViewSharingSettingsClicked(entityId);
-    });
+    DownloadCartPageProps props = DownloadCartPageProps.create();
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.DownloadCartPage,
       props
