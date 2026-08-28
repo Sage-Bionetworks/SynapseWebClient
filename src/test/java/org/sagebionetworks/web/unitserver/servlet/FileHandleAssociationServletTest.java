@@ -1,9 +1,14 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -11,8 +16,12 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +37,7 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
+import org.sagebionetworks.web.server.servlet.filter.GWTAllCacheFilter;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 
@@ -58,6 +68,8 @@ public class FileHandleAssociationServletTest {
   String fileHandleId = "333";
   String sessionToken = "fake";
   URL resolvedUrl, rawFileUrl;
+  File tempStreamedFile;
+  byte[] tempStreamedBytes;
 
   @Before
   public void setup()
@@ -97,6 +109,54 @@ public class FileHandleAssociationServletTest {
     when(mockRequest.getCookies()).thenReturn(cookies);
 
     SynapseClientBaseTest.setupTestEndpoints();
+  }
+
+  @After
+  public void teardown() {
+    if (tempStreamedFile != null && tempStreamedFile.exists()) {
+      tempStreamedFile.delete();
+    }
+  }
+
+  /**
+   * Configure {@link #mockSynapse#getFileURL} to return a file:// URL pointing at a temp file with
+   * the given contents and suffix, so that the servlet can actually stream real bytes without any
+   * network dependency. The suffix drives the Content-Type reported by the JDK's file URL
+   * handler (e.g. ".pdf" → "application/pdf", ".txt" → "text/plain"), mirroring what S3 would
+   * echo back from a presigned URL. Also captures bytes written to
+   * {@link #responseOutputStream}.
+   */
+  private ByteArrayOutputStream stubStreamingUrlAndCaptureResponse(
+    byte[] contents,
+    String suffix
+  ) throws IOException, SynapseException {
+    tempStreamedFile = File.createTempFile("fha-servlet-test-", suffix);
+    try (FileOutputStream fos = new FileOutputStream(tempStreamedFile)) {
+      fos.write(contents);
+    }
+    tempStreamedBytes = contents;
+    URL fileUrl = tempStreamedFile.toURI().toURL();
+    when(mockSynapse.getFileURL(any(FileHandleAssociation.class)))
+      .thenReturn(fileUrl);
+
+    ByteArrayOutputStream captured = new ByteArrayOutputStream();
+    doAnswer(invocation -> {
+        byte[] buf = invocation.getArgument(0);
+        int off = invocation.getArgument(1);
+        int len = invocation.getArgument(2);
+        captured.write(buf, off, len);
+        return null;
+      })
+      .when(responseOutputStream)
+      .write(any(byte[].class), anyInt(), anyInt());
+    doAnswer(invocation -> {
+        byte[] buf = invocation.getArgument(0);
+        captured.write(buf);
+        return null;
+      })
+      .when(responseOutputStream)
+      .write(any(byte[].class));
+    return captured;
   }
 
   @Test
@@ -163,5 +223,160 @@ public class FileHandleAssociationServletTest {
     verify(mockResponse).sendRedirect(captor.capture());
     String v = captor.getValue();
     assertTrue(v.contains("Error:"));
+  }
+
+  @Test
+  public void testDoGetUserProfileAttachmentStreamsAndCaches()
+    throws Exception {
+    when(
+      mockRequest.getParameter(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY)
+    )
+      .thenReturn(FileHandleAssociateType.UserProfileAttachment.toString());
+    byte[] payload = "profile-image-bytes".getBytes();
+    ByteArrayOutputStream captured = stubStreamingUrlAndCaptureResponse(
+      payload,
+      ".bin"
+    );
+
+    servlet.doGet(mockRequest, mockResponse);
+
+    // No redirect on the streaming path.
+    verify(mockResponse, never()).sendRedirect(anyString());
+    // Long-lived cache header for public profile/team attachments.
+    verify(mockResponse)
+      .setHeader(
+        eq("Cache-Control"),
+        eq("max-age=" + GWTAllCacheFilter.CACHE_TIME_SECONDS)
+      );
+    assertArrayEquals(payload, captured.toByteArray());
+  }
+
+  @Test
+  public void testDoGetDataAccessRequestAttachmentStreamsPdfContentType()
+    throws Exception {
+    when(
+      mockRequest.getParameter(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY)
+    )
+      .thenReturn(
+        FileHandleAssociateType.DataAccessRequestAttachment.toString()
+      );
+    byte[] payload = "%PDF-1.4 fake eDUC contents".getBytes();
+    ByteArrayOutputStream captured = stubStreamingUrlAndCaptureResponse(
+      payload,
+      ".pdf"
+    );
+
+    servlet.doGet(mockRequest, mockResponse);
+
+    // SWC-7960: PDF is on the safe-inline whitelist so it renders in an iframe preview.
+    verify(mockResponse, never()).sendRedirect(anyString());
+    verify(mockResponse).setContentType("application/pdf");
+    verify(mockResponse).setHeader("Content-Disposition", "inline");
+    verify(mockResponse).setHeader("X-Content-Type-Options", "nosniff");
+    // Contents may include identifying information; must not be stored anywhere.
+    verify(mockResponse).setHeader("Cache-Control", "no-store");
+    assertArrayEquals(payload, captured.toByteArray());
+  }
+
+  @Test
+  public void testDoGetDataAccessRequestAttachmentForcesDownloadForNonInlineType()
+    throws Exception {
+    // A traditional (non-eDUC) DUC could be uploaded as DOCX, plain text, HTML, SVG, etc. Serving
+    // arbitrary user-uploaded content inline from the app origin would enable stored XSS, so any
+    // type outside the safe-inline whitelist must be forced to download.
+    when(
+      mockRequest.getParameter(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY)
+    )
+      .thenReturn(
+        FileHandleAssociateType.DataAccessRequestAttachment.toString()
+      );
+    byte[] payload = "traditional duc contents".getBytes();
+    ByteArrayOutputStream captured = stubStreamingUrlAndCaptureResponse(
+      payload,
+      ".txt"
+    );
+
+    servlet.doGet(mockRequest, mockResponse);
+
+    verify(mockResponse, never()).sendRedirect(anyString());
+    ArgumentCaptor<String> contentTypeCaptor = ArgumentCaptor.forClass(
+      String.class
+    );
+    verify(mockResponse).setContentType(contentTypeCaptor.capture());
+    assertTrue(
+      "expected non-PDF content type to be forwarded, got: " +
+      contentTypeCaptor.getValue(),
+      contentTypeCaptor.getValue().startsWith("text/plain")
+    );
+    // Not on the inline whitelist → force download.
+    verify(mockResponse).setHeader("Content-Disposition", "attachment");
+    verify(mockResponse).setHeader("X-Content-Type-Options", "nosniff");
+    verify(mockResponse).setHeader("Cache-Control", "no-store");
+    assertArrayEquals(payload, captured.toByteArray());
+  }
+
+  @Test
+  public void testIsSafeToDisplayInline() {
+    // Whitelisted types.
+    assertTrue(
+      FileHandleAssociationServlet.isSafeToDisplayInline("application/pdf")
+    );
+    assertTrue(FileHandleAssociationServlet.isSafeToDisplayInline("image/png"));
+    assertTrue(
+      FileHandleAssociationServlet.isSafeToDisplayInline("image/jpeg")
+    );
+    assertTrue(FileHandleAssociationServlet.isSafeToDisplayInline("image/gif"));
+    assertTrue(
+      FileHandleAssociationServlet.isSafeToDisplayInline("image/webp")
+    );
+    // Case- and parameter-tolerant.
+    assertTrue(
+      FileHandleAssociationServlet.isSafeToDisplayInline(
+        "Application/PDF; charset=binary"
+      )
+    );
+    // SVG is XML and can execute JS — must not be inline.
+    assertTrue(
+      !FileHandleAssociationServlet.isSafeToDisplayInline("image/svg+xml")
+    );
+    assertTrue(
+      !FileHandleAssociationServlet.isSafeToDisplayInline("text/html")
+    );
+    assertTrue(
+      !FileHandleAssociationServlet.isSafeToDisplayInline(
+        "application/xhtml+xml"
+      )
+    );
+    assertTrue(
+      !FileHandleAssociationServlet.isSafeToDisplayInline("text/plain")
+    );
+    assertTrue(
+      !FileHandleAssociationServlet.isSafeToDisplayInline(
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      )
+    );
+    assertTrue(!FileHandleAssociationServlet.isSafeToDisplayInline(null));
+  }
+
+  @Test
+  public void testDoGetDataAccessRequestAttachmentErrorRedirects()
+    throws Exception {
+    when(
+      mockRequest.getParameter(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY)
+    )
+      .thenReturn(
+        FileHandleAssociateType.DataAccessRequestAttachment.toString()
+      );
+    when(mockSynapse.getFileURL(any(FileHandleAssociation.class)))
+      .thenThrow(new SynapseForbiddenException("nope"));
+
+    servlet.doGet(mockRequest, mockResponse);
+
+    // Same failure handling as all other branches: redirect to error place.
+    ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+    verify(mockResponse).sendRedirect(captor.capture());
+    assertTrue(captor.getValue().contains("Error:"));
+    // Content-Type must not be set when the URL lookup failed.
+    verify(mockResponse, never()).setContentType(anyString());
   }
 }

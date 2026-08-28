@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import org.apache.commons.io.IOUtils;
 import org.sagebionetworks.client.SynapseClient;
@@ -111,19 +112,43 @@ public class FileHandleAssociationServlet extends HttpServlet {
           )
         ) {
           // cache for a long time, and send the bytes back
-          InputStream in = null;
-          OutputStream out = null;
-          try {
-            response.setHeader(
-              "Cache-Control",
-              "max-age=" + GWTAllCacheFilter.CACHE_TIME_SECONDS
-            );
-            in = resolvedUrl.openStream();
-            out = response.getOutputStream();
+          response.setHeader(
+            "Cache-Control",
+            "max-age=" + GWTAllCacheFilter.CACHE_TIME_SECONDS
+          );
+          try (
+            InputStream in = resolvedUrl.openStream();
+            OutputStream out = response.getOutputStream()
+          ) {
             IOUtils.copy(in, out);
-          } finally {
-            IOUtils.closeQuietly(in);
-            IOUtils.closeQuietly(out);
+          }
+        } else if (
+          FileHandleAssociateType.DataAccessRequestAttachment.equals(
+            fha.getAssociateObjectType()
+          )
+        ) {
+          // SWC-7960: Stream Data Access Request attachments (eDUCs, traditional DUCs, IRB
+          // approvals, etc.) same-origin so an iframe preview isn't blocked by CORS on the S3 hop.
+          URLConnection connection = resolvedUrl.openConnection();
+          String upstreamContentType = connection.getContentType();
+          if (upstreamContentType != null) {
+            response.setContentType(upstreamContentType);
+          }
+          // Serving user-uploaded content same-origin: only allow inline preview for types we know
+          // can't script (PDF and raster images); everything else is forced to download to prevent
+          // stored XSS via an uploaded HTML/SVG file.
+          String disposition = isSafeToDisplayInline(upstreamContentType)
+            ? "inline"
+            : "attachment";
+          response.setHeader("Content-Disposition", disposition);
+          response.setHeader("X-Content-Type-Options", "nosniff");
+          // Attachments may contain identifying information; never store.
+          response.setHeader("Cache-Control", "no-store");
+          try (
+            InputStream in = connection.getInputStream();
+            OutputStream out = response.getOutputStream()
+          ) {
+            IOUtils.copy(in, out);
           }
         } else {
           response.sendRedirect(resolvedUrl.toString());
@@ -169,5 +194,33 @@ public class FileHandleAssociationServlet extends HttpServlet {
     String base =
       url.substring(0, url.length() - uri.length() + ctx.length()) + "/";
     return base;
+  }
+
+  /**
+   * Whitelist of Content-Types considered safe to render inline in the browser when serving
+   * user-uploaded content from the app's own origin. Deliberately excludes SVG (can execute JS),
+   * HTML, XML, and everything else — those must be forced to download.
+   */
+  public static boolean isSafeToDisplayInline(String contentType) {
+    if (contentType == null) {
+      return false;
+    }
+    // Strip parameters like "; charset=..." and normalize.
+    String type = contentType.toLowerCase();
+    int semi = type.indexOf(';');
+    if (semi >= 0) {
+      type = type.substring(0, semi);
+    }
+    type = type.trim();
+    switch (type) {
+      case "application/pdf":
+      case "image/png":
+      case "image/jpeg":
+      case "image/gif":
+      case "image/webp":
+        return true;
+      default:
+        return false;
+    }
   }
 }
