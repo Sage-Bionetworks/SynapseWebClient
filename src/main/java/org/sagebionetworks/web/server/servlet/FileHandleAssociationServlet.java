@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import org.apache.commons.io.IOUtils;
 import org.sagebionetworks.client.SynapseClient;
@@ -126,13 +127,19 @@ public class FileHandleAssociationServlet extends HttpServlet {
             fha.getAssociateObjectType()
           )
         ) {
-          // SWC-7960: Stream DUC PDFs same-origin so an iframe preview isn't blocked by CORS on the S3 hop.
-          response.setContentType("application/pdf");
+          // SWC-7960: Stream Data Access Request attachments (eDUCs, traditional DUCs, IRB
+          // approvals, etc.) same-origin so an iframe preview isn't blocked by CORS on the S3 hop.
+          URLConnection connection = resolvedUrl.openConnection();
+          // Forward the upstream Content-Type so DOCX / images / PDF are all served correctly.
+          String upstreamContentType = connection.getContentType();
+          if (upstreamContentType != null) {
+            response.setContentType(upstreamContentType);
+          }
           response.setHeader("Content-Disposition", "inline");
-          // PDF contains identifying information, so don't cache it
-          response.setHeader("Cache-Control", "private, no-store");
+          // Attachments may contain identifying information; never store.
+          response.setHeader("Cache-Control", "no-store");
           try (
-            InputStream in = resolvedUrl.openStream();
+            InputStream in = connection.getInputStream();
             OutputStream out = response.getOutputStream()
           ) {
             IOUtils.copy(in, out);

@@ -120,14 +120,17 @@ public class FileHandleAssociationServletTest {
 
   /**
    * Configure {@link #mockSynapse#getFileURL} to return a file:// URL pointing at a temp file with
-   * the given contents, so that the servlet can actually stream real bytes without any network
-   * dependency. Also captures bytes written to {@link #responseOutputStream} into
-   * {@code capturedResponseBytes}.
+   * the given contents and suffix, so that the servlet can actually stream real bytes without any
+   * network dependency. The suffix drives the Content-Type reported by the JDK's file URL
+   * handler (e.g. ".pdf" → "application/pdf", ".txt" → "text/plain"), mirroring what S3 would
+   * echo back from a presigned URL. Also captures bytes written to
+   * {@link #responseOutputStream}.
    */
   private ByteArrayOutputStream stubStreamingUrlAndCaptureResponse(
-    byte[] contents
+    byte[] contents,
+    String suffix
   ) throws IOException, SynapseException {
-    tempStreamedFile = File.createTempFile("fha-servlet-test-", ".bin");
+    tempStreamedFile = File.createTempFile("fha-servlet-test-", suffix);
     try (FileOutputStream fos = new FileOutputStream(tempStreamedFile)) {
       fos.write(contents);
     }
@@ -231,7 +234,8 @@ public class FileHandleAssociationServletTest {
       .thenReturn(FileHandleAssociateType.UserProfileAttachment.toString());
     byte[] payload = "profile-image-bytes".getBytes();
     ByteArrayOutputStream captured = stubStreamingUrlAndCaptureResponse(
-      payload
+      payload,
+      ".bin"
     );
 
     servlet.doGet(mockRequest, mockResponse);
@@ -248,7 +252,7 @@ public class FileHandleAssociationServletTest {
   }
 
   @Test
-  public void testDoGetDataAccessRequestAttachmentStreamsAsPdf()
+  public void testDoGetDataAccessRequestAttachmentStreamsPdfContentType()
     throws Exception {
     when(
       mockRequest.getParameter(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY)
@@ -256,19 +260,56 @@ public class FileHandleAssociationServletTest {
       .thenReturn(
         FileHandleAssociateType.DataAccessRequestAttachment.toString()
       );
-    byte[] payload = "%PDF-1.4 fake duc contents".getBytes();
+    byte[] payload = "%PDF-1.4 fake eDUC contents".getBytes();
     ByteArrayOutputStream captured = stubStreamingUrlAndCaptureResponse(
-      payload
+      payload,
+      ".pdf"
     );
 
     servlet.doGet(mockRequest, mockResponse);
 
-    // SWC-7960: served same-origin as inline PDF so an iframe can preview it.
+    // SWC-7960: served same-origin so an iframe can preview it.
     verify(mockResponse, never()).sendRedirect(anyString());
     verify(mockResponse).setContentType("application/pdf");
     verify(mockResponse).setHeader("Content-Disposition", "inline");
-    // PDF contains identifying information; must not be cached.
-    verify(mockResponse).setHeader("Cache-Control", "private, no-store");
+    // Contents may include identifying information; must not be stored anywhere.
+    verify(mockResponse).setHeader("Cache-Control", "no-store");
+    assertArrayEquals(payload, captured.toByteArray());
+  }
+
+  @Test
+  public void testDoGetDataAccessRequestAttachmentForwardsNonPdfContentType()
+    throws Exception {
+    // A traditional (non-eDUC) DUC could be uploaded as e.g. plain text or DOCX; the servlet must
+    // forward whatever Content-Type the upstream file handle URL reports, not hardcode PDF.
+    when(
+      mockRequest.getParameter(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY)
+    )
+      .thenReturn(
+        FileHandleAssociateType.DataAccessRequestAttachment.toString()
+      );
+    byte[] payload = "traditional duc contents".getBytes();
+    ByteArrayOutputStream captured = stubStreamingUrlAndCaptureResponse(
+      payload,
+      ".txt"
+    );
+
+    servlet.doGet(mockRequest, mockResponse);
+
+    verify(mockResponse, never()).sendRedirect(anyString());
+    // ".txt" resolves to text/plain via the JDK's content-type map, standing in for whatever
+    // Content-Type S3 would echo back from the presigned URL.
+    ArgumentCaptor<String> contentTypeCaptor = ArgumentCaptor.forClass(
+      String.class
+    );
+    verify(mockResponse).setContentType(contentTypeCaptor.capture());
+    assertTrue(
+      "expected non-PDF content type to be forwarded, got: " +
+      contentTypeCaptor.getValue(),
+      contentTypeCaptor.getValue().startsWith("text/plain")
+    );
+    verify(mockResponse).setHeader("Content-Disposition", "inline");
+    verify(mockResponse).setHeader("Cache-Control", "no-store");
     assertArrayEquals(payload, captured.toByteArray());
   }
 
@@ -290,7 +331,7 @@ public class FileHandleAssociationServletTest {
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(mockResponse).sendRedirect(captor.capture());
     assertTrue(captor.getValue().contains("Error:"));
-    // Nothing PDF-specific should have been set when the URL lookup failed.
+    // Content-Type must not be set when the URL lookup failed.
     verify(mockResponse, never()).setContentType(anyString());
   }
 }
