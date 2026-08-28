@@ -108,7 +108,6 @@ import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.GridPageImpl;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
-import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
@@ -634,8 +633,6 @@ public interface PortalGinInjector {
   VersionHistoryWidget getVersionHistoryWidget();
 
   JoinTeamConfigEditor getJoinTeamConfigEditor();
-
-  ModifiedCreatedByWidget getModifiedCreatedByWidget();
 
   FileHandleLink getFileHandleLink();
 

@@ -38,7 +38,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
-import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidget;
@@ -98,7 +97,6 @@ public abstract class AbstractTablesTab
   String areaToken;
   StuAlert synAlert;
   PortalGinInjector ginInjector;
-  ModifiedCreatedByWidget modifiedCreatedBy;
   TableEntityWidgetV2 tableEntityWidget;
   Map<String, String> configMap;
   CallbackP<String> entitySelectedCallback;
@@ -187,7 +185,6 @@ public abstract class AbstractTablesTab
       this.metadata = ginInjector.getEntityMetadata();
       this.queryTokenProvider = ginInjector.getQueryTokenProvider();
       this.synAlert = ginInjector.getStuAlert();
-      this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
       this.wikiPageWidget = ginInjector.getWikiPageWidget();
       this.jsClient = ginInjector.getSynapseJavascriptClient();
 
@@ -202,7 +199,6 @@ public abstract class AbstractTablesTab
       view.setTitlebar(titleBar.asWidget());
       view.setEntityMetadata(metadata.asWidget());
       view.setSynapseAlert(synAlert.asWidget());
-      view.setModifiedCreatedBy(modifiedCreatedBy);
       view.setWikiPage(wikiPageWidget.asWidget());
       tab.setContent(view.asWidget());
       initBreadcrumbLinkClickedHandler();
@@ -250,7 +246,6 @@ public abstract class AbstractTablesTab
       view.setTitlebarVisible(false);
       view.setWikiPageVisible(false);
       view.clearTableEntityWidget();
-      modifiedCreatedBy.setVisible(false);
       view.setTableUIVisible(false);
     }
   }
@@ -396,7 +391,6 @@ public abstract class AbstractTablesTab
     view.setTableListVisible(isProject);
     view.setTitlebarVisible(isShownInTab);
     view.clearTableEntityWidget();
-    modifiedCreatedBy.setVisible(false);
     view.setTableUIVisible(isShownInTab);
     view.setActionMenu(tab.getEntityActionMenu());
     boolean isCurrentVersion =
@@ -417,7 +411,6 @@ public abstract class AbstractTablesTab
       updateVersionAndAreaToken(entity.getId(), version, areaToken);
       breadcrumb.configure(bundle.getPath(), getTabArea());
       titleBar.configure(bundle, tab.getEntityActionMenu());
-      modifiedCreatedBy.configure(entity.getId(), version);
       if (entity instanceof SearchIndex) {
         IsWidget searchWidget = createSearchIndexWidget(
           entity.getId(),

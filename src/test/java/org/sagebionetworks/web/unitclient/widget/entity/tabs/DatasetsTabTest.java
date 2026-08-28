@@ -55,7 +55,6 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
-import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
@@ -130,9 +129,6 @@ public class DatasetsTabTest {
 
   @Mock
   TableEntityWidgetV2 mockTableEntityWidget;
-
-  @Mock
-  ModifiedCreatedByWidget mockModifiedCreatedBy;
 
   @Captor
   ArgumentCaptor<CallbackP> callbackPCaptor;
@@ -291,7 +287,6 @@ public class DatasetsTabTest {
         mockActionMenuWidget
       );
     verify(mockView).setTableEntityWidget(any());
-    verify(mockModifiedCreatedBy).configure(datasetId, version);
     verify(mockProvenanceWidget).configure(mapCaptor.capture());
     // verify configuration
     Map<String, String> provConfig = mapCaptor.getValue();
@@ -309,7 +304,6 @@ public class DatasetsTabTest {
     verify(mockView).setTableListVisible(false);
     verify(mockView).setTitlebarVisible(true);
     verify(mockView).clearTableEntityWidget();
-    verify(mockModifiedCreatedBy).setVisible(false);
     verify(mockView).setWikiPage(any());
     verify(mockView).setWikiPageVisible(true);
 
@@ -339,14 +333,11 @@ public class DatasetsTabTest {
     tab.setProject(projectEntityId, mockProjectEntityBundle, null);
     tab.configure(mockProjectEntityBundle, version, areaToken);
 
-    verify(mockModifiedCreatedBy, never()).configure(anyString(), anyLong());
-
     verify(mockView).setEntityMetadataVisible(false);
     verify(mockView).setBreadcrumbVisible(false);
     verify(mockView).setTableListVisible(true);
     verify(mockView).setTitlebarVisible(false);
     verify(mockView).clearTableEntityWidget();
-    verify(mockModifiedCreatedBy).setVisible(false);
     verify(mockView).setTableUIVisible(false);
     verify(mockView, never()).setTableUIVisible(true);
     verify(mockView).setWikiPageVisible(false);
@@ -522,7 +513,6 @@ public class DatasetsTabTest {
     verify(mockView).setTableListVisible(false);
     verify(mockView).setTitlebarVisible(false);
     verify(mockView).clearTableEntityWidget();
-    verify(mockModifiedCreatedBy).setVisible(false);
     verify(mockView).setTableUIVisible(false);
   }
 

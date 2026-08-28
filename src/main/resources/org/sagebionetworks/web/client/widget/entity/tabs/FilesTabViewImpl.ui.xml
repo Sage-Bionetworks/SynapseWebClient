@@ -81,7 +81,6 @@
           <bh:Div ui:field="discussionThreadsContainer" />
       </g:FlowPanel>
     </bh:Div>
-    <g:SimplePanel ui:field="fileModifiedAndCreatedContainer" />
     </g:FlowPanel>
     <w:ReactComponent ui:field="entitySidebar" addStyleNames="entityPageSidebar" />
   </bh:Div>
