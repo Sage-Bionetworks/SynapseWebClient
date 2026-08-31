@@ -44,7 +44,6 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -65,7 +64,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.AbstractTablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
@@ -162,9 +161,6 @@ public class DatasetsTabTest {
   SynapseJavascriptClient mockJsClient;
 
   @Mock
-  FeatureFlagConfig mockFeatureFlagConfig;
-
-  @Mock
   SynapseJSNIUtils mockJsniUtils;
 
   @Captor
@@ -193,7 +189,7 @@ public class DatasetsTabTest {
     when(mockPortalGinInjector.getQueryTokenProvider())
       .thenReturn(mockQueryTokenProvider);
     when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
-    when(mockPortalGinInjector.getProvenanceRenderer())
+    when(mockPortalGinInjector.getProvenanceRendererV2())
       .thenReturn(mockProvenanceWidget);
     when(mockPortalGinInjector.getGlobalApplicationState())
       .thenReturn(mockGlobalApplicationState);
@@ -204,13 +200,7 @@ public class DatasetsTabTest {
     when(mockGlobalApplicationState.getPlaceChanger())
       .thenReturn(mockPlaceChanger);
 
-    tab =
-      new DatasetsTab(
-        mockTab,
-        mockPortalGinInjector,
-        mockFeatureFlagConfig,
-        mockJsniUtils
-      );
+    tab = new DatasetsTab(mockTab, mockPortalGinInjector, mockJsniUtils);
     tab.setEntitySelectedCallback(mockEntitySelectedCallback);
 
     when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);

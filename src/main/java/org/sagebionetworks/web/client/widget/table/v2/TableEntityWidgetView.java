@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.jsinterop.DatasetEditorProps;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
-import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 
 /**
@@ -92,7 +91,6 @@ public interface TableEntityWidgetView extends IsWidget {
     String initQueryJson,
     OnQueryCallback onQueryBundleRequestChange,
     OnQueryResultBundleCallback onQueryResultBundleChange,
-    OnViewSharingSettingsHandler onViewSharingSettingsHandler,
     boolean hideSqlEditorControl
   );
 

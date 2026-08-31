@@ -31,7 +31,6 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -132,9 +131,6 @@ public class FilesTabTest {
   UserEntityPermissions mockPermissions;
 
   @Mock
-  org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget mockProvenanceWidget;
-
-  @Mock
   ProvenanceWidget mockProvenanceWidgetV2;
 
   @Mock
@@ -167,9 +163,6 @@ public class FilesTabTest {
   @Mock
   CookieProvider mockCookies;
 
-  @Mock
-  FeatureFlagConfig mockFeatureFlagConfig;
-
   FilesTab tab;
   String projectEntityId = "syn9";
   String projectName = "proyecto";
@@ -192,7 +185,7 @@ public class FilesTabTest {
       .thenReturn(mockEntityRefreshAlert);
     when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 
-    tab = new FilesTab(mockTab, mockPortalGinInjector, mockFeatureFlagConfig);
+    tab = new FilesTab(mockTab, mockPortalGinInjector);
 
     when(mockPortalGinInjector.getFilesTabView()).thenReturn(mockView);
     when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockTitleBar);
@@ -228,8 +221,6 @@ public class FilesTabTest {
     when(mockFileEntity.getName()).thenReturn(fileName);
     when(mockEntityBundle.getPermissions()).thenReturn(mockPermissions);
 
-    when(mockPortalGinInjector.getProvenanceRenderer())
-      .thenReturn(mockProvenanceWidget);
     when(mockPortalGinInjector.getProvenanceRendererV2())
       .thenReturn(mockProvenanceWidgetV2);
     when(mockLinkEntity.getLinksTo()).thenReturn(mockReference);
@@ -363,7 +354,7 @@ public class FilesTabTest {
     verify(mockView).setWikiPageWidgetVisible(true);
 
     verify(mockView, times(2)).setFileBrowserVisible(false);
-    verify(mockPortalGinInjector).getProvenanceRenderer();
+    verify(mockPortalGinInjector).getProvenanceRendererV2();
 
     verify(mockView).setRefreshAlert(any());
     verify(mockView).setDiscussionText(fileName);

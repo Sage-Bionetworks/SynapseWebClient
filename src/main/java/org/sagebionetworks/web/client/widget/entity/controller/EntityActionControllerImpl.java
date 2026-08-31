@@ -1727,10 +1727,7 @@ public class EntityActionControllerImpl
         permissions.getCanEdit()
       );
       String text = RENAME_PREFIX + entityTypeDisplay;
-      if (
-        entityBundle.getEntity() instanceof Table &&
-        featureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
-      ) {
+      if (entityBundle.getEntity() instanceof Table) {
         text = EDIT_NAME_AND_DESCRIPTION;
       }
       actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, text);

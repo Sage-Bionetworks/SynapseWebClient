@@ -113,7 +113,6 @@
             ui:field="showMapLink"
             text="Show map"
             icon="MAP_MARKER"
-            visible="false"
           />
           <b:Modal
             ui:field="mapModal"

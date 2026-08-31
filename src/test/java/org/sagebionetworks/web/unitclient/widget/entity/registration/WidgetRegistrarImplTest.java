@@ -15,8 +15,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
-import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
@@ -31,9 +29,6 @@ public class WidgetRegistrarImplTest {
 
   @Mock
   PortalGinInjector mockGinInjector;
-
-  @Mock
-  FeatureFlagConfig mockFeatureFlagConfig;
 
   Map<String, String> testImageWidgetDescriptor;
   String testFileName = "testfile.png";
@@ -51,11 +46,7 @@ public class WidgetRegistrarImplTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     widgetRegistrar =
-      new WidgetRegistrarImpl(
-        mockGinInjector,
-        new JSONObjectAdapterImpl(),
-        mockFeatureFlagConfig
-      );
+      new WidgetRegistrarImpl(mockGinInjector, new JSONObjectAdapterImpl());
     testImageWidgetDescriptor = new HashMap<String, String>();
     when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
   }
@@ -77,7 +68,7 @@ public class WidgetRegistrarImplTest {
     widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(
       WidgetConstants.PROVENANCE_CONTENT_TYPE
     );
-    verify(mockGinInjector).getProvenanceRenderer();
+    verify(mockGinInjector).getProvenanceRendererV2();
     widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(
       WidgetConstants.API_TABLE_CONTENT_TYPE
     );
@@ -88,17 +79,6 @@ public class WidgetRegistrarImplTest {
       WidgetConstants.LEADERBOARD_CONTENT_TYPE
     );
     verify(mockGinInjector, times(3)).getSynapseAPICallRenderer();
-
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.PROVENANCE_V2_VISUALIZATION
-      )
-    )
-      .thenReturn(true);
-    widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(
-      WidgetConstants.PROVENANCE_CONTENT_TYPE
-    );
-    verify(mockGinInjector).getProvenanceRendererV2();
   }
 
   @Test

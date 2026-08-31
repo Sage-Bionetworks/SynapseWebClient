@@ -8,8 +8,6 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
-import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -37,7 +35,6 @@ public class DockerRepoWidget {
   private boolean canEdit;
   private DockerRepository entity;
   private EventBus eventBus;
-  private FeatureFlagConfig featureFlagConfig;
 
   @Inject
   public DockerRepoWidget(
@@ -49,8 +46,7 @@ public class DockerRepoWidget {
     ModifiedCreatedByWidget modifiedCreatedBy,
     DockerCommitListWidget dockerCommitListWidget,
     CookieProvider cookies,
-    EventBus eventBus,
-    FeatureFlagConfig featureFlagConfig
+    EventBus eventBus
   ) {
     this.view = view;
     this.wikiPageWidget = wikiPageWidget;
@@ -61,7 +57,6 @@ public class DockerRepoWidget {
     this.dockerCommitListWidget = dockerCommitListWidget;
     this.cookies = cookies;
     this.eventBus = eventBus;
-    this.featureFlagConfig = featureFlagConfig;
     view.setWikiPage(wikiPageWidget.asWidget());
     view.setProvenance(provWidget.asWidget());
     view.setTitlebar(dockerTitleBar.asWidget());
@@ -84,11 +79,6 @@ public class DockerRepoWidget {
     configureProvenance(entity.getId());
     view.setDockerPullCommand(DOCKER_PULL_COMMAND + entity.getRepositoryName());
     dockerCommitListWidget.configure(entity.getId(), false);
-    view.setProvenanceWidgetVisible(
-      featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.PROVENANCE_DOCKER_IMAGES
-      )
-    );
   }
 
   private void configureProvenance(final String entityId) {

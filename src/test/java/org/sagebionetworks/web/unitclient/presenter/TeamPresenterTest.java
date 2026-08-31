@@ -21,8 +21,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
-import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -134,9 +132,6 @@ public class TeamPresenterTest {
   @Mock
   IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
 
-  @Mock
-  FeatureFlagConfig mockFeatureFlagConfig;
-
   @Captor
   ArgumentCaptor<CallbackP<Boolean>> callbackPcaptor;
 
@@ -169,8 +164,7 @@ public class TeamPresenterTest {
         mockGoogleMap,
         mockCookies,
         mockIsACTMemberAsyncHandler,
-        mockGinInjector,
-        mockFeatureFlagConfig
+        mockGinInjector
       );
     when(mockTeam.getName()).thenReturn(teamName);
     AsyncMockStubber
@@ -188,8 +182,6 @@ public class TeamPresenterTest {
     when(mockTeam.getCanPublicJoin()).thenReturn(canPublicJoin);
     when(mockTeam.getId()).thenReturn(teamId);
     when(mockTeam.getIcon()).thenReturn(teamIcon);
-    when(mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.GOOGLE_MAP))
-      .thenReturn(true);
   }
 
   private void setIsACT(boolean isACT) {
@@ -373,7 +365,6 @@ public class TeamPresenterTest {
     verify(mockView, never()).showAdminMenuItems();
 
     verify(mockGoogleMap, never()).configure(teamId);
-    verify(mockView).setShowMapVisible(false);
 
     // simulate clicking Show Map
     presenter.onShowMap();

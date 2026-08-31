@@ -20,8 +20,6 @@ import org.sagebionetworks.repo.model.project.ExternalGoogleCloudStorageLocation
 import org.sagebionetworks.repo.model.project.ExternalObjectStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
-import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
@@ -40,7 +38,6 @@ public class StorageLocationWidget
   CookieProvider cookies;
   EventBus eventBus;
   SynapseProperties synapseProperties;
-  FeatureFlagConfig featureFlagConfig;
 
   @Inject
   public StorageLocationWidget(
@@ -50,8 +47,7 @@ public class StorageLocationWidget
     SynapseAlert synAlert,
     SynapseProperties synapseProperties,
     CookieProvider cookies,
-    EventBus eventBus,
-    FeatureFlagConfig featureFlagConfig
+    EventBus eventBus
   ) {
     this.view = view;
     this.synapseClient = synapseClient;
@@ -61,7 +57,6 @@ public class StorageLocationWidget
     this.cookies = cookies;
     this.synapseProperties = synapseProperties;
     this.eventBus = eventBus;
-    this.featureFlagConfig = featureFlagConfig;
     view.setSynAlertWidget(synAlert);
     view.setPresenter(this);
   }
@@ -72,10 +67,7 @@ public class StorageLocationWidget
     view.setLoading(true);
     getStorageLocationSetting();
     getMyLocationSettingBanners();
-    boolean isInAlpha = featureFlagConfig.isFeatureEnabled(
-      FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS
-    );
-    view.setExternalObjectStoreVisible(isInAlpha);
+    view.setExternalObjectStoreVisible(true);
   }
 
   public void getMyLocationSettingBanners() {
@@ -111,10 +103,7 @@ public class StorageLocationWidget
         @Override
         public void onSuccess(UploadDestination uploadDestination) {
           // if null, then still show the default UI
-          boolean isInAlpha = featureFlagConfig.isFeatureEnabled(
-            FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS
-          );
-          view.setS3StsVisible(isInAlpha);
+          view.setS3StsVisible(true);
           Long defaultStorageId = Long.parseLong(
             synapseProperties.getSynapseProperty(
               WebConstants.DEFAULT_STORAGE_ID_PROPERTY_KEY

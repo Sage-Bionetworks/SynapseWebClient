@@ -12,8 +12,6 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
-import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -81,8 +79,7 @@ public class TeamPresenter
     GoogleMap map,
     CookieProvider cookies,
     IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-    PortalGinInjector ginInjector,
-    FeatureFlagConfig featureFlagConfig
+    PortalGinInjector ginInjector
   ) {
     this.view = view;
     this.ginInjector = ginInjector;
@@ -108,9 +105,6 @@ public class TeamPresenter
     view.setManagerListWidget(managerListWidget.asWidget());
     view.setMemberListWidget(memberListWidget.asWidget());
     view.setMap(map.asWidget());
-    view.setShowMapVisible(
-      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.GOOGLE_MAP)
-    );
     inviteWidget.setRefreshCallback(refreshCallback);
   }
 
