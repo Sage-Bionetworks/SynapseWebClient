@@ -33,8 +33,8 @@ importers:
         specifier: 4.11.5-sage.3
         version: 4.11.5-sage.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@sage-bionetworks/synapse-types':
-        specifier: ^0.0.8
-        version: 0.0.8
+        specifier: ^0.0.9
+        version: 0.0.9
       '@tanstack/react-query':
         specifier: 5.80.10
         version: 5.80.10(react@19.2.7)
@@ -135,8 +135,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       synapse-react-client:
-        specifier: 4.0.35
-        version: 4.0.35(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)
+        specifier: 4.0.36
+        version: 4.0.36(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)
       xss:
         specifier: ^1.0.15
         version: 1.0.15
@@ -1570,19 +1570,17 @@ packages:
     peerDependencies:
       react: ^19.2.7
 
-  '@sage-bionetworks/react-datasheet-grid@4.11.5-sage.8':
-    resolution: {integrity: sha512-3tTYFfyEGX93MRCcaJ3noUyvL1QqS4bvoWKPPQXJEG+KojjaU8nRfHByitjC3i14EYmbwlHQGR/Y/zZDucK20g==}
+  '@sage-bionetworks/react-datasheet-grid@4.11.5-sage.9':
+    resolution: {integrity: sha512-fUJ0nb+EL6/JnRSkyXJV35uLRiLO+Z888zWlmGhrY/B03fIlZY1EAeU/MPbNaHk5yDxiF4UgBlKdshEMc37dJw==}
     peerDependencies:
       react: ^19.2.7
-
-  '@sage-bionetworks/synapse-client@0.0.22':
-    resolution: {integrity: sha512-MCeJpd3JIzLpNTgSRGPG6BDAGT6BSZv9RpQeXsCPH4IlbpunpGbBeU7R3rX62ghr0yp1bltAaBXgCf7e/8pKRA==}
+      react-dom: ^19.2.7
 
   '@sage-bionetworks/synapse-client@0.0.23':
     resolution: {integrity: sha512-NbcoWpL3PxKHnHcbffCAcdCdM1CpdvhKxOUzcVT3EfuVWN3BFjDYMnTA6QBPOCOQvCitldeaJ03KUgPchf6qHg==}
 
-  '@sage-bionetworks/synapse-types@0.0.8':
-    resolution: {integrity: sha512-D88QfvOEKLfOX1EOPKWCeJuqYL0mUWaZEny7F45dzfvn66gJKwH3sgf5u2Oh2Ynos6nZGxfsybR4Ui4G5tkfZw==}
+  '@sage-bionetworks/synapse-types@0.0.9':
+    resolution: {integrity: sha512-4pvoxwFKg4DOjUfnLtQqWBilbD34kHdoCt87aiWcVFeML0T94Vf+fqJ0w0Nr7/WAKqfRrcXwH0jh5E4zTI1dDQ==}
 
   '@smithy/core@3.31.1':
     resolution: {integrity: sha512-CyogUINxvi7C7LDsh8Syo6hVJOT9ckz4rG8dRZfTJ8r91HkMY59PnNooaj7WcHyxEkxPfBAmbgztZU+xTo76lg==}
@@ -1635,6 +1633,12 @@ packages:
       react: ^19.2.7
       react-dom: ^19.2.7
 
+  '@tanstack/react-virtual@3.14.10':
+    resolution: {integrity: sha512-SRyoUbdFMRHuYXMijV5H4ZarQWpXkj3iANq8OFre+pybeVap8ZJjZ3Nz9bVjx4d8PfobVUQUdKyyyHYk3E+djw==}
+    peerDependencies:
+      react: ^19.2.7
+      react-dom: ^19.2.7
+
   '@tanstack/react-virtual@3.14.2':
     resolution: {integrity: sha512-IpWnmCLvuymRfeeLNVXIzNEYBFLpd3drVIS91sqV78VTZFyldlChkOocZRCPp1B+Wnk09bcLNme8WaMU/9/9bQ==}
     peerDependencies:
@@ -1647,6 +1651,9 @@ packages:
 
   '@tanstack/virtual-core@3.17.0':
     resolution: {integrity: sha512-gOxY/hFkPh/XQYhnThBHzkbkX3Ed+z/iushyz+R+JAr213aXxUDgQoTgTdrDpBSRsjFM73P/KfUyWmaF9WHMkQ==}
+
+  '@tanstack/virtual-core@3.17.8':
+    resolution: {integrity: sha512-BfEvehNpOT75r5Ksc5xW6NZuXujTfb7nlSEyVu4XHG3gdxNg1KqXruWbDewXOUaUYIo4oRbSfkjIajz4MAT8tA==}
 
   '@turf/area@6.5.0':
     resolution: {integrity: sha512-xCZdiuojokLbQ+29qR6qoMD89hv+JAgWjLrwSEWL+3JV8IXKeNFl6XkEJz9HGkVpnXvQKJoRz4/liT+8ZZ5Jyg==}
@@ -2637,6 +2644,9 @@ packages:
   dompurify@3.4.12:
     resolution: {integrity: sha512-zQvGet8Z2sWbQhCmfFz/T5QWH2oBmjnqK3qvOjaqaNLrLEF912WamU+ohnTp0TCep/MFVHpdJuCZEdFOdTnEFg==}
 
+  dompurify@3.4.14:
+    resolution: {integrity: sha512-dVoH9z+MY+C9IilgGCk3YfFqjLi3fChm2OiKJMzh6axrJ5qwxqWaZamgmHrpv22CN/KdbZJuGEGgfQoL00LTdg==}
+
   domutils@4.0.2:
     resolution: {integrity: sha512-qI4JLRKnSzqFqr7hAlS5xQDusBCjKSEG4t4+7aNrIQMHBcsC2TGEhuyABJdYkgSewL57PNLYEiibY2iPKhKpaA==}
     engines: {node: '>=20.19.0'}
@@ -3443,6 +3453,7 @@ packages:
   isomorphic-dompurify@3.21.0:
     resolution: {integrity: sha512-Bg5mqtMnMdBBwz7MjvH3oAuLOA/j0xtawVkcAZsOpVhOsfaLYwnAvhEvz94f8585Q6LCnnNr2XNApbXlB0J3GQ==}
     engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
+    deprecated: Raised the minimum Node.js version (breaking) without a major bump. Use 4.x for the same code with correct semver, or pin 3.19.0 for Node < 22.22.2.
 
   isomorphic-fetch@3.0.0:
     resolution: {integrity: sha512-qvUtwJ3j6qwsF3jLxkZ72qCgjMysPzDfeV240JHiGZsANBYd+EEuu35v7dfrJ9Up0Ak07D7GGSkGhCHTqg/5wA==}
@@ -5083,8 +5094,8 @@ packages:
   symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
 
-  synapse-react-client@4.0.35:
-    resolution: {integrity: sha512-y7eKgp8EErXb14mxHJjKJ08y3AefkK+wMpVGBaBhRKtwB36TVx3lcnrNUme6AhwUJ6YmHmce1LGBz9wo50tC+w==}
+  synapse-react-client@4.0.36:
+    resolution: {integrity: sha512-Cmzzottpnxcqbq5mJMn2ssmQZoMYSTwwie4Vg4ecOh03bLty0wF5P4JUmNvczASeIKrmjdBL/8ErtygsIJgLRg==}
     peerDependencies:
       '@sage-bionetworks/aridhia-client': '*'
       react: ^19.2.7
@@ -6964,24 +6975,22 @@ snapshots:
     transitivePeerDependencies:
       - react-dom
 
-  '@sage-bionetworks/react-datasheet-grid@4.11.5-sage.8(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@sage-bionetworks/react-datasheet-grid@4.11.5-sage.9(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@tanstack/react-virtual': 3.14.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-virtual': 3.14.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       classnames: 2.5.1
+      dompurify: 3.4.14
       fast-deep-equal: 3.1.3
       react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
       react-resize-detector: 10.0.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       throttle-debounce: 3.0.1
-    transitivePeerDependencies:
-      - react-dom
-
-  '@sage-bionetworks/synapse-client@0.0.22': {}
 
   '@sage-bionetworks/synapse-client@0.0.23': {}
 
-  '@sage-bionetworks/synapse-types@0.0.8':
+  '@sage-bionetworks/synapse-types@0.0.9':
     dependencies:
-      '@sage-bionetworks/synapse-client': 0.0.22
+      '@sage-bionetworks/synapse-client': 0.0.23
 
   '@smithy/core@3.31.1':
     dependencies:
@@ -7039,6 +7048,12 @@ snapshots:
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
+  '@tanstack/react-virtual@3.14.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+    dependencies:
+      '@tanstack/virtual-core': 3.17.8
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
+
   '@tanstack/react-virtual@3.14.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@tanstack/virtual-core': 3.17.0
@@ -7048,6 +7063,8 @@ snapshots:
   '@tanstack/table-core@8.21.3': {}
 
   '@tanstack/virtual-core@3.17.0': {}
+
+  '@tanstack/virtual-core@3.17.8': {}
 
   '@turf/area@6.5.0':
     dependencies:
@@ -8184,6 +8201,10 @@ snapshots:
       domelementtype: 3.0.0
 
   dompurify@3.4.12:
+    optionalDependencies:
+      '@types/trusted-types': 2.0.7
+
+  dompurify@3.4.14:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 
@@ -11177,7 +11198,7 @@ snapshots:
 
   symbol-tree@3.2.4: {}
 
-  synapse-react-client@4.0.35(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2):
+  synapse-react-client@4.0.36(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2):
     dependencies:
       '@apidevtools/json-schema-ref-parser': 14.2.1(@types/json-schema@7.0.15)
       '@aws-sdk/client-s3': 3.1101.0
@@ -11199,9 +11220,9 @@ snapshots:
       '@rjsf/utils': 6.0.0-beta.10(react@19.2.7)
       '@rjsf/validator-ajv8': 6.0.0-beta.10(@rjsf/utils@6.0.0-beta.10(react@19.2.7))
       '@sage-bionetworks/markdown-it-container': 4.0.1
-      '@sage-bionetworks/react-datasheet-grid': 4.11.5-sage.8(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@sage-bionetworks/react-datasheet-grid': 4.11.5-sage.9(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@sage-bionetworks/synapse-client': 0.0.23
-      '@sage-bionetworks/synapse-types': 0.0.8
+      '@sage-bionetworks/synapse-types': 0.0.9
       '@tanstack/query-core': 5.80.10
       '@tanstack/react-query': 5.80.10(react@19.2.7)
       '@tanstack/react-query-devtools': 5.80.10(@tanstack/react-query@5.80.10(react@19.2.7))(react@19.2.7)
