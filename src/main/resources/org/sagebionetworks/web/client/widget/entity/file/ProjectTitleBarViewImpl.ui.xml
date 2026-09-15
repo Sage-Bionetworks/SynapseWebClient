@@ -24,7 +24,7 @@
             addStyleNames="flexcontainer-column"
           />
           <b:Heading
-            addStyleNames="pageHeaderTitle flexcontainer-column"
+            addStyleNames="pageHeaderTitle flexcontainer-column margin-0-imp"
             ui:field="fileName"
             size="H3"
           />
