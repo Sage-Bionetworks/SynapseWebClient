@@ -31,7 +31,7 @@
              />
           <bh:Div ui:field="projectInfo" addStyleNames="actionMenuButtonStyle"/>
           <bh:Div ui:field="entityCitation" addStyleNames="actionMenuButtonStyle entityCitationContainer"/>
-          <bh:Span ui:field="projectActionMenuContainer" />
+          <bh:Span ui:field="projectActionMenuContainer" addStyleNames="projectActionMenuContainer" />
         </bh:Div>
       </g:FlowPanel>
     </bh:Div>

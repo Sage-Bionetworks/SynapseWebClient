@@ -225,8 +225,10 @@ a:focus {
 
     .actionMenuButtonStyle {
       button {
-        font-size: 16px;
-        line-height: 20px;
+        font-size: 12px;
+        line-height: 12px; /* 100% */
+        letter-spacing: -0.24px;
+        font-weight: 540;
       }
     }
 
@@ -234,14 +236,27 @@ a:focus {
       display: none;
     }
 
+    .projectActionMenuContainer {
+      .MuiButton-root {
+        padding: 8px;
+        height: 28px;
+      }
+      .MuiTypography-root {
+        font-size: 12px;
+        line-height: 12px;
+        letter-spacing: -0.24px;
+      }
+    }
+
     .projectSupport {
       .MuiButton-root {
-        font-size: 16px;
-        line-height: 20px;
-        text-transform: none;
+        font-size: 12px;
+        height: 28px;
         border-radius: 6px;
         font-weight: 540;
-        padding: 8px 12px;
+        padding: 8px;
+        line-height: 12px; /* 100% */
+        letter-spacing: -0.24px;
       }
     }
     .projectSupport .MuiButton-root:hover {
@@ -281,6 +296,12 @@ a:focus {
         flex-direction: column;
       }
       .projectSettings {
+        align-items: center;
+
+        .MuiButton-icon .MuiSvgIcon-root {
+          font-size: 16px;
+        }
+
         @media (min-width: 1200px) {
           justify-content: center;
           margin-left: auto;
