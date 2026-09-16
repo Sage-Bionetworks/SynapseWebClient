@@ -296,18 +296,8 @@ a:focus {
         flex-direction: column;
       }
       .projectSettings {
-        // The Support button is a direct flex item, while the other buttons are
-        // wrapped in a div/span. Without this, `align-items: stretch` (the
-        // default) stretches only the Support button to the row height, making
-        // it taller than its neighbors.
         align-items: center;
 
-        // Size every button icon in this row consistently. MUI sizes icons at
-        // 20px for medium buttons via `.MuiButton-icon > *:nth-of-type(1)`, but
-        // that misses icons rendered by SRC's IconSvg, which wraps the svg in an
-        // extra span, leaving those at the 24px `.MuiSvgIcon-fontSizeMedium`
-        // default. Targeting the svg directly covers both cases, and
-        // `MuiButton-icon` is set on start and end icons alike.
         .MuiButton-icon .MuiSvgIcon-root {
           font-size: 16px;
         }
