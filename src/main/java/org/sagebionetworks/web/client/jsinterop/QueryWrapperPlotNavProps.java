@@ -41,6 +41,9 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
   boolean hideSqlEditorControl;
 
   @JsNullable
+  boolean showQueryBuilderControl;
+
+  @JsNullable
   SynapseTableProps tableConfiguration;
 
   @JsNullable
@@ -67,6 +70,7 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
     OnQueryCallback onQueryChange,
     OnQueryResultBundleCallback onQueryResultBundleChange,
     boolean hideSqlEditorControl,
+    boolean showQueryBuilderControl,
     Boolean defaultShowPlots,
     Boolean defaultShowSearchBox,
     Boolean hideCopyToClipboard,
@@ -79,6 +83,7 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
     props.sql = sql;
     props.initQueryJson = initQueryJson;
     props.hideSqlEditorControl = hideSqlEditorControl;
+    props.showQueryBuilderControl = showQueryBuilderControl;
     props.onQueryChange = onQueryChange;
     props.onQueryResultBundleChange = onQueryResultBundleChange;
     if (tableConfiguration != null) {

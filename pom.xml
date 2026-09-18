@@ -19,7 +19,7 @@
       ${project.build.directory}/${project.build.finalName}
     </webappDirectory>
 
-    <synapse.version>599.0-15-g15056ef336</synapse.version>
+    <synapse.version>606.0</synapse.version>
     <gwtVersion>2.13.0</gwtVersion>
     <org.springframework.version>6.2.19</org.springframework.version>
     <guiceVersion>7.0.0</guiceVersion>
@@ -351,8 +351,15 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.13.0</version>
+        <version>3.14.0</version>
         <configuration>
+          <!-- `fork=true` + explicit `proc=full` work around an intermittent
+               javac NPE ("toplevel.sourcefile is null") triggered when
+               Dagger's XProcessing looks up a type element for a source it
+               just generated. Reproduces most under `pnpm dev` (concurrent
+               mvn + vite dev). -->
+          <fork>true</fork>
+          <proc>full</proc>
           <annotationProcessorPaths>
             <path>
               <groupId>com.google.dagger</groupId>

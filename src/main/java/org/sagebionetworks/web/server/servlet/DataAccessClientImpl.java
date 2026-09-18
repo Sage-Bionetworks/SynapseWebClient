@@ -13,9 +13,7 @@ import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
 import org.sagebionetworks.repo.model.dataaccess.CreateSubmissionRequest;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
-import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
-import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
@@ -47,31 +45,6 @@ public class DataAccessClientImpl
       createSynapseClient();
     try {
       return synapseClient.createOrUpdateResearchProject(researchProject);
-    } catch (SynapseException e) {
-      throw ExceptionUtil.convertSynapseException(e);
-    }
-  }
-
-  @Override
-  public RequestInterface getDataAccessRequest(Long id)
-    throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient =
-      createSynapseClient();
-    try {
-      return synapseClient.getRequestForUpdate(id.toString());
-    } catch (SynapseException e) {
-      throw ExceptionUtil.convertSynapseException(e);
-    }
-  }
-
-  @Override
-  public RequestInterface updateDataAccessRequest(
-    RequestInterface dataAccessRequest
-  ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient =
-      createSynapseClient();
-    try {
-      return synapseClient.createOrUpdateRequest(dataAccessRequest);
     } catch (SynapseException e) {
       throw ExceptionUtil.convertSynapseException(e);
     }
@@ -167,7 +140,7 @@ public class DataAccessClientImpl
   }
 
   @Override
-  public Submission updateDataAccessSubmissionState(
+  public void updateDataAccessSubmissionState(
     String submissionId,
     SubmissionState newState,
     String reason
@@ -175,11 +148,7 @@ public class DataAccessClientImpl
     org.sagebionetworks.client.SynapseClient synapseClient =
       createSynapseClient();
     try {
-      return synapseClient.updateSubmissionState(
-        submissionId,
-        newState,
-        reason
-      );
+      synapseClient.updateSubmissionState(submissionId, newState, reason);
     } catch (SynapseException e) {
       throw ExceptionUtil.convertSynapseException(e);
     }

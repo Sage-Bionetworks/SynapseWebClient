@@ -9,7 +9,7 @@
     "@mui/material": "^7.3.11",
     "@sage-bionetworks/markdown-it-container": "^4.0.1",
     "@sage-bionetworks/react-datasheet-grid": "4.11.5-sage.3",
-    "@sage-bionetworks/synapse-types": "^0.0.9",
+    "@sage-bionetworks/synapse-types": "^0.0.10",
     "@tanstack/react-query": "5.80.10",
     "animate.css": "^4.1.1",
     "bootstrap3": "npm:bootstrap@3.4.1",
@@ -43,7 +43,7 @@
     "react-plotly.js": "^2.6.0",
     "sass": "^1.102.0",
     "spark-md5": "^3.0.2",
-    "synapse-react-client": "4.0.38",
+    "synapse-react-client": "4.0.40",
     "xss": "^1.0.15"
   },
   "devDependencies": {
@@ -90,7 +90,7 @@
     "start:staging": "docker compose --env-file .env.staging up",
     "start:dev": "docker compose --env-file .env.development up",
     "dev": "pnpm concurrently -k -n \"CODESERVER,WATCHER,TOMCAT,VITE\" -c \"auto,auto,auto,auto\" \"pnpm dev:codeserver\" \"pnpm dev:watcher\" \"pnpm dev:tomcat\" \"pnpm dev:vite\"",
-    "dev:codeserver": "mvn clean gwt:run-codeserver",
+    "dev:codeserver": "n=1; while [ $n -le 10 ]; do echo \"[dev:codeserver] attempt $n/10\"; mvn clean gwt:run-codeserver && exit 0; echo \"[dev:codeserver] attempt $n/10 failed (intermittent Dagger+javac21 NPE), retrying...\"; n=$((n+1)); done; exit 1",
     "dev:watcher": "wait-on tcp:127.0.0.1:9876 && mvn fizzed-watcher:run",
     "dev:tomcat": "wait-on tcp:127.0.0.1:9876 && docker pull tomcat:10; docker run --name swc-dev --rm -p 8888:8080 -v \"/$(pwd)/target/portal-develop-SNAPSHOT/:/usr/local/tomcat/webapps/ROOT/\" -v \"/$HOME/.m2/settings.xml\":/root/.m2/settings.xml -e CATALINA_OPTS=\"-Dorg.sagebionetworks.web.client.dev.mode=true\" tomcat:10",
     "dev:vite": "vite dev",

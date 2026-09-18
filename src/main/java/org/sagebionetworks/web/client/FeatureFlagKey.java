@@ -13,6 +13,9 @@ public enum FeatureFlagKey {
   // If enabled, show the visibility chip on the project title bar
   PROJECT_VISIBILITY_CHIP("PROJECT_VISIBILITY_CHIP"),
 
+  // If enabled, show the query builder control in the QueryWrapperPlotNav for table entities
+  QUERY_BUILDER_CONTROL("QUERY_BUILDER_CONTROL"),
+
   // Last flag is used only for tests
   TEST_FLAG_ONLY("TEST_FLAG_ONLY");
 

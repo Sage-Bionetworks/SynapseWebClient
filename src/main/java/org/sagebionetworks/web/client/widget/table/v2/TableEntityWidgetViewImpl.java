@@ -14,6 +14,7 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
@@ -211,12 +212,16 @@ public class TableEntityWidgetViewImpl
     OnQueryResultBundleCallback onQueryResultBundleChange,
     boolean hideSqlEditorControl
   ) {
+    boolean showQueryBuilderControl = ginInjector
+      .getFeatureFlagConfig()
+      .isFeatureEnabled(FeatureFlagKey.QUERY_BUILDER_CONTROL);
     QueryWrapperPlotNav plotNav = new QueryWrapperPlotNav(
       sql,
       initQueryJson,
       onQueryChange,
       onQueryResultBundleChange,
       hideSqlEditorControl,
+      showQueryBuilderControl,
       null,
       null,
       null,

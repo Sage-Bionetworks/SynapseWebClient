@@ -149,7 +149,7 @@ public class ACTDataAccessSubmissionWidgetTest {
         mockUserProfileAsyncHandler
       );
     AsyncMockStubber
-      .callSuccessWith(mockDataAccessSubmission)
+      .callSuccessWith((Void) null)
       .when(mockClient)
       .updateDataAccessSubmissionState(any(), any(), any(), any());
     AsyncMockStubber
