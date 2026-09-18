@@ -215,6 +215,7 @@ public class DefaultEntityActionMenuLayoutUtil {
           Arrays.asList(
             Arrays.asList(
               ActionViewProps.create(Action.VIEW_SHARING_SETTINGS),
+              ActionViewProps.create(Action.ADD_CONDITIONS_FOR_USE),
               ActionViewProps.create(Action.EDIT_PROJECT_METADATA),
               ActionViewProps.create(Action.SHOW_ANNOTATIONS),
               ActionViewProps.create(Action.SHOW_PROJECT_STATS),
@@ -277,6 +278,7 @@ public class DefaultEntityActionMenuLayoutUtil {
           Arrays.asList(
             Arrays.asList(
               ActionViewProps.create(Action.VIEW_SHARING_SETTINGS),
+              ActionViewProps.create(Action.ADD_CONDITIONS_FOR_USE),
               ActionViewProps.create(Action.CHANGE_ENTITY_NAME),
               ActionViewProps.create(Action.EDIT_PROVENANCE),
               ActionViewProps.create(Action.CHANGE_STORAGE_LOCATION)
@@ -359,6 +361,7 @@ public class DefaultEntityActionMenuLayoutUtil {
           Arrays.asList(
             Arrays.asList(
               ActionViewProps.create(Action.VIEW_SHARING_SETTINGS),
+              ActionViewProps.create(Action.ADD_CONDITIONS_FOR_USE),
               ActionViewProps.create(Action.SHOW_VERSION_HISTORY),
               ActionViewProps.create(Action.EDIT_FILE_METADATA),
               ActionViewProps.create(Action.EDIT_PROVENANCE),
@@ -413,6 +416,7 @@ public class DefaultEntityActionMenuLayoutUtil {
           Arrays.asList(
             Arrays.asList(
               ActionViewProps.create(Action.VIEW_SHARING_SETTINGS),
+              ActionViewProps.create(Action.ADD_CONDITIONS_FOR_USE),
               ActionViewProps.create(Action.EDIT_PROVENANCE),
               ActionViewProps.create(Action.UPLOAD_TABLE_DATA),
               ActionViewProps.create(Action.TOGGLE_FULL_TEXT_SEARCH)
@@ -524,6 +528,7 @@ public class DefaultEntityActionMenuLayoutUtil {
           Arrays.asList(
             Arrays.asList(
               ActionViewProps.create(Action.VIEW_SHARING_SETTINGS),
+              ActionViewProps.create(Action.ADD_CONDITIONS_FOR_USE),
               ActionViewProps.create(Action.EDIT_PROVENANCE),
               ActionViewProps.create(Action.SUBMIT_TO_CHALLENGE),
               ActionViewProps.create(Action.ADD_DOCKER_COMMIT)
@@ -633,6 +638,7 @@ public class DefaultEntityActionMenuLayoutUtil {
           Arrays.asList(
             Arrays.asList(
               ActionViewProps.create(Action.VIEW_SHARING_SETTINGS),
+              ActionViewProps.create(Action.ADD_CONDITIONS_FOR_USE),
               ActionViewProps.create(Action.EDIT_PROVENANCE),
               ActionViewProps.create(Action.TOGGLE_FULL_TEXT_SEARCH)
             ),
@@ -682,6 +688,7 @@ public class DefaultEntityActionMenuLayoutUtil {
           Arrays.asList(
             Arrays.asList(
               ActionViewProps.create(Action.VIEW_SHARING_SETTINGS),
+              ActionViewProps.create(Action.ADD_CONDITIONS_FOR_USE),
               ActionViewProps.create(Action.EDIT_PROVENANCE)
             ),
             Arrays.asList(

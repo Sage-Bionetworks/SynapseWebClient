@@ -24,6 +24,10 @@ public class DefaultActionConfigurationUtil {
         Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
         "Edit Items"
       ),
+      ActionConfiguration.create(
+        Action.ADD_CONDITIONS_FOR_USE,
+        "Add Conditions for Use"
+      ),
       ActionConfiguration.create(Action.VIEW_SHARING_SETTINGS, "Share"),
       ActionConfiguration.create(
         Action.EDIT_PROJECT_METADATA,

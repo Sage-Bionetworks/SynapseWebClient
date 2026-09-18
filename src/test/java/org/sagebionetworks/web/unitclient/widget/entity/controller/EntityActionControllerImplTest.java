@@ -78,6 +78,7 @@ import org.sagebionetworks.repo.model.RecordSet;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
+import org.sagebionetworks.repo.model.RestrictionLevel;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
@@ -527,7 +528,6 @@ public class EntityActionControllerImplTest {
       .thenReturn(mockEntityAclModalWidget);
     when(mockPortalGinInjector.getCreateGridSessionDialog())
       .thenReturn(mockCreateGridSessionDialog);
-
     when(mockPortalGinInjector.getEntityTypeIcon())
       .thenReturn(mockEntityTypeIcon);
     when(mockEntityTypeIcon.getIconHTML()).thenReturn("");
@@ -3971,6 +3971,57 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
     verify(mockActionMenu, never())
       .setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+  }
+
+  private void configureAddConditionsForUse(RestrictionLevel restrictionLevel)
+    throws Exception {
+    entityBundle.setRestrictionInformation(mockRestrictionInformation);
+    when(mockRestrictionInformation.getRestrictionLevel())
+      .thenReturn(restrictionLevel);
+
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+  }
+
+  @Test
+  public void testConfigureAddConditionsForUseIsOpen() throws Exception {
+    configureAddConditionsForUse(RestrictionLevel.OPEN);
+
+    verify(mockActionMenu)
+      .setActionVisible(Action.ADD_CONDITIONS_FOR_USE, false);
+    verify(mockActionMenu)
+      .setActionVisible(Action.ADD_CONDITIONS_FOR_USE, true);
+    verify(mockActionMenu)
+      .setActionListener(Action.ADD_CONDITIONS_FOR_USE, controller);
+  }
+
+  @Test
+  public void testConfigureAddConditionsForUseRestrictionAlreadyExists()
+    throws Exception {
+    configureAddConditionsForUse(RestrictionLevel.RESTRICTED_BY_TERMS_OF_USE);
+
+    verify(mockActionMenu)
+      .setActionVisible(Action.ADD_CONDITIONS_FOR_USE, false);
+    verify(mockActionMenu, never())
+      .setActionVisible(Action.ADD_CONDITIONS_FOR_USE, true);
+  }
+
+  @Test
+  public void testConfigureAddConditionsForUseCantChangePermissions()
+    throws Exception {
+    permissions.setCanChangePermissions(false);
+    configureAddConditionsForUse(RestrictionLevel.OPEN);
+
+    verify(mockActionMenu)
+      .setActionVisible(Action.ADD_CONDITIONS_FOR_USE, false);
+    verify(mockActionMenu, never())
+      .setActionVisible(Action.ADD_CONDITIONS_FOR_USE, true);
   }
 
   @Test
