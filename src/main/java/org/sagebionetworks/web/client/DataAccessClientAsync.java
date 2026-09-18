@@ -12,9 +12,7 @@ import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
 import org.sagebionetworks.repo.model.dataaccess.CreateSubmissionRequest;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
-import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
-import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
@@ -28,16 +26,6 @@ public interface DataAccessClientAsync {
   void updateResearchProject(
     ResearchProject researchProject,
     AsyncCallback<ResearchProject> asyncCallback
-  );
-
-  void getDataAccessRequest(
-    Long id,
-    AsyncCallback<RequestInterface> asyncCallback
-  );
-
-  void updateDataAccessRequest(
-    RequestInterface dataAccessRequest,
-    AsyncCallback<RequestInterface> asyncCallback
   );
 
   void submitDataAccessRequest(
@@ -72,7 +60,7 @@ public interface DataAccessClientAsync {
     String submissionId,
     SubmissionState newState,
     String reason,
-    AsyncCallback<Submission> callback
+    AsyncCallback<Void> callback
   );
 
   void getOpenSubmissions(

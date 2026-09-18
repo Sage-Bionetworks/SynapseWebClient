@@ -203,15 +203,19 @@ public class ACTDataAccessSubmissionWidget
       submission.getId(),
       state,
       reason,
-      new AsyncCallback<Submission>() {
+      new AsyncCallback<Void>() {
         @Override
         public void onFailure(Throwable caught) {
           synAlert.handleException(caught);
         }
 
         @Override
-        public void onSuccess(Submission result) {
-          configure(result);
+        public void onSuccess(Void result) {
+          submission.setState(state);
+          if (SubmissionState.REJECTED.equals(state)) {
+            submission.setRejectedReason(reason);
+          }
+          configure(submission);
         }
       }
     );

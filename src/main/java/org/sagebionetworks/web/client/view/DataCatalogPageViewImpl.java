@@ -49,6 +49,7 @@ public class DataCatalogPageViewImpl implements DataCatalogPageView {
       newBundle -> {},
       true,
       false,
+      false,
       true,
       true,
       true,
