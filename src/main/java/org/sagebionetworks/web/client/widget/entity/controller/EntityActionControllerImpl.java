@@ -37,6 +37,7 @@ import org.sagebionetworks.repo.model.RecordSet;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
+import org.sagebionetworks.repo.model.RestrictionLevel;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -108,6 +109,7 @@ import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
 import org.sagebionetworks.web.client.widget.CreateTableFromCsvDialog;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.ShareThisPage;
+import org.sagebionetworks.web.client.widget.accessrequirements.ImposeRestrictionDialog;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
@@ -289,6 +291,7 @@ public class EntityActionControllerImpl
   ChallengeClientAsync challengeClient;
   SelectTeamModal selectTeamModal;
   CreateOrUpdateDoiModal createOrUpdateDoiModal;
+  ImposeRestrictionDialog imposeRestrictionDialog;
   ApproveUserAccessModal approveUserAccessModal;
   PortalGinInjector ginInjector;
   IsACTMemberAsyncHandler isACTMemberAsyncHandler;
@@ -423,6 +426,14 @@ public class EntityActionControllerImpl
       view.addWidget(createOrUpdateDoiModal.asWidget());
     }
     return createOrUpdateDoiModal;
+  }
+
+  private ImposeRestrictionDialog getImposeRestrictionDialog() {
+    if (imposeRestrictionDialog == null) {
+      imposeRestrictionDialog = ginInjector.getImposeRestrictionDialog();
+      view.addWidget(imposeRestrictionDialog.asWidget());
+    }
+    return imposeRestrictionDialog;
   }
 
   private StatisticsPlotWidget getStatisticsPlotWidget() {
@@ -663,6 +674,7 @@ public class EntityActionControllerImpl
     configureDeleteAction();
     configureShareAction();
     configureShareThisPage();
+    configureAddConditionsForUse();
     configureRenameAction();
     configureEditWiki();
     configureViewWikiSource();
@@ -1342,6 +1354,11 @@ public class EntityActionControllerImpl
       .configure(entity, getVersionIfNotLatest().orElse(null), true);
   }
 
+  private void onAddConditionsForUse() {
+    getImposeRestrictionDialog()
+      .configure(entity.getId(), true, this::fireEntityUpdatedEvent);
+  }
+
   private void onCreateChallenge() {
     getSelectTeamModal().show();
   }
@@ -1684,6 +1701,27 @@ public class EntityActionControllerImpl
     }
   }
 
+  private void configureAddConditionsForUse() {
+    actionMenu.setActionVisible(Action.ADD_CONDITIONS_FOR_USE, false);
+    RestrictionInformationResponse restrictionInformation =
+      entityBundle.getRestrictionInformation();
+
+    if (
+      permissions.getCanChangePermissions() &&
+      restrictionInformation != null &&
+      RestrictionLevel.OPEN.equals(
+        restrictionInformation.getRestrictionLevel()
+      ) &&
+      // EntityViews and Dataset/Collections can have ARs, but they aren't meaningful
+      !(entity instanceof EntityView) &&
+      !(entity instanceof EntityRefCollectionView) &&
+      !hasProjectAreaContext(entity, currentArea)
+    ) {
+      actionMenu.setActionListener(Action.ADD_CONDITIONS_FOR_USE, this);
+      actionMenu.setActionVisible(Action.ADD_CONDITIONS_FOR_USE, true);
+    }
+  }
+
   private void reconfigureShowThisPageDialogReactComponent() {
     if (shareThisPage == null) {
       shareThisPage = ginInjector.getShareThisPage();
@@ -1912,6 +1950,9 @@ public class EntityActionControllerImpl
   @Override
   public void onAction(Action action, ReactMouseEvent event) {
     switch (action) {
+      case ADD_CONDITIONS_FOR_USE:
+        onAddConditionsForUse();
+        break;
       case DELETE_ENTITY:
         onDeleteEntity();
         break;

@@ -3,12 +3,9 @@ package org.sagebionetworks.web.client.widget.entity.file;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.function.Consumer;
 import javax.inject.Inject;
-import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.jsinterop.EntityPageTitleBarProps;
-import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenuProps;
@@ -16,17 +13,11 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenuProp
 public class BasicTitleBar implements SynapseWidgetPresenter {
 
   private BasicTitleBarView view;
-  private final GlobalApplicationState globalAppState;
-
   private EntityPageTitleBarProps props;
 
   @Inject
-  public BasicTitleBar(
-    BasicTitleBarView view,
-    GlobalApplicationState globalApplicationState
-  ) {
+  public BasicTitleBar(BasicTitleBarView view) {
     this.view = view;
-    this.globalAppState = globalApplicationState;
   }
 
   @Override
@@ -44,22 +35,8 @@ public class BasicTitleBar implements SynapseWidgetPresenter {
     } else {
       this.props = EntityPageTitleBarProps.create(bundle.getEntity().getId());
     }
-    addActClickhandler(bundle.getEntity().getId());
     setActionMenu(actionMenu);
     this.view.setProps(this.props);
-  }
-
-  private void addActClickhandler(String entityId) {
-    this.props.setOnActMemberClickAddConditionsForUse(() -> {
-        // go to access requirements place where they can modify access requirements
-        AccessRequirementsPlace place = new AccessRequirementsPlace("");
-        place.putParam(AccessRequirementsPlace.ID_PARAM, entityId);
-        place.putParam(
-          AccessRequirementsPlace.TYPE_PARAM,
-          RestrictableObjectType.ENTITY.toString()
-        );
-        globalAppState.getPlaceChanger().goTo(place);
-      });
   }
 
   private void setActionMenu(EntityActionMenu actionMenu) {
