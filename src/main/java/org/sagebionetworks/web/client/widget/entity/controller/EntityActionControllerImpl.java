@@ -1724,7 +1724,7 @@ public class EntityActionControllerImpl
           @Override
           public void onSuccess(@Nullable Boolean isACT) {
             // The ACT doesn't need to impose a lock, they create access requirements
-            // direclty via the "Manage Access Requirements (ACT)" action
+            // directly via the "Manage Access Requirements (ACT)" action
             if (!Boolean.TRUE.equals(isACT)) {
               actionMenu.setActionListener(
                 Action.ADD_CONDITIONS_FOR_USE,
