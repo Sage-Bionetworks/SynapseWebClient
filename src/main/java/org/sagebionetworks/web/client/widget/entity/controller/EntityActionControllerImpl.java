@@ -1715,7 +1715,7 @@ public class EntityActionControllerImpl
       // EntityViews and Dataset/Collections can have ARs, but they aren't meaningful
       !(entity instanceof EntityView) &&
       !(entity instanceof EntityRefCollectionView) &&
-      !hasProjectAreaContext(entity, currentArea)
+      !(entity instanceof Project)
     ) {
       actionMenu.setActionListener(Action.ADD_CONDITIONS_FOR_USE, this);
       actionMenu.setActionVisible(Action.ADD_CONDITIONS_FOR_USE, true);

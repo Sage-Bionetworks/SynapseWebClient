@@ -215,7 +215,6 @@ public class DefaultEntityActionMenuLayoutUtil {
           Arrays.asList(
             Arrays.asList(
               ActionViewProps.create(Action.VIEW_SHARING_SETTINGS),
-              ActionViewProps.create(Action.ADD_CONDITIONS_FOR_USE),
               ActionViewProps.create(Action.EDIT_PROJECT_METADATA),
               ActionViewProps.create(Action.SHOW_ANNOTATIONS),
               ActionViewProps.create(Action.SHOW_PROJECT_STATS),
