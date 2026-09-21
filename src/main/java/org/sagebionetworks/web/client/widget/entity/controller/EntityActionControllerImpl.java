@@ -674,7 +674,6 @@ public class EntityActionControllerImpl
     configureDeleteAction();
     configureShareAction();
     configureShareThisPage();
-    configureAddConditionsForUse();
     configureRenameAction();
     configureEditWiki();
     configureViewWikiSource();
@@ -710,6 +709,7 @@ public class EntityActionControllerImpl
     FluentFuture challengeFuture = configureCreateChallenge();
     FluentFuture actFuture = configureACTCommands();
     FluentFuture reorderWikiSubpagesFuture = configureReorderWikiSubpages();
+    FluentFuture addConditionsForUseFuture = configureAddConditionsForUse();
 
     // Show the button
     FluentFuture.from(
@@ -718,7 +718,8 @@ public class EntityActionControllerImpl
         containerDownloadFuture,
         challengeFuture,
         actFuture,
-        reorderWikiSubpagesFuture
+        reorderWikiSubpagesFuture,
+        addConditionsForUseFuture
       )
         .call(
           () -> {
@@ -1355,31 +1356,8 @@ public class EntityActionControllerImpl
   }
 
   private void onAddConditionsForUse() {
-    isACTMemberAsyncHandler
-      .isACTActionAvailable()
-      .addCallback(
-        new FutureCallback<Boolean>() {
-          @Override
-          public void onSuccess(@Nullable Boolean isACT) {
-            if (Boolean.TRUE.equals(isACT)) {
-              onManageAccessRequirements();
-            } else {
-              getImposeRestrictionDialog()
-                .configure(
-                  entity.getId(),
-                  true,
-                  EntityActionControllerImpl.this::fireEntityUpdatedEvent
-                );
-            }
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            view.showErrorMessage(caught.getMessage());
-          }
-        },
-        directExecutor()
-      );
+    getImposeRestrictionDialog()
+      .configure(entity.getId(), true, this::fireEntityUpdatedEvent);
   }
 
   private void onCreateChallenge() {
@@ -1724,7 +1702,7 @@ public class EntityActionControllerImpl
     }
   }
 
-  private void configureAddConditionsForUse() {
+  private FluentFuture configureAddConditionsForUse() {
     actionMenu.setActionVisible(Action.ADD_CONDITIONS_FOR_USE, false);
     RestrictionInformationResponse restrictionInformation =
       entityBundle.getRestrictionInformation();
@@ -1740,9 +1718,32 @@ public class EntityActionControllerImpl
       !(entity instanceof EntityRefCollectionView) &&
       !(entity instanceof Project)
     ) {
-      actionMenu.setActionListener(Action.ADD_CONDITIONS_FOR_USE, this);
-      actionMenu.setActionVisible(Action.ADD_CONDITIONS_FOR_USE, true);
+      FluentFuture future = isACTMemberAsyncHandler.isACTActionAvailable();
+      future.addCallback(
+        new FutureCallback<Boolean>() {
+          @Override
+          public void onSuccess(@Nullable Boolean isACT) {
+            // The ACT doesn't need to impose a lock, they create access requirements
+            // direclty via the "Manage Access Requirements (ACT)" action
+            if (!Boolean.TRUE.equals(isACT)) {
+              actionMenu.setActionListener(
+                Action.ADD_CONDITIONS_FOR_USE,
+                EntityActionControllerImpl.this
+              );
+              actionMenu.setActionVisible(Action.ADD_CONDITIONS_FOR_USE, true);
+            }
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            view.showErrorMessage(caught.getMessage());
+          }
+        },
+        directExecutor()
+      );
+      return future;
     }
+    return getDoneFuture(null);
   }
 
   private void reconfigureShowThisPageDialogReactComponent() {

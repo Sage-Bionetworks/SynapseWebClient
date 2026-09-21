@@ -3990,6 +3990,17 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
+  public void testConfigureAddConditionsForUseActMember() throws Exception {
+    when(mockIsACTMemberAsyncHandler.isACTActionAvailable())
+      .thenReturn(getDoneFuture(true));
+
+    configureAddConditionsForUse(RestrictionLevel.OPEN);
+
+    verify(mockActionMenu, never())
+      .setActionVisible(Action.ADD_CONDITIONS_FOR_USE, true);
+  }
+
+  @Test
   public void testConfigureAddConditionsForUseIsOpen() throws Exception {
     configureAddConditionsForUse(RestrictionLevel.OPEN);
 
