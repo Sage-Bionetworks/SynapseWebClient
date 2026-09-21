@@ -1355,8 +1355,31 @@ public class EntityActionControllerImpl
   }
 
   private void onAddConditionsForUse() {
-    getImposeRestrictionDialog()
-      .configure(entity.getId(), true, this::fireEntityUpdatedEvent);
+    isACTMemberAsyncHandler
+      .isACTActionAvailable()
+      .addCallback(
+        new FutureCallback<Boolean>() {
+          @Override
+          public void onSuccess(@Nullable Boolean isACT) {
+            if (Boolean.TRUE.equals(isACT)) {
+              onManageAccessRequirements();
+            } else {
+              getImposeRestrictionDialog()
+                .configure(
+                  entity.getId(),
+                  true,
+                  EntityActionControllerImpl.this::fireEntityUpdatedEvent
+                );
+            }
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            view.showErrorMessage(caught.getMessage());
+          }
+        },
+        directExecutor()
+      );
   }
 
   private void onCreateChallenge() {
