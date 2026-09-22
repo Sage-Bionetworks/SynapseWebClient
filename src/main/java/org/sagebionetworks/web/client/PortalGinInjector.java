@@ -71,6 +71,7 @@ import org.sagebionetworks.web.client.widget.ShareThisPage;
 import org.sagebionetworks.web.client.widget.UpdateTableWithCsvDialog;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ImposeRestrictionDialog;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidget;
@@ -506,6 +507,8 @@ public interface PortalGinInjector {
   APITableColumnConfigView getAPITableColumnConfigView();
 
   // Other widgets
+  ImposeRestrictionDialog getImposeRestrictionDialog();
+
   UserBadge getUserBadgeWidget();
 
   EmailInvitationBadge getEmailInvitationBadgeWidget();

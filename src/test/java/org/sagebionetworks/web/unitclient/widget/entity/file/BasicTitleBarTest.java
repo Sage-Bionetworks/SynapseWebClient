@@ -21,13 +21,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.jsinterop.EntityPageTitleBarProps;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuPropsJsInterop;
-import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
@@ -52,9 +48,6 @@ public class BasicTitleBarTest {
   BasicTitleBarView mockView;
 
   @Mock
-  GlobalApplicationState mockGlobalAppState;
-
-  @Mock
   EntityActionMenu mockActionMenu;
 
   @Mock
@@ -69,17 +62,11 @@ public class BasicTitleBarTest {
   @Mock
   EntityActionMenuPropsJsInterop mockActionMenuJsInteropProps;
 
-  @Mock
-  PlaceChanger mockPlaceChanger;
-
   @Captor
   ArgumentCaptor<EntityPageTitleBarProps> propsCaptor;
 
   @Captor
   ArgumentCaptor<Consumer<EntityActionMenuProps>> onActionMenuPropsChangeCaptor;
-
-  @Captor
-  ArgumentCaptor<AccessRequirementsPlace> placeCaptor;
 
   Folder folder;
   String testEntityName = "Entity Name";
@@ -89,7 +76,7 @@ public class BasicTitleBarTest {
 
   @Before
   public void setup() {
-    titleBar = new BasicTitleBar(mockView, mockGlobalAppState);
+    titleBar = new BasicTitleBar(mockView);
 
     folder = new Folder();
     folder.setId(entityId);
@@ -105,7 +92,6 @@ public class BasicTitleBarTest {
     when(mockActionMenuProps.toJsInterop())
       .thenReturn(mockActionMenuJsInteropProps);
     when(mockBundle.getEntity()).thenReturn(folder);
-    when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
   }
 
   @Test
@@ -124,9 +110,6 @@ public class BasicTitleBarTest {
       propsCaptor.getValue().getVersionNumber()
     );
     assertNotNull(propsCaptor.getValue().getEntityActionMenuProps());
-    assertNotNull(
-      propsCaptor.getValue().getOnActMemberClickAddConditionsForUse()
-    );
   }
 
   @Test
@@ -136,9 +119,6 @@ public class BasicTitleBarTest {
     assertEquals(entityId, propsCaptor.getValue().getEntityId());
     assertEquals(0L, propsCaptor.getValue().getVersionNumber());
     assertNotNull(propsCaptor.getValue().getEntityActionMenuProps());
-    assertNotNull(
-      propsCaptor.getValue().getOnActMemberClickAddConditionsForUse()
-    );
   }
 
   @Test
@@ -174,30 +154,6 @@ public class BasicTitleBarTest {
     assertEquals(
       newJsInteropPropsAfterUpdate,
       propsCaptor.getValue().getEntityActionMenuProps()
-    );
-  }
-
-  @Test
-  public void testAddActClickHandler() {
-    titleBar.configure(mockBundle, mockActionMenu);
-    verify(mockView).setProps(propsCaptor.capture());
-    assertNotNull(
-      propsCaptor.getValue().getOnActMemberClickAddConditionsForUse()
-    );
-    propsCaptor.getValue().getOnActMemberClickAddConditionsForUse().run();
-
-    verify(mockPlaceChanger).goTo(placeCaptor.capture());
-    assertEquals(
-      AccessRequirementsPlace.class,
-      placeCaptor.getValue().getClass()
-    );
-    assertEquals(
-      entityId,
-      placeCaptor.getValue().getParam(AccessRequirementsPlace.ID_PARAM)
-    );
-    assertEquals(
-      RestrictableObjectType.ENTITY.toString(),
-      placeCaptor.getValue().getParam(AccessRequirementsPlace.TYPE_PARAM)
     );
   }
 }

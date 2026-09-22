@@ -55,6 +55,9 @@ public class SRC {
     public static ReactComponentType<EmptyProps> FavoritesPage;
     public static ReactComponentType<EntityModalProps> EntityModal;
     public static ReactComponentType<IconSvgProps> IconSvg;
+    public static ReactComponentType<
+      ImposeRestrictionDialogProps
+    > ImposeRestrictionDialog;
     public static ReactComponentType<EntityTypeIconProps> EntityTypeIcon;
     public static ReactComponentType<UserProfileLinksProps> UserProfileLinks;
     public static ReactComponentType<SkeletonButtonProps> SkeletonButton;
