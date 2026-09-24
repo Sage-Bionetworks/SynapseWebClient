@@ -35,7 +35,7 @@
     <gwtvisualizationwrappers.version>
       1.6-gwt-2.7.0
     </gwtvisualizationwrappers.version>
-    <freemarker.version>2.3.34</freemarker.version>
+    <freemarker.version>2.3.35</freemarker.version>
     <gwt.module.suffix />
   </properties>
 
