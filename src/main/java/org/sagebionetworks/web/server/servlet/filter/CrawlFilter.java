@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
-import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+// escapeHtml4 is the commons-lang3 equivalent of commons-lang 2.x's escapeHtml,
+// which is EOL and unpatched for CVE-2025-48924.
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -187,7 +189,7 @@ public class CrawlFilter {
     String plainTextWiki = null;
     if (rootPage != null) {
       try {
-        String markdown = escapeHtml(rootPage.getMarkdown());
+        String markdown = escapeHtml4(rootPage.getMarkdown());
         if (markdown != null) {
           try {
             Node document = parser.parse(removeSynapseWikiWidgets(markdown));
@@ -234,8 +236,8 @@ public class CrawlFilter {
       }
     }
     Annotations annotations = bundle.getAnnotations();
-    String name = escapeHtml(entity.getName());
-    String description = escapeHtml(entity.getDescription());
+    String name = escapeHtml4(entity.getName());
+    String description = escapeHtml4(entity.getDescription());
     String createdBy = null;
     WikiPage rootPage = null;
     try {
@@ -271,7 +273,7 @@ public class CrawlFilter {
       AnnotationsValue values = annotationMap.get(key);
       List<String> value = values.getValue();
       html.append(
-        escapeHtml(key) + escapeHtml(getValueString(value)) + "<br />"
+        escapeHtml4(key) + escapeHtml4(getValueString(value)) + "<br />"
       );
     }
     // and link to the discussion forum (all threads and replies) if this is a project.
@@ -710,18 +712,18 @@ public class CrawlFilter {
               html.append("<div>");
               html.append("<h3>");
               if (link != null && !link.isEmpty()) {
-                String escapedLink = escapeHtml(link);
+                String escapedLink = escapeHtml4(link);
                 html.append("<a href=\"");
                 html.append(escapedLink);
                 html.append("\">");
-                html.append(escapeHtml(name));
+                html.append(escapeHtml4(name));
                 html.append("</a>");
               } else {
-                html.append(escapeHtml(name));
+                html.append(escapeHtml4(name));
               }
               html.append("</h3>");
               if (description != null && !description.isEmpty()) {
-                html.append(escapeHtml(description));
+                html.append(escapeHtml4(description));
                 html.append("<br />");
               }
               html.append("</div><br />");
