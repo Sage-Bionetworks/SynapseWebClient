@@ -714,7 +714,6 @@ public class DisplayUtils {
    * will probably not be quite what you want. Read the twitter bootstrap documentation for the
    * options that you can specify in optionsMap
    *
-   * @param util the JSNIUtils class (or mock)
    * @param widget the widget to attach the tooltip to
    * @param tooltipText text to display
    * @param pos where to position the tooltip relative to the widget
@@ -727,7 +726,6 @@ public class DisplayUtils {
     Tooltip t = new Tooltip();
     t.setPlacement(pos);
     t.setTitle(tooltipText);
-    t.setIsHtml(true);
     t.setIsAnimated(false);
     t.setTrigger(Trigger.HOVER);
     t.setContainer("body");
