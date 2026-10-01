@@ -15,6 +15,11 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 
   public interface Binder extends UiBinder<Widget, FileCellRendererViewImpl> {}
 
+  /**
+   * (SWC-8005): Non-breaking space. Using the character rather than the HTML entity &amp;nbsp; is what lets this tooltip render as text instead of HTML
+   */
+  private static final char NBSP = 0xA0;
+
   @UiField
   Span loadingUI;
 
@@ -67,9 +72,10 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 
   @Override
   public void setTooltip(Long contentSize) {
-    String friendlySize = DisplayUtils
-      .getFriendlySize(contentSize, true)
-      .replace(" ", "&nbsp;");
-    tooltip.setTitle("<strong>Size:</strong>&nbsp;" + friendlySize);
+    tooltip.setTitle(
+      "Size:" +
+      NBSP +
+      DisplayUtils.getFriendlySize(contentSize, true).replace(' ', NBSP)
+    );
   }
 }
