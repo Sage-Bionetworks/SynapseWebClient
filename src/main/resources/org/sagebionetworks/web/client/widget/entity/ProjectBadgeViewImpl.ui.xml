@@ -17,7 +17,6 @@
       addStyleNames="displayInline margin-right-10 lightGreyText"
     />
     <b:Tooltip
-      isHtml="true"
       placement="RIGHT"
       ui:field="tooltip"
       trigger="HOVER"

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.Date;
@@ -20,7 +21,7 @@ public interface ProjectBadgeView extends IsWidget {
 
   void configure(String projectName, String projectId);
 
-  void setTooltip(String tooltip);
+  void setTooltip(SafeHtml tooltip);
 
   void addClickHandler(ClickHandler clickHandler);
 }
