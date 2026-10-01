@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
@@ -80,8 +81,8 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
   }
 
   @Override
-  public void setTooltip(String tooltipText) {
-    tooltip.setTitle(tooltipText);
+  public void setTooltip(SafeHtml tooltipHtml) {
+    tooltip.setHtml(tooltipHtml);
   }
 
   @Override

@@ -106,9 +106,9 @@ public class ProjectBadge implements SynapseWidgetPresenter {
     }
 
     view.setTooltip(
-      ProvViewUtil
-        .createEntityPopoverHtml(new KeyValueDisplay<String>(map, order))
-        .asString()
+      ProvViewUtil.createEntityPopoverHtml(
+        new KeyValueDisplay<String>(map, order)
+      )
     );
   }
 

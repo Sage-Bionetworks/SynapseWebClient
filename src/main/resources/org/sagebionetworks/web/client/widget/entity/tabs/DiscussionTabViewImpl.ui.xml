@@ -4,10 +4,6 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >
-  <ui:with
-    field='help'
-    type='org.sagebionetworks.web.client.help.HelpMessages'
-  />
   <bh:Div addStyleNames="margin-top-15 entity-page-side-margins">
     <bh:Div ui:field="forumContainer" />
   </bh:Div>

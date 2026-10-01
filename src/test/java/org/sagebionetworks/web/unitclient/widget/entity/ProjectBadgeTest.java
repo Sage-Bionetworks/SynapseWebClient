@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
@@ -87,6 +88,9 @@ public class ProjectBadgeTest {
 
   @Captor
   ArgumentCaptor<String> stringCaptor;
+
+  @Captor
+  ArgumentCaptor<SafeHtml> safeHtmlCaptor;
 
   @Before
   public void before() throws JSONObjectAdapterException {
@@ -181,9 +185,9 @@ public class ProjectBadgeTest {
       .createEntityPopoverHtml(new KeyValueDisplay<String>(map, order))
       .asString();
 
-    verify(mockView).setTooltip(stringCaptor.capture());
-    String tooltip = stringCaptor.getValue();
-    assertEquals(expected, tooltip);
+    verify(mockView).setTooltip(safeHtmlCaptor.capture());
+    SafeHtml tooltip = safeHtmlCaptor.getValue();
+    assertEquals(expected, tooltip.asString());
   }
 
   @Test
@@ -208,9 +212,9 @@ public class ProjectBadgeTest {
       .createEntityPopoverHtml(new KeyValueDisplay<String>(map, order))
       .asString();
     // note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
-    verify(mockView).setTooltip(stringCaptor.capture());
-    String tooltip = stringCaptor.getValue();
-    assertEquals(expected, tooltip);
+    verify(mockView).setTooltip(safeHtmlCaptor.capture());
+    SafeHtml tooltip = safeHtmlCaptor.getValue();
+    assertEquals(expected, tooltip.asString());
   }
 
   @Test
