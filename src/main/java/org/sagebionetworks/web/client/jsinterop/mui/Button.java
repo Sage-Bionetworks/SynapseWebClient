@@ -18,6 +18,11 @@ public class Button
     this.render();
   }
 
+  public void setClassName(String className) {
+    props.className = className;
+    this.render();
+  }
+
   public void setVariant(String variant) {
     props.variant = variant;
     this.render();
