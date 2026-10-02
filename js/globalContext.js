@@ -12,8 +12,21 @@ window.SynapseSessionManager = sessionManager
 /* A store that will be used across all React elements in the app */
 const contextStore = createStore()
 
-/* Atom that can store the props for SynapseContextProvider */
-const contextProviderPropsAtom = atom({})
+/*
+ * Atom that can store the props for SynapseContextProvider.
+ * Seeded with a valid "not yet initialized" applicationSessionContext so that any React
+ * component mounted (via GWT interop) before window.ContextUtils.setGlobalContext() is first
+ * called still has a defined context to read, instead of crashing useApplicationSessionContext().
+ */
+const contextProviderPropsAtom = atom({
+  applicationSessionContext: {
+    isAuthenticated: false,
+    hasInitializedSession: false,
+    isLoadingSSO: false,
+    refreshSession: async () => {},
+    clearSession: async () => {},
+  },
+})
 
 /* Wraps children in a FullContextProvider, reading the global context store to configure the context */
 function SynapseContextProviderFromStore({ children }) {
