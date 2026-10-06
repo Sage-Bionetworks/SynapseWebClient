@@ -599,8 +599,12 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     String repoServiceUrl = synapseProperties.getSynapseProperty(
       REPO_SERVICE_URL_KEY
     );
-    String repoUrl =
-      repoServiceUrl.substring(0, repoServiceUrl.indexOf("/repo/")) + "/";
+    // SRC's path constants already begin with a slash (e.g. "/repo/v1"), so the
+    // endpoint must not end with one.
+    String repoUrl = repoServiceUrl.substring(
+      0,
+      repoServiceUrl.indexOf("/repo/")
+    );
     String portalUrl = gwt.getHostPrefix();
     if (!portalUrl.endsWith("/")) {
       portalUrl += "/";
