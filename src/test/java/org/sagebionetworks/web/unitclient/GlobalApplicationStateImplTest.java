@@ -123,7 +123,7 @@ public class GlobalApplicationStateImplTest {
   Runnable mockRunnable;
 
   public static final String REPO_ENDPOINT =
-    "https://repo-staging.prod.sagebase.org/";
+    "https://repo-staging.prod.sagebase.org";
   public static final String SWC_ENDPOINT = "https://staging.synapse.org/";
 
   @Before
@@ -154,7 +154,7 @@ public class GlobalApplicationStateImplTest {
     globalApplicationState.setPlaceController(mockPlaceController);
     globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
     when(mockSynapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY))
-      .thenReturn(REPO_ENDPOINT + "repo/v1");
+      .thenReturn(REPO_ENDPOINT + "/repo/v1");
     when(mockGWT.getHostPrefix()).thenReturn(SWC_ENDPOINT);
   }
 
