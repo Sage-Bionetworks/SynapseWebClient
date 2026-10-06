@@ -12,6 +12,9 @@ public class ButtonProps extends PropsWithSx {
   @JsNullable
   String id;
 
+  @JsNullable
+  String className;
+
   @JsProperty
   public String variant;
 
