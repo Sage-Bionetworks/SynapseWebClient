@@ -10,7 +10,7 @@
     "@sage-bionetworks/markdown-it-container": "^4.0.1",
     "@sage-bionetworks/react-datasheet-grid": "4.11.5-sage.3",
     "@sage-bionetworks/synapse-types": "^0.0.7",
-    "@tanstack/react-query": "5.80.10",
+    "@tanstack/react-query": "5.104.1",
     "animate.css": "^4.1.1",
     "bootstrap3": "npm:bootstrap@3.4.1",
     "croppie": "2.6.5",
