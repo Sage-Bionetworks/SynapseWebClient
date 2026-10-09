@@ -9,7 +9,7 @@
     "@mui/material": "^7.3.11",
     "@sage-bionetworks/markdown-it-container": "^4.0.1",
     "@sage-bionetworks/synapse-types": "^0.0.12",
-    "@tanstack/react-query": "5.80.10",
+    "@tanstack/react-query": "5.104.5",
     "animate.css": "^4.1.1",
     "bootstrap3": "npm:bootstrap@3.4.1",
     "croppie": "2.6.5",
