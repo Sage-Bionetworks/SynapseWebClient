@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps.OnClickLinkHandler;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps.OnViewForumClickedHandler;
 
 public interface FilesTabView extends IsWidget {
   void setTitlebar(Widget w);
@@ -40,7 +42,11 @@ public interface FilesTabView extends IsWidget {
 
   void clearRefreshAlert();
 
-  void setDiscussionThreadListWidget(Widget widget);
+  void configureDiscussionThreads(
+    String entityId,
+    OnClickLinkHandler onClickLink,
+    OnViewForumClickedHandler onViewForumClicked
+  );
 
   void setDiscussionThreadListWidgetVisible(Boolean visible);
 

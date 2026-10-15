@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.discussion;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps.OnClickLinkHandler;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps.OnIsEmptyChangeHandler;
 
 public interface ForumWidgetView extends IsWidget {
   public interface Presenter {
@@ -16,7 +18,13 @@ public interface ForumWidgetView extends IsWidget {
 
   void setPresenter(Presenter presenter);
 
-  void setThreadList(Widget w);
+  void configureThreadList(
+    String forumId,
+    OnClickLinkHandler onClickLink,
+    OnIsEmptyChangeHandler onIsEmptyChange
+  );
+
+  void setThreadCountAlert(Widget w);
 
   void setNewThreadModal(Widget w);
 
@@ -40,7 +48,10 @@ public interface ForumWidgetView extends IsWidget {
 
   void setDeletedThreadListVisible(boolean visible);
 
-  void setDeletedThreadList(Widget widget);
+  void configureDeletedThreadList(
+    String forumId,
+    OnClickLinkHandler onClickLink
+  );
 
   void setMainContainerVisible(boolean visible);
 

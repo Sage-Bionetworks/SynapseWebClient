@@ -10,16 +10,33 @@ import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.jsinterop.ForumSearchProps.OnSearchResultsVisibleHandler;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps.OnClickLinkHandler;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps.OnIsEmptyChangeHandler;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class ForumWidgetViewImpl implements ForumWidgetView {
+
+  private static final int THREADS_LIMIT = 20;
+  private static final String FULL_HEIGHT = "none";
 
   @UiField
   Button newThreadButton;
 
   @UiField
-  SimplePanel threadListContainer;
+  Div threadListArea;
+
+  @UiField
+  ReactComponent threadListContainer;
+
+  @UiField
+  SimplePanel threadCountAlertContainer;
 
   @UiField
   SimplePanel newThreadModalContainer;
@@ -37,7 +54,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
   Span subscribeButtonContainer;
 
   @UiField
-  SimplePanel deletedThreadListContainer;
+  ReactComponent deletedThreadListContainer;
 
   @UiField
   Div deleteThreadsArea;
@@ -121,8 +138,32 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
   }
 
   @Override
-  public void setThreadList(Widget w) {
-    threadListContainer.setWidget(w);
+  public void configureThreadList(
+    String forumId,
+    OnClickLinkHandler onClickLink,
+    OnIsEmptyChangeHandler onIsEmptyChange
+  ) {
+    ForumTableProps props = ForumTableProps.create(
+      forumId,
+      null,
+      DiscussionFilter.EXCLUDE_DELETED.name(),
+      THREADS_LIMIT,
+      onClickLink,
+      null,
+      true,
+      onIsEmptyChange,
+      FULL_HEIGHT
+    );
+    ReactElement component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.ForumTable,
+      props
+    );
+    threadListContainer.render(component);
+  }
+
+  @Override
+  public void setThreadCountAlert(Widget w) {
+    threadCountAlertContainer.setWidget(w);
   }
 
   @Override
@@ -143,7 +184,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 
   @Override
   public void setThreadListUIVisible(boolean visible) {
-    threadListContainer.setVisible(visible);
+    threadListArea.setVisible(visible);
   }
 
   @Override
@@ -195,8 +236,26 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
   }
 
   @Override
-  public void setDeletedThreadList(Widget widget) {
-    deletedThreadListContainer.setWidget(widget);
+  public void configureDeletedThreadList(
+    String forumId,
+    OnClickLinkHandler onClickLink
+  ) {
+    ForumTableProps props = ForumTableProps.create(
+      forumId,
+      null,
+      DiscussionFilter.DELETED_ONLY.name(),
+      THREADS_LIMIT,
+      onClickLink,
+      null,
+      true,
+      null,
+      FULL_HEIGHT
+    );
+    ReactElement component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.ForumTable,
+      props
+    );
+    deletedThreadListContainer.render(component);
   }
 
   @Override

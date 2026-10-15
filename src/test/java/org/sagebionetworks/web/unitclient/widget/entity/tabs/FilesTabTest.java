@@ -28,7 +28,6 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -36,12 +35,13 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps.OnClickLinkHandler;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps.OnViewForumClickedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
@@ -139,12 +139,6 @@ public class FilesTabTest {
   @Mock
   EntityRefreshAlert mockEntityRefreshAlert;
 
-  @Mock
-  DiscussionThreadListWidget mockDiscussionThreadListWidget;
-
-  @Mock
-  DiscussionThreadBundle mockBundle;
-
   @Captor
   ArgumentCaptor<CallbackP> callbackPCaptor;
 
@@ -202,8 +196,6 @@ public class FilesTabTest {
     when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
     when(mockPortalGinInjector.getGlobalApplicationState())
       .thenReturn(mockGlobalApplicationState);
-    when(mockPortalGinInjector.getDiscussionThreadListWidget())
-      .thenReturn(mockDiscussionThreadListWidget);
     when(mockPortalGinInjector.getSynapseJavascriptClient())
       .thenReturn(mockJsClient);
     when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
@@ -227,9 +219,6 @@ public class FilesTabTest {
     when(mockReference.getTargetId()).thenReturn(linkEntityId);
     when(mockReference.getTargetVersionNumber()).thenReturn(linkEntityVersion);
 
-    when(mockBundle.getProjectId()).thenReturn(projectEntityId);
-    when(mockBundle.getId()).thenReturn(threadId);
-
     tab.lazyInject();
   }
 
@@ -243,18 +232,6 @@ public class FilesTabTest {
     verify(mockView).setWikiPage(any());
     verify(mockView).setSynapseAlert(any());
     verify(mockBreadcrumb).setLinkClickedHandler(any(CallbackP.class));
-    verify(mockView).setDiscussionThreadListWidget(any());
-    ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
-    verify(mockDiscussionThreadListWidget)
-      .setThreadIdClickedCallback(captor.capture());
-    captor.getValue().invoke(mockBundle);
-    verify(mockGlobalApplicationState).getPlaceChanger();
-    ArgumentCaptor<Place> placeCaptor = ArgumentCaptor.forClass(Place.class);
-    verify(mockPlaceChanger).goTo(placeCaptor.capture());
-    assertEquals(
-      placeCaptor.getValue(),
-      TopicUtils.getThreadPlace(projectEntityId, threadId)
-    );
   }
 
   @Test
@@ -368,8 +345,32 @@ public class FilesTabTest {
     assertNull(place.getArea());
     assertNull(place.getAreaToken());
 
-    verify(mockDiscussionThreadListWidget).configure(fileEntityId, null, null);
+    ArgumentCaptor<OnClickLinkHandler> onClickLinkCaptor =
+      ArgumentCaptor.forClass(OnClickLinkHandler.class);
+    ArgumentCaptor<OnViewForumClickedHandler> onViewForumClickedCaptor =
+      ArgumentCaptor.forClass(OnViewForumClickedHandler.class);
+    verify(mockView)
+      .configureDiscussionThreads(
+        eq(fileEntityId),
+        onClickLinkCaptor.capture(),
+        onViewForumClickedCaptor.capture()
+      );
     verify(mockView).setDiscussionThreadListWidgetVisible(true);
+
+    // a thread from another project that mentions this file opens in that project
+    String otherProjectId = "syn777";
+    onClickLinkCaptor.getValue().onClickLink(threadId, otherProjectId);
+    verify(mockPlaceChanger)
+      .goTo(TopicUtils.getThreadPlace(otherProjectId, threadId));
+
+    // falls back to the current project if the thread's project is unknown
+    onClickLinkCaptor.getValue().onClickLink(threadId, null);
+    verify(mockPlaceChanger)
+      .goTo(TopicUtils.getThreadPlace(projectEntityId, threadId));
+
+    onViewForumClickedCaptor.getValue().onViewForumClicked();
+    verify(mockPlaceChanger)
+      .goTo(new Synapse(projectEntityId, null, EntityArea.DISCUSSION, null));
   }
 
   @Test

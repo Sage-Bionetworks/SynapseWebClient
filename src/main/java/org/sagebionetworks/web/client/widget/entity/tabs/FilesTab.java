@@ -25,7 +25,6 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
@@ -55,7 +54,6 @@ public class FilesTab {
   StuAlert synAlert;
   SynapseClientAsync synapseClient;
   GlobalApplicationState globalApplicationState;
-  DiscussionThreadListWidget discussionThreadListWidget;
   ProvenanceEditorWidget provenanceEditor;
 
   Map<String, String> configMap;
@@ -90,8 +88,6 @@ public class FilesTab {
       this.synapseClient = ginInjector.getSynapseClientAsync();
       fixServiceEntryPoint(synapseClient);
       this.globalApplicationState = ginInjector.getGlobalApplicationState();
-      this.discussionThreadListWidget =
-        ginInjector.getDiscussionThreadListWidget();
       this.addToDownloadListWidget = ginInjector.getAddToDownloadListV2();
       tab.setContent(view.asWidget());
       previewWidget.addStyleName("min-height-200");
@@ -103,16 +99,8 @@ public class FilesTab {
       view.setMetadata(metadata.asWidget());
       view.setWikiPage(wikiPageWidget.asWidget());
       view.setSynapseAlert(synAlert.asWidget());
-      view.setDiscussionThreadListWidget(discussionThreadListWidget.asWidget());
       view.setAddToDownloadListWidget(addToDownloadListWidget.asWidget());
       view.setFilesTab(this);
-      discussionThreadListWidget.setThreadIdClickedCallback(bundle ->
-        globalApplicationState
-          .getPlaceChanger()
-          .goTo(
-            TopicUtils.getThreadPlace(bundle.getProjectId(), bundle.getId())
-          )
-      );
 
       configMap =
         org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget.getDefaultWidgetDescriptor();
@@ -238,12 +226,24 @@ public class FilesTab {
       titleBar.configure(bundle, tab.getEntityActionMenu());
 
       previewWidget.configure(bundle);
-      discussionThreadListWidget.setOnViewForumClickedCallback(() ->
-        globalApplicationState
-          .getPlaceChanger()
-          .goTo(new Synapse(projectEntityId, null, EntityArea.DISCUSSION, null))
+      view.configureDiscussionThreads(
+        currentEntityId,
+        (threadId, threadProjectId) ->
+          globalApplicationState
+            .getPlaceChanger()
+            .goTo(
+              TopicUtils.getThreadPlace(
+                threadProjectId != null ? threadProjectId : projectEntityId,
+                threadId
+              )
+            ),
+        () ->
+          globalApplicationState
+            .getPlaceChanger()
+            .goTo(
+              new Synapse(projectEntityId, null, EntityArea.DISCUSSION, null)
+            )
       );
-      discussionThreadListWidget.configure(currentEntityId, null, null);
       view.setDiscussionText(currentEntity.getName());
     }
     view.setDiscussionThreadListWidgetVisible(isFile);
