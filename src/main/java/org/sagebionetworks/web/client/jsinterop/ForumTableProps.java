@@ -68,15 +68,11 @@ public class ForumTableProps extends ReactComponentProps {
     String maxHeight
   ) {
     ForumTableProps props = new ForumTableProps();
-    if (forumId != null) {
-      props.forumId = forumId;
-    }
+    props.forumId = forumId;
     if (entityId != null) {
       props.entityId = entityId;
     }
-    if (filter != null) {
-      props.filter = filter;
-    }
+    props.filter = filter;
     props.limit = limit;
     props.onClickLink = onClickLink;
     props.onViewForumClicked = onViewForumClicked;
