@@ -99,7 +99,6 @@ import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
-import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
@@ -2663,79 +2662,6 @@ public class SynapseJavascriptClient {
     int limit
   ) {
     return getFuture(cb -> getEntityVersions(entityId, offset, limit, cb));
-  }
-
-  public void getThreadsForEntity(
-    String entityId,
-    Long limit,
-    Long offset,
-    DiscussionThreadOrder order,
-    Boolean ascending,
-    DiscussionFilter filter,
-    AsyncCallback<List<DiscussionThreadBundle>> callback
-  ) {
-    String url = getThreadsURL(
-      ENTITY,
-      entityId,
-      limit,
-      offset,
-      order,
-      ascending,
-      filter
-    );
-    doGet(url, OBJECT_TYPE.PaginatedResultsDiscussionThreadBundle, callback);
-  }
-
-  public void getThreadsForForum(
-    String forumId,
-    Long limit,
-    Long offset,
-    DiscussionThreadOrder order,
-    Boolean ascending,
-    DiscussionFilter filter,
-    AsyncCallback<List<DiscussionThreadBundle>> callback
-  ) {
-    String url = getThreadsURL(
-      FORUM,
-      forumId,
-      limit,
-      offset,
-      order,
-      ascending,
-      filter
-    );
-    doGet(url, OBJECT_TYPE.PaginatedResultsDiscussionThreadBundle, callback);
-  }
-
-  private String getThreadsURL(
-    String associatedObjectType,
-    String objectId,
-    Long limit,
-    Long offset,
-    DiscussionThreadOrder order,
-    Boolean ascending,
-    DiscussionFilter filter
-  ) {
-    String url =
-      getRepoServiceUrl() +
-      associatedObjectType +
-      "/" +
-      objectId +
-      THREADS +
-      "?" +
-      LIMIT_PARAMETER +
-      limit +
-      "&" +
-      OFFSET_PARAMETER +
-      offset;
-    if (order != null) {
-      url += "&sort=" + order.name();
-    }
-    if (ascending != null) {
-      url += "&ascending=" + ascending;
-    }
-    url += "&filter=" + filter.toString();
-    return url;
   }
 
   public void getRepliesForThread(

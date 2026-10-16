@@ -8,10 +8,10 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -40,7 +40,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.PaginatedIds;
-import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
@@ -48,13 +47,21 @@ import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.context.KeyFactoryProvider;
+import org.sagebionetworks.web.client.context.QueryClientProvider;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps.OnClickLinkHandler;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps.OnIsEmptyChangeHandler;
+import org.sagebionetworks.web.client.jsinterop.KeyFactory;
+import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryKey;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget;
@@ -65,6 +72,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
+import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -74,10 +82,34 @@ public class ForumWidgetTest {
   ForumWidgetView mockView;
 
   @Mock
-  DiscussionThreadListWidget mockAvailableThreadListWidget;
+  PortalGinInjector mockGinInjector;
 
   @Mock
-  DiscussionThreadListWidget mockDeletedThreadListWidget;
+  DiscussionThreadCountAlert mockThreadCountAlert;
+
+  @Mock
+  QueryClientProvider mockQueryClientProvider;
+
+  @Mock
+  QueryClient mockQueryClient;
+
+  @Mock
+  KeyFactoryProvider mockKeyFactoryProvider;
+
+  @Mock
+  KeyFactory mockKeyFactory;
+
+  @Mock
+  QueryKey mockAllForumThreadsQueryKey;
+
+  @Captor
+  ArgumentCaptor<OnClickLinkHandler> onClickLinkCaptor;
+
+  @Captor
+  ArgumentCaptor<OnIsEmptyChangeHandler> onIsEmptyChangeCaptor;
+
+  @Captor
+  ArgumentCaptor<InvalidateQueryFilters> invalidateQueryFiltersCaptor;
 
   @Mock
   CallbackP<Tab> mockOnClickCallback;
@@ -173,13 +205,21 @@ public class ForumWidgetTest {
       .thenReturn(DEFAULT_THREAD_MESSAGE_KEY);
     when(mockDiscussionThreadBundle.getCreatedBy()).thenReturn(CREATED_BY);
     when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CREATED_BY);
+    when(mockGinInjector.getDiscussionThreadCountAlert())
+      .thenReturn(mockThreadCountAlert);
+    when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
+    when(mockKeyFactoryProvider.getKeyFactory(any()))
+      .thenReturn(mockKeyFactory);
+    when(mockKeyFactory.getAllForumThreadsQueryKey(any()))
+      .thenReturn(mockAllForumThreadsQueryKey);
     forumWidget =
       new ForumWidget(
         mockView,
         mockStuAlert,
         mockDiscussionForumClient,
-        mockAvailableThreadListWidget,
-        mockDeletedThreadListWidget,
+        mockGinInjector,
+        mockQueryClientProvider,
+        mockKeyFactoryProvider,
         mockNewDiscussionThreadModal,
         mockAuthController,
         mockGlobalApplicationState,
@@ -218,7 +258,6 @@ public class ForumWidgetTest {
   @SuppressWarnings({ "unchecked" })
   @Test
   public void testConstruction() {
-    verify(mockView).setThreadList(any());
     verify(mockView).setNewThreadModal(any());
     verify(mockView).setPresenter(forumWidget);
     verify(mockView).setAlert(any());
@@ -233,14 +272,9 @@ public class ForumWidgetTest {
     Callback onUnsubscribeCallback = captor.getValue();
 
     assertTrue(onSubscribeCallback.equals(onUnsubscribeCallback));
-    // invoke callback to verify thread list is reconfigured
+    // invoke callback to verify thread list is refreshed
     onSubscribeCallback.invoke();
-
-    ArgumentCaptor<CallbackP> captorP = ArgumentCaptor.forClass(
-      CallbackP.class
-    );
-    verify(mockAvailableThreadListWidget)
-      .configure(any(), any(), any(), captorP.capture(), any());
+    verify(mockQueryClient).invalidateQueries(any());
 
     Set<String> moderatorIds = new HashSet<String>();
     Callback deleteCallback = null;
@@ -272,18 +306,35 @@ public class ForumWidgetTest {
 
     verify(mockDefaultThreadWidget).setNewReplyContainerVisible(false);
     verify(mockDefaultThreadWidget).setCommandsVisible(false);
+  }
 
-    // test empty thread callback
-    CallbackP emptyThreadsCallback = captorP.getValue();
+  @Test
+  public void testEmptyThreadListCallback() {
+    forumWidget.configure(
+      "syn1",
+      new ParameterizedToken(""),
+      canModerate,
+      mockActionMenuWidget,
+      mockParamChangeCallback,
+      mockCallback
+    );
+    verify(mockView)
+      .configureThreadList(
+        eq(forumId),
+        any(OnClickLinkHandler.class),
+        onIsEmptyChangeCaptor.capture()
+      );
+    OnIsEmptyChangeHandler onIsEmptyChange = onIsEmptyChangeCaptor.getValue();
+
     reset(mockView);
-    boolean isThreads = true;
-    emptyThreadsCallback.invoke(isThreads);
-    verify(mockView).setDefaultThreadWidgetVisible(!isThreads);
+    onIsEmptyChange.onIsEmptyChange(true);
+    verify(mockView).setDefaultThreadWidgetVisible(true);
+    verify(mockView).setThreadListUIVisible(false);
 
-    verify(mockAvailableThreadListWidget)
-      .setThreadIdClickedCallback(any(CallbackP.class));
-    verify(mockDeletedThreadListWidget)
-      .setThreadIdClickedCallback(any(CallbackP.class));
+    reset(mockView);
+    onIsEmptyChange.onIsEmptyChange(false);
+    verify(mockView).setDefaultThreadWidgetVisible(false);
+    verify(mockView).setThreadListUIVisible(true);
   }
 
   @Test
@@ -291,15 +342,14 @@ public class ForumWidgetTest {
     verify(mockSubscribeButtonWidget)
       .setOnSubscribeCallback(callbackCaptor.capture());
     callbackCaptor.getValue().invoke();
-    verify(mockAvailableThreadListWidget)
-      .configure(
-        any(),
-        any(),
-        any(),
-        any(),
-        eq(DiscussionFilter.EXCLUDE_DELETED)
-      );
+    verify(mockQueryClient)
+      .invalidateQueries(invalidateQueryFiltersCaptor.capture());
+    verify(mockKeyFactory).getAllForumThreadsQueryKey(any());
     verify(mockSubscribersWidget).configure(any(Topic.class));
+    // following resets the thread count alert with a fresh instance
+    verify(mockGinInjector).getDiscussionThreadCountAlert();
+    verify(mockView).setThreadCountAlert(any());
+    verify(mockThreadCountAlert).configure(any());
   }
 
   @Test
@@ -307,14 +357,7 @@ public class ForumWidgetTest {
     verify(mockSubscribeButtonWidget)
       .setOnUnsubscribeCallback(callbackCaptor.capture());
     callbackCaptor.getValue().invoke();
-    verify(mockAvailableThreadListWidget)
-      .configure(
-        any(),
-        any(),
-        any(),
-        any(),
-        eq(DiscussionFilter.EXCLUDE_DELETED)
-      );
+    verify(mockQueryClient).invalidateQueries(any());
     verify(mockSubscribersWidget).configure(any(Topic.class));
   }
 
@@ -350,8 +393,9 @@ public class ForumWidgetTest {
         mockView,
         mockStuAlert,
         mockDiscussionForumClient,
-        mockAvailableThreadListWidget,
-        mockDeletedThreadListWidget,
+        mockGinInjector,
+        mockQueryClientProvider,
+        mockKeyFactoryProvider,
         mockNewDiscussionThreadModal,
         mockAuthController,
         mockGlobalApplicationState,
@@ -403,15 +447,16 @@ public class ForumWidgetTest {
       .getForumByProjectId(anyString(), any(AsyncCallback.class));
     verify(mockNewDiscussionThreadModal)
       .configure(anyString(), any(Callback.class));
-    verify(mockAvailableThreadListWidget).clear();
-    verify(mockAvailableThreadListWidget)
-      .configure(
-        anyString(),
-        eq(canModerate),
-        eq(moderatorIds),
-        any(CallbackP.class),
-        eq(DiscussionFilter.EXCLUDE_DELETED)
+    verify(mockView)
+      .configureThreadList(
+        eq(forumId),
+        onClickLinkCaptor.capture(),
+        any(OnIsEmptyChangeHandler.class)
       );
+    // a fresh thread count alert is created and placed when the forum is shown
+    verify(mockGinInjector).getDiscussionThreadCountAlert();
+    verify(mockView).setThreadCountAlert(any());
+    verify(mockThreadCountAlert).configure(forumId);
     verify(mockView).configureForumSearch(anyString(), anyString());
 
     verify(mockSubscribersWidget).configure(topicCaptor.capture());
@@ -431,16 +476,8 @@ public class ForumWidgetTest {
     );
     verify(mockCallback, never()).invoke();
 
-    ArgumentCaptor<CallbackP> captorP = ArgumentCaptor.forClass(
-      CallbackP.class
-    );
-    verify(mockAvailableThreadListWidget)
-      .setThreadIdClickedCallback(captorP.capture());
-    CallbackP<DiscussionThreadBundle> threadIdClickedCallback =
-      captorP.getValue();
     String threadId = "9584";
-    when(mockDiscussionThreadBundle.getId()).thenReturn(threadId);
-    threadIdClickedCallback.invoke(mockDiscussionThreadBundle);
+    onClickLinkCaptor.getValue().onClickLink(threadId, null);
     verify(mockSynapseJavascriptClient)
       .getThread(eq(threadId), any(AsyncCallback.class));
     verify(mockStuAlert, atLeastOnce()).clear();
@@ -452,20 +489,16 @@ public class ForumWidgetTest {
         any(AsyncCallback.class)
       );
 
-    // going back to the forum should not cause the thread list to reconfigure, but should scroll to
-    // thread
-    reset(mockAvailableThreadListWidget);
+    // going back to the forum should not re-render the thread list, but should refresh its data
+    reset(mockView, mockQueryClient);
+    clearInvocations(mockGinInjector);
     forumWidget.onClickShowAllThreads();
-    verify(mockAvailableThreadListWidget, never()).clear();
-    verify(mockAvailableThreadListWidget, never())
-      .configure(
-        anyString(),
-        eq(canModerate),
-        eq(moderatorIds),
-        any(CallbackP.class),
-        eq(DiscussionFilter.EXCLUDE_DELETED)
-      );
-    verify(mockAvailableThreadListWidget).scrollToThread(threadId);
+    verify(mockView, never()).configureThreadList(any(), any(), any());
+    verify(mockQueryClient)
+      .invalidateQueries(invalidateQueryFiltersCaptor.capture());
+    verify(mockKeyFactory, atLeastOnce()).getAllForumThreadsQueryKey(forumId);
+    // the thread count alert keeps running; it isn't replaced
+    verify(mockGinInjector, never()).getDiscussionThreadCountAlert();
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -483,24 +516,23 @@ public class ForumWidgetTest {
       mockCallback
     );
 
-    ArgumentCaptor<CallbackP> captorP = ArgumentCaptor.forClass(
-      CallbackP.class
-    );
-    verify(mockAvailableThreadListWidget)
-      .setThreadIdClickedCallback(captorP.capture());
-    CallbackP<DiscussionThreadBundle> threadIdClickedCallback =
-      captorP.getValue();
+    verify(mockView)
+      .configureThreadList(
+        eq(forumId),
+        onClickLinkCaptor.capture(),
+        any(OnIsEmptyChangeHandler.class)
+      );
     String threadId = "9584";
     when(mockDiscussionThreadBundle.getId()).thenReturn(threadId);
     AsyncMockStubber
       .callSuccessWith(mockDiscussionThreadBundle)
       .when(mockSynapseJavascriptClient)
       .getThread(any(), any());
-    threadIdClickedCallback.invoke(mockDiscussionThreadBundle);
+    onClickLinkCaptor.getValue().onClickLink(threadId, null);
     verify(mockSynapseJavascriptClient).getThread(eq(threadId), any());
 
-    // going back to the forum should cause the thread list to reconfigure if thread was deleted
-    reset(mockAvailableThreadListWidget);
+    // going back to the forum should re-render the thread list if thread was deleted
+    reset(mockView, mockQueryClient);
 
     ArgumentCaptor<Callback> onShowAllThreadsCallback = ArgumentCaptor.forClass(
       Callback.class
@@ -515,16 +547,8 @@ public class ForumWidgetTest {
         onShowAllThreadsCallback.capture()
       );
     onShowAllThreadsCallback.getValue().invoke();
-    verify(mockAvailableThreadListWidget).clear();
-    verify(mockAvailableThreadListWidget)
-      .configure(
-        anyString(),
-        eq(canModerate),
-        eq(moderatorIds),
-        any(CallbackP.class),
-        eq(DiscussionFilter.EXCLUDE_DELETED)
-      );
-    verify(mockAvailableThreadListWidget, never()).scrollToThread(threadId);
+    verify(mockView).configureThreadList(eq(forumId), any(), any());
+    verify(mockQueryClient).invalidateQueries(any());
   }
 
   @Test
@@ -584,14 +608,7 @@ public class ForumWidgetTest {
       mockCallback
     );
 
-    verify(mockAvailableThreadListWidget)
-      .configure(
-        anyString(),
-        eq(canModerate),
-        eq(moderatorIds),
-        any(CallbackP.class),
-        any(DiscussionFilter.class)
-      );
+    verify(mockView).configureThreadList(eq(forumId), any(), any());
 
     // verify action menu configuration
     verify(mockActionMenuWidget)
@@ -704,14 +721,7 @@ public class ForumWidgetTest {
         eq(mockActionMenuWidget),
         onShowAllThreadsCallback.capture()
       );
-    verify(mockAvailableThreadListWidget, never())
-      .configure(
-        anyString(),
-        anyBoolean(),
-        anySet(),
-        any(CallbackP.class),
-        any(DiscussionFilter.class)
-      );
+    verify(mockView, never()).configureThreadList(any(), any(), any());
 
     // verify param was updated
     ArgumentCaptor<ParameterizedToken> captorToken = ArgumentCaptor.forClass(
@@ -815,14 +825,7 @@ public class ForumWidgetTest {
         eq(mockActionMenuWidget),
         any(Callback.class)
       );
-    verify(mockAvailableThreadListWidget, never())
-      .configure(
-        anyString(),
-        anyBoolean(),
-        anySet(),
-        any(CallbackP.class),
-        any(DiscussionFilter.class)
-      );
+    verify(mockView, never()).configureThreadList(any(), any(), any());
 
     ArgumentCaptor<CallbackP> onReplyIdCallbackCaptor = ArgumentCaptor.forClass(
       CallbackP.class
@@ -945,14 +948,7 @@ public class ForumWidgetTest {
     );
     forumWidget.onClickDeletedThreadCommand();
     verify(mockView).setDeletedThreadListVisible(true);
-    verify(mockDeletedThreadListWidget)
-      .configure(
-        anyString(),
-        eq(canModerate),
-        eq(moderatorIds),
-        eq((CallbackP) null),
-        eq(DiscussionFilter.DELETED_ONLY)
-      );
+    verify(mockView).configureDeletedThreadList(eq(forumId), any());
   }
 
   @Test

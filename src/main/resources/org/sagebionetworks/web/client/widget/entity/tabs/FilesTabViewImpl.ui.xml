@@ -78,7 +78,7 @@
         <bh:Div addStyleNames="entity-title">
           <bh:Text ui:field="discussionText" />
         </bh:Div>
-          <bh:Div ui:field="discussionThreadsContainer" />
+          <w:ReactComponent ui:field="discussionThreadsContainer" />
       </g:FlowPanel>
     </bh:Div>
     </g:FlowPanel>

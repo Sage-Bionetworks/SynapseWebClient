@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.inject.Inject;
 import org.sagebionetworks.repo.model.PaginatedIds;
-import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
@@ -18,8 +17,14 @@ import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.context.KeyFactoryProvider;
+import org.sagebionetworks.web.client.context.QueryClientProvider;
+import org.sagebionetworks.web.client.jsinterop.KeyFactory;
+import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -29,6 +34,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThrea
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
+import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 
 public class ForumWidget implements ForumWidgetView.Presenter {
@@ -41,13 +47,14 @@ public class ForumWidget implements ForumWidgetView.Presenter {
   ForumWidgetView view;
 
   NewDiscussionThreadModal newThreadModal;
-  DiscussionThreadListWidget threadListWidget;
+  PortalGinInjector ginInjector;
+  QueryClient queryClient;
+  KeyFactoryProvider keyFactoryProvider;
   StuAlert stuAlert;
   DiscussionForumClientAsync discussionForumClient;
   AuthenticationController authController;
   GlobalApplicationState globalApplicationState;
   SingleDiscussionThreadWidget singleThreadWidget;
-  DiscussionThreadListWidget deletedThreadListWidget;
   SynapseJavascriptClient jsClient;
   String forumId, threadId;
   String entityId;
@@ -76,8 +83,9 @@ public class ForumWidget implements ForumWidgetView.Presenter {
     final ForumWidgetView view,
     StuAlert stuAlert,
     DiscussionForumClientAsync discussionForumClient,
-    DiscussionThreadListWidget threadListWidget,
-    DiscussionThreadListWidget deletedThreadListWidget,
+    PortalGinInjector ginInjector,
+    QueryClientProvider queryClientProvider,
+    KeyFactoryProvider keyFactoryProvider,
     NewDiscussionThreadModal newThreadModal,
     AuthenticationController authController,
     GlobalApplicationState globalApplicationState,
@@ -90,7 +98,9 @@ public class ForumWidget implements ForumWidgetView.Presenter {
   ) {
     this.view = view;
     this.stuAlert = stuAlert;
-    this.threadListWidget = threadListWidget;
+    this.ginInjector = ginInjector;
+    this.queryClient = queryClientProvider.getQueryClient();
+    this.keyFactoryProvider = keyFactoryProvider;
     this.newThreadModal = newThreadModal;
     this.discussionForumClient = discussionForumClient;
     fixServiceEntryPoint(discussionForumClient);
@@ -99,16 +109,13 @@ public class ForumWidget implements ForumWidgetView.Presenter {
     this.singleThreadWidget = singleThreadWidget;
     this.subscribeToForumButton = subscribeToForumButton;
     this.defaultThreadWidget = defaultThreadWidget;
-    this.deletedThreadListWidget = deletedThreadListWidget;
     this.forumSubscribersWidget = forumSubscribersWidget;
     this.jsClient = jsClient;
     view.setPresenter(this);
-    view.setThreadList(threadListWidget.asWidget());
     view.setNewThreadModal(newThreadModal.asWidget());
     view.setAlert(stuAlert.asWidget());
     view.setSubscribeButton(subscribeToForumButton.asWidget());
     view.setDefaultThreadWidget(defaultThreadWidget.asWidget());
-    view.setDeletedThreadList(deletedThreadListWidget.asWidget());
     view.setSubscribersWidget(forumSubscribersWidget.asWidget());
     String defaultThreadId = synapseProperties.getSynapseProperty(
       DEFAULT_THREAD_ID_KEY
@@ -131,21 +138,12 @@ public class ForumWidget implements ForumWidgetView.Presenter {
       public void invoke() {
         ForumWidget.this.forumSubscribersWidget.configure(forumTopic);
         refreshThreads();
+        resetThreadCountAlert();
       }
     };
     subscribeToForumButton.setOnSubscribeCallback(refreshThreadsCallback);
     subscribeToForumButton.setOnUnsubscribeCallback(refreshThreadsCallback);
 
-    threadListWidget.setThreadIdClickedCallback(bundle -> {
-      String replyId = null;
-      showThread(bundle.getId(), replyId);
-      urlChangeCallback.invoke();
-    });
-    deletedThreadListWidget.setThreadIdClickedCallback(bundle -> {
-      String replyId = null;
-      showThread(bundle.getId(), replyId);
-      urlChangeCallback.invoke();
-    });
     singleThreadWidget.setReplyIdCallback(replyId -> {
       updatePlaceToReply(replyId);
       urlChangeCallback.invoke();
@@ -396,17 +394,9 @@ public class ForumWidget implements ForumWidgetView.Presenter {
     );
     newThreadModal.configure(
       forumId,
-      new Callback() {
-        @Override
-        public void invoke() {
-          threadListWidget.configure(
-            forumId,
-            isCurrentUserModerator,
-            moderatorIds,
-            emptyListCallback,
-            DiscussionFilter.EXCLUDE_DELETED
-          );
-        }
+      () -> {
+        refreshThreads();
+        resetThreadCountAlert();
       }
     );
     view.setThreadListUIVisible(true);
@@ -416,14 +406,12 @@ public class ForumWidget implements ForumWidgetView.Presenter {
     view.setForumSearchVisible(true);
     if (!isForumConfigured) {
       isForumConfigured = true;
-      threadListWidget.clear();
-      threadListWidget.configure(
+      view.configureThreadList(
         forumId,
-        isCurrentUserModerator,
-        moderatorIds,
-        emptyListCallback,
-        DiscussionFilter.EXCLUDE_DELETED
+        this::onThreadClicked,
+        isEmpty -> emptyListCallback.invoke(!isEmpty)
       );
+      resetThreadCountAlert();
       forumTopic.setObjectId(forumId);
       forumSubscribersWidget.configure(forumTopic);
       view.configureForumSearch(forumId, entityId);
@@ -478,10 +466,14 @@ public class ForumWidget implements ForumWidgetView.Presenter {
   public void onClickShowAllThreads() {
     showForum();
     urlChangeCallback.invoke();
-    // jump to single thread that we just showed (if set)
-    if (threadId != null) {
-      threadListWidget.scrollToThread(threadId);
-    }
+    // pick up view/reply count changes from the thread we just showed
+    refreshThreads();
+  }
+
+  private void onThreadClicked(String threadId, String projectId) {
+    String replyId = null;
+    showThread(threadId, replyId);
+    urlChangeCallback.invoke();
   }
 
   public void onClickNewThread() {
@@ -496,13 +488,21 @@ public class ForumWidget implements ForumWidgetView.Presenter {
   }
 
   private void refreshThreads() {
-    threadListWidget.configure(
-      forumId,
-      isCurrentUserModerator,
-      moderatorIds,
-      emptyListCallback,
-      DiscussionFilter.EXCLUDE_DELETED
+    KeyFactory keyFactory = keyFactoryProvider.getKeyFactory(
+      authController.getCurrentUserAccessToken()
     );
+    queryClient.invalidateQueries(
+      InvalidateQueryFilters.create(
+        keyFactory.getAllForumThreadsQueryKey(forumId)
+      )
+    );
+  }
+
+  private void resetThreadCountAlert() {
+    DiscussionThreadCountAlert threadCountAlert =
+      ginInjector.getDiscussionThreadCountAlert();
+    view.setThreadCountAlert(threadCountAlert.asWidget());
+    threadCountAlert.configure(forumId);
   }
 
   @Override
@@ -515,13 +515,7 @@ public class ForumWidget implements ForumWidgetView.Presenter {
       view.setDeletedThreadListVisible(false);
     } else {
       view.setDeletedThreadListVisible(true);
-      deletedThreadListWidget.configure(
-        forumId,
-        isCurrentUserModerator,
-        moderatorIds,
-        null,
-        DiscussionFilter.DELETED_ONLY
-      );
+      view.configureDeletedThreadList(forumId, this::onThreadClicked);
     }
     updateActionMenuDeletedThreadsCommand();
   }

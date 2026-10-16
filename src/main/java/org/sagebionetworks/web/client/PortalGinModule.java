@@ -135,8 +135,6 @@ import org.sagebionetworks.web.client.widget.CreateTableFromCsvDialog;
 import org.sagebionetworks.web.client.widget.CreateTableFromCsvDialogImpl;
 import org.sagebionetworks.web.client.widget.CsvPreview;
 import org.sagebionetworks.web.client.widget.CsvPreviewImpl;
-import org.sagebionetworks.web.client.widget.DiscussionEmpty;
-import org.sagebionetworks.web.client.widget.DiscussionEmptyImpl;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTesterImpl;
 import org.sagebionetworks.web.client.widget.EntityCitation;
@@ -229,10 +227,6 @@ import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelpView;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelpViewImpl;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelpImpl;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetView;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.NewReplyWidgetView;
@@ -1888,16 +1882,6 @@ public abstract class PortalGinModule {
   abstract ReplyModalView bindReplyModalView(ReplyModalViewImpl impl);
 
   @Binds
-  abstract DiscussionThreadListWidgetView bindDiscussionThreadListWidgetView(
-    DiscussionThreadListWidgetViewImpl impl
-  );
-
-  @Binds
-  abstract DiscussionThreadListItemWidgetView bindDiscussionThreadListItemWidgetView(
-    DiscussionThreadListItemWidgetViewImpl impl
-  );
-
-  @Binds
   abstract SingleDiscussionThreadWidgetView bindSingleDiscussionThreadWidgetView(
     SingleDiscussionThreadWidgetViewImpl impl
   );
@@ -2446,9 +2430,6 @@ public abstract class PortalGinModule {
 
   @Binds
   abstract EntityCitation bindEntityCitation(EntityCitationImpl impl);
-
-  @Binds
-  abstract DiscussionEmpty bindDiscussionEmpty(DiscussionEmptyImpl impl);
 
   @Binds
   abstract ProjectVisibilityChip bindProjectVisibilityChip(

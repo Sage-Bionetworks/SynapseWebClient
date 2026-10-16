@@ -90,8 +90,6 @@ import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceS
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidget;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
@@ -646,8 +644,6 @@ public interface PortalGinInjector {
   VerificationSubmissionRowViewImpl getVerificationSubmissionRowViewImpl();
 
   // discussion
-  DiscussionThreadListItemWidget createThreadListItemWidget();
-
   ReplyWidget createReplyWidget();
 
   EntityRefreshAlert getEntityRefreshAlert();
@@ -700,8 +696,6 @@ public interface PortalGinInjector {
   FilesBrowser getFilesBrowser();
 
   WikiPageWidget getWikiPageWidget();
-
-  DiscussionThreadListWidget getDiscussionThreadListWidget();
 
   ChallengeTabView getChallengeTabView();
 

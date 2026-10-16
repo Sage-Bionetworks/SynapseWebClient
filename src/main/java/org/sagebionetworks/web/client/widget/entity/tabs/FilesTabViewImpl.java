@@ -20,6 +20,9 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.jsinterop.EntitySidebarProps;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps.OnClickLinkHandler;
+import org.sagebionetworks.web.client.jsinterop.ForumTableProps.OnViewForumClickedHandler;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -31,6 +34,7 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 public class FilesTabViewImpl implements FilesTabView {
 
   private static final String DISCUSSION_ABOUT = "Discussion about ";
+  private static final int DISCUSSION_THREADS_LIMIT = 20;
 
   @UiField
   LoadingSpinner loading;
@@ -75,7 +79,7 @@ public class FilesTabViewImpl implements FilesTabView {
   SimplePanel refreshAlertContainer;
 
   @UiField
-  Div discussionThreadsContainer;
+  ReactComponent discussionThreadsContainer;
 
   @UiField
   FlowPanel discussionContainer;
@@ -274,9 +278,27 @@ public class FilesTabViewImpl implements FilesTabView {
   }
 
   @Override
-  public void setDiscussionThreadListWidget(Widget widget) {
-    discussionThreadsContainer.clear();
-    discussionThreadsContainer.add(widget);
+  public void configureDiscussionThreads(
+    String entityId,
+    OnClickLinkHandler onClickLink,
+    OnViewForumClickedHandler onViewForumClicked
+  ) {
+    ForumTableProps props = ForumTableProps.create(
+      null,
+      entityId,
+      null,
+      DISCUSSION_THREADS_LIMIT,
+      onClickLink,
+      onViewForumClicked,
+      true,
+      null,
+      null
+    );
+    ReactElement component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.ForumTable,
+      props
+    );
+    discussionThreadsContainer.render(component);
   }
 
   @Override
