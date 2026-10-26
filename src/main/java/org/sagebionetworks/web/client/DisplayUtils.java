@@ -789,6 +789,10 @@ public class DisplayUtils {
   public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY =
     "SynapseTestWebsite";
 
+  /** Comma-separated feature flag keys the user enabled individually in SRC's Experimental Features menu */
+  public static final String SYNAPSE_EXPERIMENTAL_FEATURES_COOKIE_KEY =
+    "SynapseExperimentalFeatures";
+
   public static boolean isInCookies(String cookieKey, CookieProvider cookies) {
     return cookies.getCookie(cookieKey) != null;
   }
