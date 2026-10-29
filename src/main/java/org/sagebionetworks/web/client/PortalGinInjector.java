@@ -450,7 +450,6 @@ public interface PortalGinInjector {
 
   TutorialWizard getTutorialWidgetRenderer();
 
-  org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget getProvenanceRenderer();
   ProvenanceWidget getProvenanceRendererV2();
 
   AdministerEvaluationsList getAdministerEvaluationsList();

@@ -16,10 +16,6 @@ import javax.inject.Inject;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
-import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
-import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
@@ -168,58 +164,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   public String getLocationQueryString() {
     return Location.getQueryString();
   }
-
-  @Override
-  public LayoutResult nChartlayout(
-    NChartLayersArray layers,
-    NChartCharacters characters
-  ) {
-    return _nChartlayout(layers, characters);
-  }
-
-  private static final native LayoutResultJso _nChartlayout(
-    NChartLayersArray layers,
-    NChartCharacters characters
-  ) /*-{
-		var layoutResult = {};
-		try {
-			var debug = {
-				'features' : [ 'nodes' ],
-				'wireframe' : true
-			};
-			var conf = {
-				'subnode_spacing' : 40,
-				'group_styles' : {
-					'pov' : {
-						'stroke-width' : 3
-					}
-				},
-				'debug' : debug
-			};
-			var chart = new $wnd.NChart(characters, layers, conf).calc().plot();
-
-			// convert graph into LayoutResult
-			var ncGraph = chart.graph;
-			for (var i = 0; i < ncGraph.layers.length; i++) {
-				var ncLayer = ncGraph.layers[i];
-				for (var j = 0; j < ncLayer.nodes.length; j++) {
-					var ncNode = ncLayer.nodes[j];
-					var provGraphNodeId = ncNode.event;
-					var xypoint = {
-						'x' : ncNode.x,
-						'y' : ncNode.y
-					};
-					if (!(provGraphNodeId in layoutResult)) {
-						layoutResult[provGraphNodeId] = [];
-					}
-					layoutResult[provGraphNodeId].push(xypoint);
-				}
-			}
-		} catch (err) {
-			console.error(err);
-		}
-		return layoutResult;
-	}-*/;
 
   @Override
   public void setPageTitle(String newTitle) {

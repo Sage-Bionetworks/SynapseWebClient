@@ -57,9 +57,6 @@ importers:
       jquery-ui:
         specifier: 1.13.3
         version: 1.13.3
-      jsplumb:
-        specifier: 2.13.2
-        version: 2.13.2
       katex:
         specifier: ^0.16.47
         version: 0.16.47
@@ -3583,9 +3580,6 @@ packages:
   jsonpointer@5.0.1:
     resolution: {integrity: sha512-p/nXbhSEcu3pZRdkW1OfJhpsVtW1gd4Wa1fnQc9YLiTfAjn0312eMKimbdIQzuZl9aa9xUGaRlP9T/CJE/ditQ==}
     engines: {node: '>=0.10.0'}
-
-  jsplumb@2.13.2:
-    resolution: {integrity: sha512-Ad54lZusITD/7ENdt0Z3H7iyeyw0ov+dcPBRbMxezMxCnzzM27+dVKBlEZhhJ6EbrYY3DzPo7eFK5YBmR8NLzg==}
 
   jss-plugin-camel-case@10.10.0:
     resolution: {integrity: sha512-z+HETfj5IYgFxh1wJnUAU8jByI48ED+v0fuTuhKrPR+pRBYS2EDwbusU8aFOpCdYhtRc9zhN+PJ7iNE8pAWyPw==}
@@ -9374,8 +9368,6 @@ snapshots:
       jsep: 1.4.0
 
   jsonpointer@5.0.1: {}
-
-  jsplumb@2.13.2: {}
 
   jss-plugin-camel-case@10.10.0:
     dependencies:

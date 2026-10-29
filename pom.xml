@@ -442,10 +442,6 @@
                   tofile="src/main/webapp/generated/jquery-ui.min.css"
                 />
                 <copy
-                  file="${project.basedir}/node_modules/jsplumb/dist/js/jsplumb.min.js"
-                  tofile="src/main/webapp/generated/jsplumb.min.js"
-                />
-                <copy
                   file="${project.basedir}/node_modules/pica/dist/pica.min.js"
                   tofile="src/main/webapp/generated/pica.min.js"
                 />
@@ -917,13 +913,6 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava-gwt</artifactId>
       <version>32.1.1-jre</version>
-    </dependency>
-
-    <!-- Prov Tree layout -->
-    <dependency>
-      <groupId>org.abego.treelayout</groupId>
-      <artifactId>org.abego.treelayout.core</artifactId>
-      <version>1.0.3</version>
     </dependency>
 
     <!-- note: This refers to a custom POM in the SageBionetworks artifactory, 

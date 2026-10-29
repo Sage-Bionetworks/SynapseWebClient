@@ -102,8 +102,7 @@ public class FilesTab {
       view.setAddToDownloadListWidget(addToDownloadListWidget.asWidget());
       view.setFilesTab(this);
 
-      configMap =
-        org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget.getDefaultWidgetDescriptor();
+      configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
       initBreadcrumbLinkClickedHandler();
     }
   }

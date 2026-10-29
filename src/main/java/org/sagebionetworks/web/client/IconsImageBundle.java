@@ -13,9 +13,6 @@ public interface IconsImageBundle extends ClientBundle {
   @Source("resource/images/icons/arrow-right-dir-16.png")
   ImageResource arrowRightDir16();
 
-  @Source("resource/images/icons/document-external-16.png")
-  ImageResource documentExternal16();
-
   @Source("resource/images/icons/exclamation-red-16.png")
   ImageResource error16();
 
@@ -30,12 +27,6 @@ public interface IconsImageBundle extends ClientBundle {
 
   @Source("resource/images/icons/flag-small-16.png")
   ImageResource flagSmall16();
-
-  @Source("resource/images/icons/genomespace-16.png")
-  ImageResource genomespace16();
-
-  @Source("resource/images/icons/github-16.png")
-  ImageResource github16();
 
   @Source("resource/images/icons/lock-grey-16.png")
   ImageResource lockGrey16();
