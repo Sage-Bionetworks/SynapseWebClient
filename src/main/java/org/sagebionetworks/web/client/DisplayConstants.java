@@ -166,17 +166,10 @@ public class DisplayConstants {
   public static final String NETWORK_ERROR = "Network error";
   public static final String ERROR_RESPONSE_UNAVAILABLE =
     "The web page is not available. Please check your Internet connection.";
-  public static final String DESCRIPTION = "Description";
   public static final String OK = "OK";
   public static final String LEFT_ARROWS = "<<";
   public static final String RIGHT_ARROWS = ">>";
-  public static final String NOT_FOUND = "Not Found";
   public static final String ERROR_LOADING = "Error Loading";
-  public static final String UNDEFINED = "Undefined";
-  public static final String ERROR_PROVENANCE =
-    "An error occured creating the Provenance view.";
-  public static final String ERROR_PROVENANCE_RELOAD = "Loading Error. Reload.";
-  public static final String ACTIVITY = "Activity";
 
   /**
    * Widget editors
@@ -207,8 +200,6 @@ public class DisplayConstants {
 
   public static final String VERSION_INFO_UPDATED = "Updated Version Info";
 
-  public static final String PROVENANCE_BASIC_HELP =
-    "Provenance tracks the relationship between data, code and analytical results.";
   public static final String ERROR_NO_LINK_DEFINED =
     "Warning: No target reference is defined for this link.";
   public static final String MEMBERS = "Members";
@@ -223,7 +214,6 @@ public class DisplayConstants {
   public static final String FILES = "Files";
   public static final String ERROR_PAGE_CREATION_FAILED =
     "Page creation failed. Please try again";
-  public static final String UNAUTHORIZED = "Unauthorized";
   public static final String INVALID_WIDGET_MARKDOWN_MESSAGE =
     "Invalid widget markdown: ";
   public static final String BROWSE_MY_ENTITIES = "Browse";
@@ -299,7 +289,6 @@ public class DisplayConstants {
     "Please enter a project name";
   public static final String PLEASE_ENTER_TEAM_NAME =
     "Please enter a team name";
-  public static final String OLD_VERSION = "old version";
   public static final String NEW_VERSION_AVAILABLE =
     "New Version of Synapse Available. ";
   public static final String NEW_VERSION_INSTRUCTIONS =

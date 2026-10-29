@@ -1,1 +1,0 @@
-jQuery.noConflict()(function($){	$(document).ready(bezier_prototype_length_and_lengthAtPoint);});

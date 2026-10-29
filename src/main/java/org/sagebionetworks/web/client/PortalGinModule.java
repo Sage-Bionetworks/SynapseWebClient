@@ -37,8 +37,6 @@ import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.ResourceLoaderImpl;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
-import org.sagebionetworks.web.client.transform.JsoProvider;
-import org.sagebionetworks.web.client.transform.JsoProviderImpl;
 import org.sagebionetworks.web.client.view.ACTAccessApprovalsView;
 import org.sagebionetworks.web.client.view.ACTAccessApprovalsViewImpl;
 import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
@@ -751,9 +749,6 @@ public abstract class PortalGinModule {
   abstract EventBus bindEventBus(SimpleEventBus impl);
 
   @Binds
-  abstract JsoProvider bindJsoProvider(JsoProviderImpl impl);
-
-  @Binds
   @Singleton
   abstract AuthenticationController bindAuthenticationController(
     AuthenticationControllerImpl impl
@@ -1316,11 +1311,6 @@ public abstract class PortalGinModule {
   @Binds
   abstract TIFFPreviewWidgetView bindTIFFPreviewWidgetView(
     TIFFPreviewWidgetViewImpl impl
-  );
-
-  @Binds
-  abstract org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView bindProvenanceWidgetViewV1(
-    org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl impl
   );
 
   @Binds

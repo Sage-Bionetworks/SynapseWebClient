@@ -58,7 +58,6 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -731,30 +730,6 @@ public class DisplayUtils {
     t.setContainer("body");
     t.setWidget(widget);
     return t;
-  }
-
-  public static String getVersionDisplay(VersionableEntity versionable) {
-    String version = "";
-    if (
-      versionable == null || versionable.getVersionNumber() == null
-    ) return version;
-
-    if (
-      versionable.getVersionLabel() != null &&
-      !versionable
-        .getVersionNumber()
-        .toString()
-        .equals(versionable.getVersionLabel())
-    ) {
-      version =
-        versionable.getVersionLabel() +
-        " (" +
-        versionable.getVersionNumber() +
-        ")";
-    } else {
-      version = versionable.getVersionNumber().toString();
-    }
-    return version;
   }
 
   // from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab

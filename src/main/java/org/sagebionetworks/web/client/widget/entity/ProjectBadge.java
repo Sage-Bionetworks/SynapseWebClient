@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
@@ -15,10 +17,10 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
-import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
-import org.sagebionetworks.web.shared.KeyValueDisplay;
 
 public class ProjectBadge implements SynapseWidgetPresenter {
+
+  private static final int MAX_TOOL_TIP_VALUE_CHAR = 300;
 
   private ProjectBadgeView view;
   private ProjectHeader header;
@@ -105,11 +107,31 @@ public class ProjectBadge implements SynapseWidgetPresenter {
       );
     }
 
-    view.setTooltip(
-      ProvViewUtil.createEntityPopoverHtml(
-        new KeyValueDisplay<String>(map, order)
-      )
-    );
+    view.setTooltip(createTooltipHtml(map, order));
+  }
+
+  private static SafeHtml createTooltipHtml(
+    Map<String, String> map,
+    List<String> order
+  ) {
+    SafeHtmlBuilder sb = new SafeHtmlBuilder();
+    for (String key : order) {
+      String val = map.get(key);
+      if (val == null) val = "";
+      val =
+        val.length() > MAX_TOOL_TIP_VALUE_CHAR
+          ? val.substring(0, MAX_TOOL_TIP_VALUE_CHAR - 3) + "..."
+          : val;
+      sb
+        .appendHtmlConstant("<span class=\"boldText\">")
+        .appendEscaped(key)
+        .appendHtmlConstant("</span>");
+      if (val.length() > 0) {
+        sb.appendEscaped(": ").appendEscaped(val);
+      }
+      sb.appendHtmlConstant("<br/>");
+    }
+    return sb.toSafeHtml();
   }
 
   public void addStyleName(String style) {

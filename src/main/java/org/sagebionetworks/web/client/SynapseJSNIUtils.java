@@ -7,9 +7,6 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 import elemental2.dom.Blob;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
-import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
-import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 
 public interface SynapseJSNIUtils {
   public String getCurrentHistoryToken();
@@ -38,11 +35,6 @@ public interface SynapseJSNIUtils {
   public String getLocationPath();
 
   public String getLocationQueryString();
-
-  public LayoutResult nChartlayout(
-    NChartLayersArray layers,
-    NChartCharacters characters
-  );
 
   public void setPageTitle(String newTitle);
 

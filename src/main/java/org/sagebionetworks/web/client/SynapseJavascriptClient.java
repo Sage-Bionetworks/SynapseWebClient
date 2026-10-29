@@ -233,7 +233,6 @@ public class SynapseJavascriptClient {
   private static final String PROFILE_IMAGE = "/image";
   public static final String OBJECT = "/object";
   public static final String ETAG = "etag";
-  public static final String GENERATED_PATH = "/generated";
   public static final String GENERATED_BY_SUFFIX = "/generatedBy";
   public static final String OPEN_MEMBERSHIP_REQUEST = "/openRequest";
   public static final String UPLOAD_DESTINATIONS = "/uploadDestinations";
@@ -2143,27 +2142,6 @@ public class SynapseJavascriptClient {
       false,
       callback
     );
-  }
-
-  public void getEntitiesGeneratedBy(
-    String activityId,
-    Integer limit,
-    Integer offset,
-    AsyncCallback<ArrayList<Reference>> callback
-  ) {
-    String url =
-      getRepoServiceUrl() +
-      ACTIVITY_URI_PATH +
-      "/" +
-      activityId +
-      GENERATED_PATH +
-      "?" +
-      OFFSET_PARAMETER +
-      offset +
-      "&" +
-      LIMIT_PARAMETER +
-      limit;
-    doGet(url, OBJECT_TYPE.PaginatedResultReference, callback);
   }
 
   public void createActivityAndLinkToEntity(

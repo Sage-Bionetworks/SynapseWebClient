@@ -13,11 +13,7 @@ import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -40,8 +36,6 @@ import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
-import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
-import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -176,14 +170,7 @@ public class ProjectBadgeTest {
     header.setName(name);
     header.setModifiedBy(Long.valueOf(userProfile.getOwnerId()));
     widget.configure(header);
-    // note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
-    Map<String, String> map = new HashMap<String, String>();
-    List<String> order = new ArrayList<String>();
-    order.add("ID");
-    map.put("ID", header.getId());
-    String expected = ProvViewUtil
-      .createEntityPopoverHtml(new KeyValueDisplay<String>(map, order))
-      .asString();
+    String expected = "<span class=\"boldText\">ID</span>: syn37373<br/>";
 
     verify(mockView).setTooltip(safeHtmlCaptor.capture());
     SafeHtml tooltip = safeHtmlCaptor.getValue();
@@ -200,18 +187,12 @@ public class ProjectBadgeTest {
     header.setModifiedBy(Long.valueOf(userProfile.getOwnerId()));
     header.setModifiedOn(mockDate);
     widget.configure(header);
-    Map<String, String> map = new HashMap<String, String>();
-    List<String> order = new ArrayList<String>();
-    order.add("ID");
-    map.put("ID", header.getId());
-    order.add("Modified By");
-    map.put("Modified By", DisplayUtils.getDisplayName(userProfile));
-    order.add("Modified On");
-    map.put("Modified On", "today");
-    String expected = ProvViewUtil
-      .createEntityPopoverHtml(new KeyValueDisplay<String>(map, order))
-      .asString();
-    // note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
+    String expected =
+      "<span class=\"boldText\">ID</span>: syn37373<br/>" +
+      "<span class=\"boldText\">Modified By</span>: " +
+      DisplayUtils.getDisplayName(userProfile) +
+      "<br/>" +
+      "<span class=\"boldText\">Modified On</span>: today<br/>";
     verify(mockView).setTooltip(safeHtmlCaptor.capture());
     SafeHtml tooltip = safeHtmlCaptor.getValue();
     assertEquals(expected, tooltip.asString());

@@ -202,8 +202,7 @@ public abstract class AbstractTablesTab
       view.setWikiPage(wikiPageWidget.asWidget());
       tab.setContent(view.asWidget());
       initBreadcrumbLinkClickedHandler();
-      configMap =
-        org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget.getDefaultWidgetDescriptor();
+      configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
     }
   }
 

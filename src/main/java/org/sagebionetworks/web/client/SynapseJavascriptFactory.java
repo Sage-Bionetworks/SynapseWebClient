@@ -26,7 +26,6 @@ import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeaderList;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
@@ -126,7 +125,6 @@ public class SynapseJavascriptFactory {
     Count,
     PaginatedResultsEntityHeader,
     ProjectHeaderList,
-    PaginatedResultReference,
     V2WikiPage,
     V2WikiOrderHint,
     DockerRepository,
@@ -448,18 +446,6 @@ public class SynapseJavascriptFactory {
         return dockerCommitList;
       case ProjectHeaderList:
         return new ProjectHeaderList(json);
-      case PaginatedResultReference:
-        // json really represents a PaginatedResults (cannot reference here in js)
-        List<Reference> referenceList = new ArrayList<>();
-        JSONArrayAdapter referenceResultsJsonArray = json.getJSONArray(
-          "results"
-        );
-        for (int i = 0; i < referenceResultsJsonArray.length(); i++) {
-          JSONObjectAdapter jsonObject =
-            referenceResultsJsonArray.getJSONObject(i);
-          referenceList.add(new Reference(jsonObject));
-        }
-        return referenceList;
       case ListWrapperColumnModel:
         List<ColumnModel> columnModelList = new ArrayList<>();
         JSONArrayAdapter columnModelJsonList = json.getJSONArray("list");

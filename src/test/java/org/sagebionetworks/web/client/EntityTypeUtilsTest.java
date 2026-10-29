@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client;
 
 import static org.junit.Assert.assertEquals;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
@@ -132,50 +131,6 @@ public class EntityTypeUtilsTest {
     assertEquals(
       EntityType.file,
       EntityTypeUtils.getEntityTypeForEntityClassName("default")
-    );
-  }
-
-  @Test
-  public void testGetIconTypeForEntityClassName() {
-    assertEquals(
-      IconType.FILE,
-      EntityTypeUtils.getIconTypeForEntityClassName(FileEntity.class.getName())
-    );
-    assertEquals(
-      IconType.FOLDER,
-      EntityTypeUtils.getIconTypeForEntityClassName(Folder.class.getName())
-    );
-    assertEquals(
-      IconType.LIST_ALT,
-      EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName())
-    );
-    assertEquals(
-      IconType.TABLE,
-      EntityTypeUtils.getIconTypeForEntityClassName(TableEntity.class.getName())
-    );
-    assertEquals(
-      IconType.TH_LIST,
-      EntityTypeUtils.getIconTypeForEntityClassName(EntityView.class.getName())
-    );
-    assertEquals(
-      IconType.LINK,
-      EntityTypeUtils.getIconTypeForEntityClassName(Link.class.getName())
-    );
-    assertEquals(
-      IconType.TH_LIST,
-      EntityTypeUtils.getIconTypeForEntityClassName(
-        MaterializedView.class.getName()
-      )
-    );
-    assertEquals(
-      IconType.TH_LIST,
-      EntityTypeUtils.getIconTypeForEntityClassName(
-        VirtualTable.class.getName()
-      )
-    );
-    assertEquals(
-      IconType.FILE,
-      EntityTypeUtils.getIconTypeForEntityClassName("default")
     );
   }
 
