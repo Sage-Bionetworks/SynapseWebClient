@@ -38,6 +38,7 @@ import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
 import org.sagebionetworks.web.server.servlet.InitSessionServlet;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
+import org.sagebionetworks.web.server.servlet.LogServlet;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
@@ -222,6 +223,10 @@ public class PortalServletModule extends ServletModule {
     bind(VersionsServlet.class).in(Singleton.class);
     serve("/Portal/" + WebConstants.VERSIONS_SERVLET)
       .with(VersionsServlet.class);
+
+    // Log handler
+    bind(LogServlet.class).in(Singleton.class);
+    serve("/Portal/" + WebConstants.LOG_SERVLET).with(LogServlet.class);
 
     // Alias resolution
     bind(AliasRedirectorServlet.class).in(Singleton.class);
