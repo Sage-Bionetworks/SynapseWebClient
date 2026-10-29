@@ -564,11 +564,11 @@ function report(kind, message, stack) {
     window.__swcModuleLoadErrors.push(payload)
 
     const loggablePayload = { ...payload }
-    // Remove `stack` from the payload, put it in the `stack` argument to the log method
+    // Remove `stack` from the payload, send it as the `exception.stacktrace` attribute instead
     delete loggablePayload.stack
     sendLog(EVENT_NAME_ERROR, 'ERROR', loggablePayload, {
       'exception.message': message,
-      'exception.stacktrace': stack
+      'exception.stacktrace': stack,
     })
 
     // eslint-disable-next-line no-console
