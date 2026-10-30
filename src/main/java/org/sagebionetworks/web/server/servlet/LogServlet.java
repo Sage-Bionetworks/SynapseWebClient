@@ -37,14 +37,16 @@ public class LogServlet extends HttpServlet {
   );
 
   // Must match the logger in log4j2.xml, which writes these lines to stdout (shipped to CloudWatch Logs) as bare JSON
-  private transient Logger clientLog = LogManager.getLogger(
-    "org.sagebionetworks.web.ClientLog"
-  );
+  private final transient Logger clientLog;
+
+  public LogServlet() {
+    this(LogManager.getLogger("org.sagebionetworks.web.ClientLog"));
+  }
 
   /**
-   * Unit test can override this.
+   * Unit test can pass in a mock logger.
    */
-  public void setLogger(Logger clientLog) {
+  public LogServlet(Logger clientLog) {
     this.clientLog = clientLog;
   }
 

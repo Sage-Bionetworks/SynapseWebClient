@@ -40,8 +40,7 @@ public class LogServletTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    servlet = new LogServlet();
-    servlet.setLogger(mockLogger);
+    servlet = new LogServlet(mockLogger);
   }
 
   @Test
