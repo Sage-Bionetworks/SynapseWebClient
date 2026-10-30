@@ -398,7 +398,6 @@ const EVENT_NAME_RECOVERY = 'swc.module_load.recovery'
 const PRODUCTION_PORTAL_ENDPOINT = 'https://www.synapse.org/'
 const PORTAL_VERSIONS_PATH = 'Portal/versions'
 
-
 function getPortalEndpoint() {
   try {
     const override =
@@ -444,25 +443,28 @@ function sendLog(eventName, severityText, body, attributes) {
     const timestamp = new Date().toISOString()
     return getVersions()
       .then(versions => {
-        return fetch(`${getPortalEndpoint().replace(/\/+$/, '')}/${LOG_SERVLET_PATH}`, {
-          method: 'POST',
-          mode: 'cors',
-          credentials: 'omit',
-          keepalive: true,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            timestamp,
-            severityText,
-            eventName,
-            body,
-            attributes: {
-              ...attributes,
-              'synapse.repo.version': versions.repoVersion,
+        return fetch(
+          `${getPortalEndpoint().replace(/\/+$/, '')}/${LOG_SERVLET_PATH}`,
+          {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'omit',
+            keepalive: true,
+            headers: {
+              'Content-Type': 'application/json',
             },
-          }),
-        })
+            body: JSON.stringify({
+              timestamp,
+              severityText,
+              eventName,
+              body,
+              attributes: {
+                ...attributes,
+                'synapse.repo.version': versions.repoVersion,
+              },
+            }),
+          },
+        )
       })
       .catch(() => {})
   } catch {
