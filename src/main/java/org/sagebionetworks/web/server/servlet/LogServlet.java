@@ -50,16 +50,16 @@ public class LogServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) {
-    JSONObject record;
+    JSONObject logRecord;
     try {
-      record = new JSONObject(IOUtils.toString(request.getReader()));
+      logRecord = new JSONObject(IOUtils.toString(request.getReader()));
     } catch (IOException | JSONException e) {
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       return;
     }
 
     clientLog.info(
-      toLogLine(record, request.getHeader("User-Agent")).toString()
+      toLogLine(logRecord, request.getHeader("User-Agent")).toString()
     );
     response.setStatus(HttpServletResponse.SC_NO_CONTENT);
   }
@@ -79,12 +79,12 @@ public class LogServlet extends HttpServlet {
    * Builds an OpenTelemetry log line from the given record and user agent. put() with a null value leaves the
    * key out.
    */
-  static JSONObject toLogLine(JSONObject record, String userAgent) {
+  static JSONObject toLogLine(JSONObject logRecord, String userAgent) {
     String severityText = toValidSeverityOrNull(
-      record.optString("severityText", "")
+      logRecord.optString("severityText", "")
     );
 
-    JSONObject attributes = record.optJSONObject("attributes");
+    JSONObject attributes = logRecord.optJSONObject("attributes");
     if (attributes == null) {
       attributes = new JSONObject();
     }
@@ -99,15 +99,15 @@ public class LogServlet extends HttpServlet {
     );
 
     JSONObject logLine = new JSONObject();
-    logLine.put("timestamp", record.optString("timestamp", null));
+    logLine.put("timestamp", logRecord.optString("timestamp", null));
     logLine.put("observedTimestamp", Instant.now().toString());
     // Map.of() maps throw on a null key, so only look up the number when there's a severity
     if (severityText != null) {
       logLine.put("severityText", severityText);
       logLine.put("severityNumber", SEVERITY_NUMBERS.get(severityText));
     }
-    logLine.put("eventName", record.optString("eventName", null));
-    logLine.put("body", record.opt("body"));
+    logLine.put("eventName", logRecord.optString("eventName", null));
+    logLine.put("body", logRecord.opt("body"));
     logLine.put("attributes", attributes);
     logLine.put("resource", resource);
     return logLine;
