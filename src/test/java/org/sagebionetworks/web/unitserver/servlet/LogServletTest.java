@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -69,6 +70,16 @@ public class LogServletTest {
   public void invalidJson() throws Exception {
     BufferedReader br = new BufferedReader(new StringReader("not json"));
     when(mockRequest.getReader()).thenReturn(br);
+
+    servlet.doPost(mockRequest, mockResponse);
+
+    verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    verifyNoInteractions(mockLogger);
+  }
+
+  @Test
+  public void unreadableBody() throws Exception {
+    when(mockRequest.getReader()).thenThrow(new IOException("disconnected"));
 
     servlet.doPost(mockRequest, mockResponse);
 

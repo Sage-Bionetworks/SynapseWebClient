@@ -49,14 +49,11 @@ public class LogServlet extends HttpServlet {
   }
 
   @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws IOException {
-    String body = IOUtils.toString(request.getReader());
-
+  public void doPost(HttpServletRequest request, HttpServletResponse response) {
     JSONObject record;
     try {
-      record = new JSONObject(body);
-    } catch (JSONException e) {
+      record = new JSONObject(IOUtils.toString(request.getReader()));
+    } catch (IOException | JSONException e) {
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       return;
     }
