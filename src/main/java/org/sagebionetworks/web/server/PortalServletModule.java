@@ -28,6 +28,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.AliasRedirectorServlet;
 import org.sagebionetworks.web.server.servlet.AppConfigServlet;
+import org.sagebionetworks.web.server.servlet.CSPReportServlet;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DataAccessClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
@@ -227,6 +228,11 @@ public class PortalServletModule extends ServletModule {
     // Log handler
     bind(LogServlet.class).in(Singleton.class);
     serve("/Portal/" + WebConstants.LOG_SERVLET).with(LogServlet.class);
+
+    // CSP report endpoint
+    bind(CSPReportServlet.class).in(Singleton.class);
+    serve("/Portal/" + WebConstants.CSP_REPORT_SERVLET)
+      .with(CSPReportServlet.class);
 
     // Alias resolution
     bind(AliasRedirectorServlet.class).in(Singleton.class);
