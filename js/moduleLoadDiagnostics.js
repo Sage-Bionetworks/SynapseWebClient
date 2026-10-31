@@ -10,7 +10,7 @@
  * regardless of the boundary (Vite's `vite:preloadError`, global `error`, and
  * `unhandledrejection`) to answer two questions:
  *   1. How often and when is this happening? (logged to CloudWatch via
- *      `POST /repo/v1/log`, see `sendLog`, and to the console)
+ *      `POST /Portal/log`, see `sendLog`, and to the console)
  *   2. Why? When a failing chunk URL is known, we re-fetch BOTH the cached copy and a fresh
  *      network copy and record status / size / head+tail bytes / encoding / how many times the
  *      URL was actually requested on this page (via Resource Timing) / whether the *specific*
@@ -46,7 +46,7 @@ const RELOAD_COUNT_KEY = 'swcModuleReloadCount'
 let hasAttemptedRecoveryThisLoad = false
 
 // A reload cancels any in-flight fetches, which would silently drop the
-// forensic re-fetch (and its `swc_module_load_error_inspection` log entry)
+// forensic re-fetch (and its `swc.module_load.inspection` log entry)
 // this module just kicked off. Give it a bounded amount of time to finish
 // before navigating away.
 const INSPECTION_TIMEOUT_MS = 3000
@@ -378,43 +378,25 @@ async function inspectModule(url, expectedExport) {
   return { cached, network }
 }
 
-// --- Backend logging --------------------------------------------------
+// --- logging --------------------------------------------------
 //
-// The server logs each entry as `"{label} - {userAgent}: {message}"` (see
-// LogServiceImpl in Synapse-Repository-Services), so `label` is the only
-// field cheaply filterable without parsing; the full payload travels in
-// `message` as a JSON string instead, and includes `portalVersion`/
-// `repoVersion` (see `getVersions`) on every entry. A typical Logs Insights
-// query:
+// LogServlet writes each record to stdout as one JSON line following the
+// OpenTelemetry Logs Data Model (eventName, severityText, body, attributes,
+// resource). Logs Insights discovers JSON fields automatically. A typical query:
 //   fields @timestamp, @message
-//   | filter @message like /swc_module_load_error/
-//   | parse @message '* - *: *' as label, userAgent, jsonBody
-//   | parse jsonBody '"buildId":"*"' as buildId
-//   | stats count(*) by buildId
+//   | filter eventName = "swc.module_load.error"
+//   | stats count(*) by `body.buildId`
 
-const LOG_ENDPOINT_PATH = '/log'
+const LOG_SERVLET_PATH = 'Portal/log'
+const EVENT_NAME_ERROR = 'swc.module_load.error'
+const EVENT_NAME_INSPECTION = 'swc.module_load.inspection'
+const EVENT_NAME_RECOVERY = 'swc.module_load.recovery'
 // Mirrors the fallback in synapse-react-client's getEndpoint(): if GWT
 // hasn't set `window.SRC_OVERRIDE_ENDPOINT_CONFIG` yet (this module can run
-// before GWT bootstraps), assume production.
-const PRODUCTION_REPO_ENDPOINT = 'https://repo-prod.prod.sagebase.org/repo/v1'
-// Same idea for the Portal's own origin (used only for `GET /Portal/versions`
-// below, not for the log service itself).
+// before GWT bootstraps), assume the production Portal origin. Used for both
+// `GET /Portal/versions` and `POST /Portal/log` below.
 const PRODUCTION_PORTAL_ENDPOINT = 'https://www.synapse.org/'
 const PORTAL_VERSIONS_PATH = 'Portal/versions'
-const LOG_LABEL_ERROR = 'swc_module_load_error'
-const LOG_LABEL_INSPECTION = 'swc_module_load_error_inspection'
-const LOG_LABEL_RECOVERY = 'swc_module_load_recovery'
-
-function getRepoEndpoint() {
-  try {
-    const override =
-      window.SRC_OVERRIDE_ENDPOINT_CONFIG &&
-      window.SRC_OVERRIDE_ENDPOINT_CONFIG.REPO
-    return override || PRODUCTION_REPO_ENDPOINT
-  } catch {
-    return PRODUCTION_REPO_ENDPOINT
-  }
-}
 
 function getPortalEndpoint() {
   try {
@@ -424,23 +406,6 @@ function getPortalEndpoint() {
     return override || PRODUCTION_PORTAL_ENDPOINT
   } catch {
     return PRODUCTION_PORTAL_ENDPOINT
-  }
-}
-
-// `/repo/v1/log` doesn't require a bearer token. We still attach one when
-// available so an authenticated user's failures are attributable to their
-// account instead of logged anonymously. Its absence, e.g. very early in page
-// life, before GWT starts `SynapseSessionManager`, is not a failure mode.
-function getAccessToken() {
-  try {
-    return (
-      (window.SynapseSessionManager &&
-        window.SynapseSessionManager.getSnapshot &&
-        window.SynapseSessionManager.getSnapshot().token) ||
-      undefined
-    )
-  } catch {
-    return undefined
   }
 }
 
@@ -466,30 +431,40 @@ function getVersions() {
 }
 
 /**
- * Send one entry to the backend log service. `keepalive` lets the request
+ * Send one OpenTelemetry-shaped log record to the Portal's log servlet
+ * (`POST /Portal/log`), which writes it to stdout for CloudWatch Logs. Timestamp
+ * is captured before the async version lookup, so it records when the event
+ * happened. `keepalive` lets the request
  * survive a page reload (e.g. the one `attemptRecovery` triggers) without
  * needing to be awaited first.
  */
-function sendLog(label, messagePayload, stacktrace) {
+function sendLog(eventName, severityText, body, attributes) {
   try {
+    const timestamp = new Date().toISOString()
     return getVersions()
       .then(versions => {
-        const token = getAccessToken()
-        return fetch(`${getRepoEndpoint()}${LOG_ENDPOINT_PATH}`, {
-          method: 'POST',
-          mode: 'cors',
-          credentials: 'omit',
-          keepalive: true,
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        return fetch(
+          `${getPortalEndpoint().replace(/\/+$/, '')}/${LOG_SERVLET_PATH}`,
+          {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'omit',
+            keepalive: true,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              timestamp,
+              severityText,
+              eventName,
+              body,
+              attributes: {
+                ...attributes,
+                'synapse.repo.version': versions.repoVersion,
+              },
+            }),
           },
-          body: JSON.stringify({
-            label,
-            message: JSON.stringify({ ...messagePayload, ...versions }),
-            stacktrace: stacktrace || '',
-          }),
-        })
+        )
       })
       .catch(() => {})
   } catch {
@@ -532,7 +507,7 @@ function runInspectionAndReport(url, payload) {
       // one; they keep every key below present rather than throwing.
       const cached = inspection.cached || {}
       const network = inspection.network || {}
-      sendLog(LOG_LABEL_INSPECTION, {
+      sendLog(EVENT_NAME_INSPECTION, 'INFO', {
         url,
         expectedExport: payload.expectedExport,
         messageShape: payload.messageShape,
@@ -591,9 +566,12 @@ function report(kind, message, stack) {
     window.__swcModuleLoadErrors.push(payload)
 
     const loggablePayload = { ...payload }
-    // Remove `stack` from the payload, put it in the `stack` argument to the log method
+    // Remove `stack` from the payload, send it as the `exception.stacktrace` attribute instead
     delete loggablePayload.stack
-    sendLog(LOG_LABEL_ERROR, loggablePayload, stack)
+    sendLog(EVENT_NAME_ERROR, 'ERROR', loggablePayload, {
+      'exception.message': message,
+      'exception.stacktrace': stack,
+    })
 
     // eslint-disable-next-line no-console
     console.error('[swc-module-load-error]', payload)
@@ -651,7 +629,7 @@ function showReloadBanner() {
  * underlying bug occurs, not whether this mitigation works.
  */
 function pushRecoveryEvent(outcome, attempt, url) {
-  sendLog(LOG_LABEL_RECOVERY, { outcome, attempt, url })
+  sendLog(EVENT_NAME_RECOVERY, 'INFO', { outcome, attempt, url })
 }
 
 /**
@@ -662,7 +640,7 @@ function pushRecoveryEvent(outcome, attempt, url) {
  * `inspectionPromise` (the in-flight forensic re-fetch kicked off by
  * `report()`, if any) is awaited - with a timeout, since it must never
  * block recovery indefinitely - before reloading, so the navigation
- * doesn't cancel it and drop the `swc_module_load_error_inspection` log
+ * doesn't cancel it and drop the `swc.module_load.inspection` log
  * entry.
  */
 async function attemptRecovery(message, inspectionPromise) {
