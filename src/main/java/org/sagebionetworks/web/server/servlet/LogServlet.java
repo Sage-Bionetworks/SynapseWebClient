@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 /**
  * Accepts log entries from the browser and writes each one to stdout (shipped to CloudWatch) as a single
- * JSON line, using OpenTelemetry field names. Replaces the previous backend POST /repo/v1/log service.
+ * JSON line, using OpenTelemetry field names.
  */
 public class LogServlet extends HttpServlet {
 
