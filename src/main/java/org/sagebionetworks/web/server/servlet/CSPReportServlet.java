@@ -20,6 +20,8 @@ import org.json.JSONObject;
 public class CSPReportServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1L;
+  // Limits how many log lines a single request can produce. Entries past this are ignored
+  public static final int MAX_REPORTS_PER_REQUEST = 50;
 
   // Must match the logger in log4j2.xml, which writes these lines to stdout (shipped to CloudWatch Logs) as bare JSON
   private final transient Logger clientLog;
@@ -48,23 +50,22 @@ public class CSPReportServlet extends HttpServlet {
         // The array can also hold other report types (e.g. deprecation), which are skipped.
         // Malformed entries are skipped too, so one bad entry doesn't fail the whole batch.
         JSONArray reports = new JSONArray(body);
-        for (int i = 0; i < reports.length(); i++) {
+        int n = Math.min(reports.length(), MAX_REPORTS_PER_REQUEST);
+        for (int i = 0; i < n; i++) {
           JSONObject report = reports.optJSONObject(i);
-          JSONObject reportBody = report == null
-            ? null
-            : report.optJSONObject("body");
           if (
-            reportBody != null &&
-            "csp-violation".equals(report.optString("type"))
-          ) {
-            // age is how many milliseconds ago the violation happened
-            log(
-              Instant.now().minusMillis(Math.max(0, report.optLong("age", 0))),
-              reportBody,
-              report.optString("url", null),
-              userAgent
-            );
-          }
+            report == null || !"csp-violation".equals(report.optString("type"))
+          ) continue;
+          JSONObject reportBody = report.optJSONObject("body");
+          if (reportBody == null) continue;
+          // age is how many milliseconds ago the violation happened. Clamped at 0 in case of clock drift
+          long ageMs = Math.max(0, report.optLong("age", 0));
+          log(
+            Instant.now().minusMillis(ageMs),
+            reportBody,
+            report.optString("url", null),
+            userAgent
+          );
         }
       } else if (contentType.startsWith("application/csp-report")) {
         // report-uri (older browsers): {"csp-report": {...}}

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitserver.servlet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -109,6 +110,29 @@ public class CSPReportServletTest {
     assertFalse(
       Instant.parse(second.getString("timestamp")).isAfter(Instant.now())
     );
+    verify(mockResponse).setStatus(HttpServletResponse.SC_NO_CONTENT);
+  }
+
+  @Test
+  public void reportsPastLimitIgnored() throws Exception {
+    StringBuilder reports = new StringBuilder("[");
+    for (int i = 0; i <= CSPReportServlet.MAX_REPORTS_PER_REQUEST; i++) {
+      if (i > 0) {
+        reports.append(",");
+      }
+      reports.append(
+        "{\"type\":\"csp-violation\",\"age\":0,\"body\":{\"blockedURL\":\"" +
+        i +
+        "\"}}"
+      );
+    }
+    reports.append("]");
+    mockRequestBody("application/reports+json", reports.toString());
+
+    servlet.doPost(mockRequest, mockResponse);
+
+    verify(mockLogger, times(CSPReportServlet.MAX_REPORTS_PER_REQUEST))
+      .info(anyString());
     verify(mockResponse).setStatus(HttpServletResponse.SC_NO_CONTENT);
   }
 
