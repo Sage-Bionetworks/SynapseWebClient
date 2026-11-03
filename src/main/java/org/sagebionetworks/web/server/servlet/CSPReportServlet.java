@@ -45,15 +45,22 @@ public class CSPReportServlet extends HttpServlet {
       // startsWith, not equals, in case the browser adds extras like "; charset=utf-8" after the type
       if (contentType.startsWith("application/reports+json")) {
         // report-to: a JSON array of reports (https://w3c.github.io/reporting/).
-        // The array can also hold other report types (e.g. deprecation), which are skipped
+        // The array can also hold other report types (e.g. deprecation), which are skipped.
+        // Malformed entries are skipped too, so one bad entry doesn't fail the whole batch.
         JSONArray reports = new JSONArray(body);
         for (int i = 0; i < reports.length(); i++) {
-          JSONObject report = reports.getJSONObject(i);
-          if ("csp-violation".equals(report.optString("type"))) {
+          JSONObject report = reports.optJSONObject(i);
+          JSONObject reportBody = report == null
+            ? null
+            : report.optJSONObject("body");
+          if (
+            reportBody != null &&
+            "csp-violation".equals(report.optString("type"))
+          ) {
             // age is how many milliseconds ago the violation happened
             log(
-              Instant.now().minusMillis(report.optLong("age", 0)),
-              report.getJSONObject("body"),
+              Instant.now().minusMillis(Math.max(0, report.optLong("age", 0))),
+              reportBody,
               report.optString("url", null),
               userAgent
             );

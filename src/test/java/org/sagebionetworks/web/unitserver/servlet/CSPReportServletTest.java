@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -9,6 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.StringReader;
+import java.time.Instant;
+import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -78,6 +82,33 @@ public class CSPReportServletTest {
     JSONObject attributes = line.getJSONObject("attributes");
     assertEquals("https://www.synapse.org/", attributes.getString("url.full"));
     assertEquals("mockUserAgent", attributes.getString("user_agent.original"));
+    verify(mockResponse).setStatus(HttpServletResponse.SC_NO_CONTENT);
+  }
+
+  @Test
+  public void malformedEntriesSkipped() throws Exception {
+    // A valid report, a non-object, a report without a body, a future (negative) age, and another valid report
+    String reports =
+      "[{\"type\":\"csp-violation\",\"age\":0,\"body\":{\"blockedURL\":\"a\"}}," +
+      "\"not an object\"," +
+      "{\"type\":\"csp-violation\",\"age\":0}," +
+      "{\"type\":\"csp-violation\",\"age\":-60000,\"body\":{\"blockedURL\":\"b\"}}]";
+    mockRequestBody("application/reports+json", reports);
+
+    servlet.doPost(mockRequest, mockResponse);
+
+    verify(mockLogger, times(2)).info(lineCaptor.capture());
+    List<String> lines = lineCaptor.getAllValues();
+    assertEquals(
+      "a",
+      new JSONObject(lines.get(0)).getJSONObject("body").getString("blockedURL")
+    );
+    JSONObject second = new JSONObject(lines.get(1));
+    assertEquals("b", second.getJSONObject("body").getString("blockedURL"));
+    // The negative age is clamped, so the timestamp isn't in the future
+    assertFalse(
+      Instant.parse(second.getString("timestamp")).isAfter(Instant.now())
+    );
     verify(mockResponse).setStatus(HttpServletResponse.SC_NO_CONTENT);
   }
 
