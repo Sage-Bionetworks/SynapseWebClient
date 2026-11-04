@@ -28,11 +28,11 @@ importers:
         specifier: ^7.3.11
         version: 7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@sage-bionetworks/markdown-it-container':
-        specifier: ^4.0.1
-        version: 4.0.1
+        specifier: ^4.0.2
+        version: 4.0.2
       '@sage-bionetworks/synapse-types':
-        specifier: ^0.0.12
-        version: 0.0.12
+        specifier: ^0.0.13
+        version: 0.0.13
       '@tanstack/react-query':
         specifier: 5.80.10
         version: 5.80.10(react@19.2.7)
@@ -69,15 +69,9 @@ importers:
       markdown-it-center-text:
         specifier: ^1.0.4
         version: 1.0.4
-      markdown-it-emphasis-alt:
-        specifier: ^1.0.8
-        version: 1.0.8
       markdown-it-inline-comments:
         specifier: ^1.0.1
         version: 1.0.1
-      markdown-it-math:
-        specifier: ^4.1.1
-        version: 4.1.1
       markdown-it-strikethrough-alt:
         specifier: ^1.0.0
         version: 1.0.0
@@ -88,8 +82,8 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       markdown-it-synapse:
-        specifier: ^1.1.17
-        version: 1.1.17
+        specifier: ^2.0.1
+        version: 2.0.1
       markdown-it-synapse-heading:
         specifier: ^1.0.1
         version: 1.0.1
@@ -97,8 +91,8 @@ importers:
         specifier: ^3.0.5
         version: 3.0.5
       markdown-it-synapse-table:
-        specifier: ^1.0.8
-        version: 1.0.8
+        specifier: ^1.0.9
+        version: 1.0.9
       moment:
         specifier: ^2.31.0
         version: 2.31.0
@@ -111,9 +105,6 @@ importers:
       plotly.js:
         specifier: 2.34.0
         version: 2.34.0(mapbox-gl@1.13.3)
-      prop-types:
-        specifier: ^15.8.1
-        version: 15.8.1
       react:
         specifier: ^19.2.7
         version: 19.2.7
@@ -130,8 +121,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       synapse-react-client:
-        specifier: 4.0.48
-        version: 4.0.48(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.31.0)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)
+        specifier: 4.0.49
+        version: 4.0.49(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.31.0)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)
       xss:
         specifier: ^1.0.15
         version: 1.0.15
@@ -1585,27 +1576,25 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@sage-bionetworks/markdown-it-container@4.0.1':
-    resolution: {integrity: sha512-ufgmV+kGlP7sYNanlsjzx+D+ZywmW/QE3gIolffm8H2Zix3/hpO65FrWmXPlKslz32WUdRZsmjD+2AJKOO0AFg==}
+  '@sage-bionetworks/markdown-it-container@4.0.2':
+    resolution: {integrity: sha512-T8YbrblYLhiHasFBqnyIgOZHQ3yCM2EjhH30tK+W0VjEPgrGKZZuAp+5WcHCS//I/7hj8A4SYVTDamVzhbTyjg==}
 
-  '@sage-bionetworks/react-datasheet-grid@4.11.5-sage.10':
-    resolution: {integrity: sha512-sXnl/JyX7FNXk9QlQTUeOXa672lSVIXBBgJT1AfzILNoRJa1V/1v68HvdQJpwGD29LRXLGBWaNWhmyzn0yKlBQ==}
+  '@sage-bionetworks/react-datasheet-grid@4.11.5-sage.11':
+    resolution: {integrity: sha512-SoJg8Ztp5iPDI7ry9PlgOC2UpoQdBD2AaKJsFOFHqDxxGTFlUPoYR/mVF5JQWXuYc2Bt7ShTp6IiTk25QidJWg==}
     peerDependencies:
       react: ^19.2.7
       react-dom: ^19.2.7
 
-  '@sage-bionetworks/synapse-client@0.0.24':
-    resolution: {integrity: sha512-qgfyIkTOytKfaBoaym4TPGaOvZkZ8HcZ5bKQj4ZZmeAoJmrFdt3lRq1IqtAgAGgJIRAM1cCbj8uYPgrWI6kAQA==}
-
   '@sage-bionetworks/synapse-client@0.0.25':
     resolution: {integrity: sha512-Ahybdrv/auB+6WEz3noHg5oEixxUj32zQpQSDFXNZLmjbouWJE+bMs4fXLcBAIUm9LfkWp/mmXN2tCtpxzD95A==}
 
-  '@sage-bionetworks/synapse-types@0.0.12':
-    resolution: {integrity: sha512-RbV9NoOwHkAUE8FRzvOVFEE097C/h5N3aIIvkRzBy40r/Y1P0FoTR20yK8WRjPXAe1c1DsZxGnkWAQJHdm3JlQ==}
+  '@sage-bionetworks/synapse-types@0.0.13':
+    resolution: {integrity: sha512-lG58VGeO9F+8tUJTQMOC574v5RQf8K2IcenhsONTNPAP/hYiK28GR4jYysAjox1+eT+b9FL0n0HqR8Gar2FklQ==}
 
   '@smithy/core@3.31.1':
     resolution: {integrity: sha512-CyogUINxvi7C7LDsh8Syo6hVJOT9ckz4rG8dRZfTJ8r91HkMY59PnNooaj7WcHyxEkxPfBAmbgztZU+xTo76lg==}
     engines: {node: '>=18.0.0'}
+    deprecated: Deprecated due to a bug in custom logger data redaction. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
 
   '@smithy/credential-provider-imds@4.4.16':
     resolution: {integrity: sha512-QfuLWAkLzptffFW980AFeHZFdqds2B64rpEd3uJ6lgs3xVn9QegGMUgUcj+4d7dRrAsya3r58ZKpku97WcFb4w==}
@@ -2659,6 +2648,9 @@ packages:
 
   dompurify@3.4.16:
     resolution: {integrity: sha512-sqo+pNp3qRhCIpbgRi1y8Tgk27Bo2Ry7w0dC1NBeNTdZChWjz9Xb/KOoZbRP/R6pQZ80Qw8YhXw13hWWBbMRnQ==}
+
+  dompurify@3.4.17:
+    resolution: {integrity: sha512-B/pSlYVHQ58kqISD/yDjuJ1yfzI34m1gF4lAod2bwSRhiN4K5Cl3H8Af7hqB2PmTL911tdEudnnXn5FnhRoz0w==}
 
   domutils@4.0.2:
     resolution: {integrity: sha512-qI4JLRKnSzqFqr7hAlS5xQDusBCjKSEG4t4+7aNrIQMHBcsC2TGEhuyABJdYkgSewL57PNLYEiibY2iPKhKpaA==}
@@ -3800,14 +3792,8 @@ packages:
   markdown-it-center-text@1.0.4:
     resolution: {integrity: sha512-7AA0gek4FYJ6gWB2kdGNx06k3GrlO97nEMY7uovQ70/6MtfqPznrgnKoWO3V4p36m3RT5GeQIFXqBH9Wr4iL/g==}
 
-  markdown-it-emphasis-alt@1.0.8:
-    resolution: {integrity: sha512-5oGI4i8YM3S7Nyn0u7n2I6XJaZIbjFmYrvhwo7En2yFXZW8UzBAJG/vkSJ985GRymuW0tgQgqcIdwPjuH74kzQ==}
-
   markdown-it-inline-comments@1.0.1:
     resolution: {integrity: sha512-gObNM3NumcpsU66pO2LmV8MGBfdfFp7TcYME9iuUGs82+JYJWMmBQtAj6/qho4OhKqpR0UX2JTkuuA2HPgHUtQ==}
-
-  markdown-it-math@4.1.1:
-    resolution: {integrity: sha512-LQ0hREgMgN4tNcy2PGyw1XypjmKJjc+ZzATMuDIVD/Bagr5SGL198uHleVdiFDrNdXpqVmL4N1KD1GYyftMakQ==}
 
   markdown-it-strikethrough-alt@1.0.0:
     resolution: {integrity: sha512-pYVJNwcSm1DEuug0AG4wTQWuJtTN3MvbSp6r/7HbO3ApI96tfpHDIiD3KytlgBjUR7IRcgAX6GJl9nLRbX34uA==}
@@ -3827,14 +3813,11 @@ packages:
   markdown-it-synapse-math@3.0.5:
     resolution: {integrity: sha512-jbmJRx0fKYjhZoja2RGVQDpXB+qckUp5TucWFZIxtsLbOi/Cw62ocS3BaSsfmikhj0U51zpIp8F/HKmaxwiTDg==}
 
-  markdown-it-synapse-table@1.0.8:
-    resolution: {integrity: sha512-Fhc7Mi2CUsuUXKjY3MNFhblXjqVhpIGJWsIGwB0hYSGrmiZrLlkAKHoIGwjnYLxEyawYrKIKaqkmjF9XCHrsqw==}
+  markdown-it-synapse-table@1.0.9:
+    resolution: {integrity: sha512-l8jDbtJvKiPOLa4YNSJJgsxs1SbABAurugndH9QzkSo+twM+643SReM78Qfb3nb0dGL/ZgXiKXbQEmCz6+t01Q==}
 
-  markdown-it-synapse@1.1.17:
-    resolution: {integrity: sha512-MXxtus7fSce5bysrImIgtl7w2Ugw9CPOeVnDFxV6tmjhvKx9yHBWE+X1vWOBlyz/qNnT/Uo4jDr6Vaip+3xurw==}
-
-  markdown-it-synapse@2.0.0:
-    resolution: {integrity: sha512-KXWGnVrCYKyrEz7VA+Gq8TafrxwTbMtQCkNwMY/qMa8fF/pj8bsKVzHlOX3sIGJV9tpeBWc9rPbRSCldMfMyCg==}
+  markdown-it-synapse@2.0.1:
+    resolution: {integrity: sha512-9YIaboJbbK9RF05ZA/QdxQFpJ9OHVlZ/FUV6GnpyXDPFJIbxm1Q3pja7jZSlBn9oAzEZPYzEMUwzwa2vR3LJmQ==}
 
   markdown-it@14.3.2:
     resolution: {integrity: sha512-sHHjZ5fJKlgrG4qns2YwVcdNep35h5fERrfkD2YNsb9UFk0UIHarbiTaHKVMlPuWAoiilyK8Fv/jAm11slsY7Q==}
@@ -5124,8 +5107,8 @@ packages:
   symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
 
-  synapse-react-client@4.0.48:
-    resolution: {integrity: sha512-bg48Lb/Ek4q7ylL6WCYgNplo1MSAEY8Grc3Vo6L1hC94vfrhLSG/3t/lHjpOLrAoVf7f+1o0SgW02L2nigzVXg==}
+  synapse-react-client@4.0.49:
+    resolution: {integrity: sha512-sPQ7aGtrS5n/YTEBrddA00Puxib6h4UsuZ5p//X1Oc1niwm9CSZvBqIr77DZIsDhMtkbBW1AyrVR8f1uTwQsKA==}
     peerDependencies:
       '@sage-bionetworks/aridhia-client': '*'
       react: ^19.2.7
@@ -5620,8 +5603,8 @@ packages:
   youtube-player@5.5.2:
     resolution: {integrity: sha512-ZGtsemSpXnDky2AUYWgxjaopgB+shFHgXVpiJFeNB5nWEugpW1KWYDaHKuLqh2b67r24GtP6HoSW5swvf0fFIQ==}
 
-  zod@4.4.3:
-    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+  zod@4.6.7:
+    resolution: {integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==}
 
   zustand@4.5.7:
     resolution: {integrity: sha512-CHOUy7mu3lbD6o6LJLfllpjkzhHXSBlX8B9+qPddUsIfeF5S/UZ5q0kmCsnRqT1UHFQZchNFDDzMbQsuesHWlw==}
@@ -7038,26 +7021,24 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.60.1':
     optional: true
 
-  '@sage-bionetworks/markdown-it-container@4.0.1': {}
+  '@sage-bionetworks/markdown-it-container@4.0.2': {}
 
-  '@sage-bionetworks/react-datasheet-grid@4.11.5-sage.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@sage-bionetworks/react-datasheet-grid@4.11.5-sage.11(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@tanstack/react-virtual': 3.14.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       classnames: 2.5.1
-      dompurify: 3.4.16
+      dompurify: 3.4.17
       fast-deep-equal: 3.1.3
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
       react-resize-detector: 10.0.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       throttle-debounce: 3.0.1
 
-  '@sage-bionetworks/synapse-client@0.0.24': {}
-
   '@sage-bionetworks/synapse-client@0.0.25': {}
 
-  '@sage-bionetworks/synapse-types@0.0.12':
+  '@sage-bionetworks/synapse-types@0.0.13':
     dependencies:
-      '@sage-bionetworks/synapse-client': 0.0.24
+      '@sage-bionetworks/synapse-client': 0.0.25
 
   '@smithy/core@3.31.1':
     dependencies:
@@ -8262,6 +8243,10 @@ snapshots:
       domelementtype: 3.0.0
 
   dompurify@3.4.16:
+    optionalDependencies:
+      '@types/trusted-types': 2.0.7
+
+  dompurify@3.4.17:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 
@@ -9621,13 +9606,7 @@ snapshots:
 
   markdown-it-center-text@1.0.4: {}
 
-  markdown-it-emphasis-alt@1.0.8: {}
-
   markdown-it-inline-comments@1.0.1: {}
-
-  markdown-it-math@4.1.1:
-    optionalDependencies:
-      ascii2mathml: 0.6.2
 
   markdown-it-strikethrough-alt@1.0.0: {}
 
@@ -9645,11 +9624,9 @@ snapshots:
     optionalDependencies:
       ascii2mathml: 0.6.2
 
-  markdown-it-synapse-table@1.0.8: {}
+  markdown-it-synapse-table@1.0.9: {}
 
-  markdown-it-synapse@1.1.17: {}
-
-  markdown-it-synapse@2.0.0: {}
+  markdown-it-synapse@2.0.1: {}
 
   markdown-it@14.3.2:
     dependencies:
@@ -11275,7 +11252,7 @@ snapshots:
 
   symbol-tree@3.2.4: {}
 
-  synapse-react-client@4.0.48(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.31.0)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2):
+  synapse-react-client@4.0.49(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.31.0)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2):
     dependencies:
       '@apidevtools/json-schema-ref-parser': 14.2.1(@types/json-schema@7.0.15)
       '@aws-sdk/client-s3': 3.1101.0
@@ -11299,10 +11276,10 @@ snapshots:
       '@rjsf/mui': 6.0.0-beta.10(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@mui/icons-material@7.3.11(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@rjsf/core@6.0.0-beta.10(@rjsf/utils@6.0.0-beta.10(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.0.0-beta.10(react@19.2.7))(react@19.2.7)
       '@rjsf/utils': 6.0.0-beta.10(react@19.2.7)
       '@rjsf/validator-ajv8': 6.0.0-beta.10(@rjsf/utils@6.0.0-beta.10(react@19.2.7))
-      '@sage-bionetworks/markdown-it-container': 4.0.1
-      '@sage-bionetworks/react-datasheet-grid': 4.11.5-sage.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@sage-bionetworks/markdown-it-container': 4.0.2
+      '@sage-bionetworks/react-datasheet-grid': 4.11.5-sage.11(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@sage-bionetworks/synapse-client': 0.0.25
-      '@sage-bionetworks/synapse-types': 0.0.12
+      '@sage-bionetworks/synapse-types': 0.0.13
       '@tanstack/query-core': 5.80.10
       '@tanstack/react-query': 5.80.10(react@19.2.7)
       '@tanstack/react-query-devtools': 5.80.10(@tanstack/react-query@5.80.10(react@19.2.7))(react@19.2.7)
@@ -11334,10 +11311,10 @@ snapshots:
       markdown-it-strikethrough-alt: 1.0.0
       markdown-it-sub-alt: 1.0.0
       markdown-it-sup-alt: 1.0.2
-      markdown-it-synapse: 2.0.0
+      markdown-it-synapse: 2.0.1
       markdown-it-synapse-heading: 1.0.1
       markdown-it-synapse-math: 3.0.5
-      markdown-it-synapse-table: 1.0.8
+      markdown-it-synapse-table: 1.0.9
       mui-one-time-password-input: 5.0.0(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       mui-tel-input: 11.0.0(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       papaparse: 5.7.0
@@ -11377,7 +11354,7 @@ snapshots:
       ua-parser-js: 1.0.41
       use-deep-compare-effect: 1.8.1(react@19.2.7)
       xss: 1.0.15
-      zod: 4.4.3
+      zod: 4.6.7
     transitivePeerDependencies:
       - '@babel/core'
       - '@babel/template'
@@ -11911,7 +11888,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  zod@4.4.3: {}
+  zod@4.6.7: {}
 
   zustand@4.5.7(@types/react@19.2.14)(react@19.2.7):
     dependencies:
