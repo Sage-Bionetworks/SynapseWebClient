@@ -16,7 +16,9 @@ import ReactDOM from 'react-dom'
 import ReactDOMClient from 'react-dom/client'
 import * as ReactQuery from '@tanstack/react-query'
 import * as SRC from 'synapse-react-client/SWC.index'
+import plotlyFactory from 'react-plotly.js/factory'
 import './mui.js'
+import './markdown.js'
 import './globalContext.js'
 // Import SWC styles. Vite will compile and handle SCSS now.
 import '../src/main/webapp/sass/swc.scss'
@@ -30,3 +32,6 @@ window.ReactDOMClient = ReactDOMClient
 window.ReactQuery = ReactQuery
 
 window.SRC = SRC
+
+// react-plotly.js/factory is CJS; with Node-style interop the default import is `exports`
+window.createPlotlyComponent = plotlyFactory.default
