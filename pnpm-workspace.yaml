@@ -3,4 +3,5 @@ minimumReleaseAgeExclude:
   - '@sage-bionetworks/*'
   - 'synapse-react-client'
   - 'markdown-it-synapse'
+  - 'markdown-it-synapse-table'
   - 'brace-expansion'
