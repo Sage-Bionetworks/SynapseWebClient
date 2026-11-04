@@ -65,6 +65,7 @@ import org.sagebionetworks.web.server.servlet.filter.HSTSFilter;
 import org.sagebionetworks.web.server.servlet.filter.HtmlInjectionFilter;
 import org.sagebionetworks.web.server.servlet.filter.JavaScriptContentTypeFilter;
 import org.sagebionetworks.web.server.servlet.filter.MHealthFilter;
+import org.sagebionetworks.web.server.servlet.filter.MaxRequestBodySizeFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.RegisterAccountFilter;
 import org.sagebionetworks.web.server.servlet.filter.SSLFilter;
@@ -143,6 +144,12 @@ public class PortalServletModule extends ServletModule {
     // This supports RPC
     filter("/Portal/*").through(RPCValidationFilter.class);
     bind(RPCValidationFilter.class).in(Singleton.class);
+
+    // Limit request body sizes, since these are written straight to CloudWatch
+    filter("/Portal/" + WebConstants.LOG_SERVLET)
+      .through(new MaxRequestBodySizeFilter(64 * 1024));
+    filter("/Portal/" + WebConstants.CSP_REPORT_SERVLET)
+      .through(new MaxRequestBodySizeFilter(256 * 1024));
 
     bind(AmpADFilter.class).in(Singleton.class);
     filter("/ampad").through(AmpADFilter.class);
