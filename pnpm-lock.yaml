@@ -121,8 +121,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       synapse-react-client:
-        specifier: 4.0.49
-        version: 4.0.49(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.31.0)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)
+        specifier: 4.0.50
+        version: 4.0.50(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.31.0)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)
       xss:
         specifier: ^1.0.15
         version: 1.0.15
@@ -2635,9 +2635,6 @@ packages:
     resolution: {integrity: sha512-gYzvtM72ZtxQO0T048kd6HWSbbGCNOUwcnfQ01cqIJ4X2IYKFFHZ5mKvrQETcFXxsRObZulDaKmy//R7TPtsBg==}
     engines: {node: '>=20.19.0'}
 
-  dompurify@3.4.16:
-    resolution: {integrity: sha512-sqo+pNp3qRhCIpbgRi1y8Tgk27Bo2Ry7w0dC1NBeNTdZChWjz9Xb/KOoZbRP/R6pQZ80Qw8YhXw13hWWBbMRnQ==}
-
   dompurify@3.4.17:
     resolution: {integrity: sha512-B/pSlYVHQ58kqISD/yDjuJ1yfzI34m1gF4lAod2bwSRhiN4K5Cl3H8Af7hqB2PmTL911tdEudnnXn5FnhRoz0w==}
 
@@ -5089,8 +5086,8 @@ packages:
   symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
 
-  synapse-react-client@4.0.49:
-    resolution: {integrity: sha512-sPQ7aGtrS5n/YTEBrddA00Puxib6h4UsuZ5p//X1Oc1niwm9CSZvBqIr77DZIsDhMtkbBW1AyrVR8f1uTwQsKA==}
+  synapse-react-client@4.0.50:
+    resolution: {integrity: sha512-88yirQtzTxGgfD8FuYrM/POsHg4OZzxtrIQcd64fOgF6Sh6wvhHJLXsvM4UVbOn15L+I8KayWF8WZ3C4ZrRdCg==}
     peerDependencies:
       '@sage-bionetworks/aridhia-client': '*'
       react: ^19.2.7
@@ -8196,10 +8193,6 @@ snapshots:
     dependencies:
       domelementtype: 3.0.0
 
-  dompurify@3.4.16:
-    optionalDependencies:
-      '@types/trusted-types': 2.0.7
-
   dompurify@3.4.17:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
@@ -9167,7 +9160,7 @@ snapshots:
 
   isomorphic-dompurify@3.21.0:
     dependencies:
-      dompurify: 3.4.16
+      dompurify: 3.4.17
       jsdom: 30.0.1
     transitivePeerDependencies:
       - '@noble/hashes'
@@ -11190,7 +11183,7 @@ snapshots:
 
   symbol-tree@3.2.4: {}
 
-  synapse-react-client@4.0.49(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.31.0)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2):
+  synapse-react-client@4.0.50(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.31.0)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2):
     dependencies:
       '@apidevtools/json-schema-ref-parser': 14.2.1(@types/json-schema@7.0.15)
       '@aws-sdk/client-s3': 3.1101.0
