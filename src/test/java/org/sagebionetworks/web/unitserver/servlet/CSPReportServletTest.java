@@ -198,6 +198,33 @@ public class CSPReportServletTest {
       body.getString("blockedURL")
     );
     assertEquals("https://www.synapse.org/a.js", body.getString("sourceFile"));
+
+    // The same fields in the report-uri format
+    mockRequestBody(
+      "application/csp-report",
+      "{\"csp-report\":{\"document-uri\":\"https://www.synapse.org/PasswordResetSignedToken:secret\"," +
+      "\"blocked-uri\":\"https://bucket.s3.amazonaws.com/f?X-Amz-Signature=secret\"," +
+      "\"source-file\":\"https://www.synapse.org/a.js#secret\"}}"
+    );
+
+    servlet.doPost(mockRequest, mockResponse);
+
+    verify(mockLogger, times(2)).info(lineCaptor.capture());
+    assertFalse(lineCaptor.getValue().contains("secret"));
+    JSONObject reportUriBody = new JSONObject(lineCaptor.getValue())
+      .getJSONObject("body");
+    assertEquals(
+      "/PasswordResetSignedToken:{token}",
+      reportUriBody.getString("document-uri")
+    );
+    assertEquals(
+      "https://bucket.s3.amazonaws.com/f",
+      reportUriBody.getString("blocked-uri")
+    );
+    assertEquals(
+      "https://www.synapse.org/a.js",
+      reportUriBody.getString("source-file")
+    );
   }
 
   @Test
