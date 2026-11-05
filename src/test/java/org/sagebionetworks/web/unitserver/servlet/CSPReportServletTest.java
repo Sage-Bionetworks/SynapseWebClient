@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitserver.servlet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -200,32 +201,23 @@ public class CSPReportServletTest {
   }
 
   @Test
-  public void objectWhereArrayExpected() throws Exception {
-    mockRequestBody("application/reports+json", CSP_REPORT_JSON);
+  public void badRequests() throws Exception {
+    String[] contentTypes = {
+      // An object where the report-to array is expected
+      "application/reports+json",
+      // Unsupported content type
+      "application/json",
+      // Missing content type
+      null,
+    };
+    for (String contentType : contentTypes) {
+      reset(mockResponse);
+      mockRequestBody(contentType, CSP_REPORT_JSON);
 
-    servlet.doPost(mockRequest, mockResponse);
+      servlet.doPost(mockRequest, mockResponse);
 
-    verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-    verifyNoInteractions(mockLogger);
-  }
-
-  @Test
-  public void unsupportedContentType() throws Exception {
-    mockRequestBody("application/json", CSP_REPORT_JSON);
-
-    servlet.doPost(mockRequest, mockResponse);
-
-    verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-    verifyNoInteractions(mockLogger);
-  }
-
-  @Test
-  public void missingContentType() throws Exception {
-    mockRequestBody(null, CSP_REPORT_JSON);
-
-    servlet.doPost(mockRequest, mockResponse);
-
-    verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    }
     verifyNoInteractions(mockLogger);
   }
 }
