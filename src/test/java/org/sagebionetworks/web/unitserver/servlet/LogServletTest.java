@@ -71,6 +71,24 @@ public class LogServletTest {
   }
 
   @Test
+  public void serverAttributesOverrideClientValues() throws Exception {
+    String json =
+      "{\"attributes\":{\"user_agent.original\":\"fromClient\",\"client.address\":\"fromClient\"}}";
+    when(mockRequest.getReader())
+      .thenReturn(new BufferedReader(new StringReader(json)));
+    when(mockRequest.getHeader("User-Agent")).thenReturn("mockUserAgent");
+    when(mockRequest.getHeader("X-Forwarded-For")).thenReturn("1.2.3.4");
+
+    servlet.doPost(mockRequest, mockResponse);
+
+    verify(mockLogger).info(lineCaptor.capture());
+    JSONObject attributes = new JSONObject(lineCaptor.getValue())
+      .getJSONObject("attributes");
+    assertEquals("mockUserAgent", attributes.getString("user_agent.original"));
+    assertEquals("1.2.3.4", attributes.getString("client.address"));
+  }
+
+  @Test
   public void invalidJson() throws Exception {
     BufferedReader br = new BufferedReader(new StringReader("not json"));
     when(mockRequest.getReader()).thenReturn(br);
