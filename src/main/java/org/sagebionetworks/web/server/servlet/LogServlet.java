@@ -20,9 +20,9 @@ import org.json.JSONObject;
 public class LogServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1L;
-  public static final String SERVICE_NAME = "synapse-web-client";
+  private static final String SERVICE_NAME = "synapse-web-client";
   // OpenTelemetry SeverityNumber for each SeverityText
-  public static final Map<String, Integer> SEVERITY_NUMBERS = Map.of(
+  private static final Map<String, Integer> SEVERITY_NUMBERS = Map.of(
     "TRACE",
     1,
     "DEBUG",
