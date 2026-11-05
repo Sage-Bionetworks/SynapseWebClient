@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -76,7 +77,9 @@ public class LogServlet extends HttpServlet {
    * SEVERITY_NUMBERS (the log line then has no severity, which OpenTelemetry treats as unspecified).
    */
   static String toValidSeverityOrNull(String requestedSeverity) {
-    String normalizedSeverity = requestedSeverity.trim().toUpperCase();
+    String normalizedSeverity = requestedSeverity
+      .trim()
+      .toUpperCase(Locale.ROOT);
     return SEVERITY_NUMBERS.containsKey(normalizedSeverity)
       ? normalizedSeverity
       : null;
