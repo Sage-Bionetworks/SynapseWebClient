@@ -472,6 +472,19 @@ function sendLog(eventName, severityText, body, attributes) {
   }
 }
 
+// '/PasswordResetSignedToken:abc…' → '/PasswordResetSignedToken:{token}'
+// '/Synapse:syn123/wiki/456'       → '/Synapse:{token}'
+// '/'                              → '/'
+function toUrlTemplate(href) {
+  try {
+    const first = new URL(href).pathname.split('/').find(Boolean) || ''
+    const colon = first.indexOf(':')
+    return colon === -1 ? `/${first}` : `/${first.slice(0, colon)}:{token}`
+  } catch {
+    return undefined
+  }
+}
+
 /** Build the payload reported for one failure/boundary combination. */
 function buildPayload(kind, message, stack, url) {
   return {
@@ -566,11 +579,18 @@ function report(kind, message, stack) {
     window.__swcModuleLoadErrors.push(payload)
 
     const loggablePayload = { ...payload }
-    // Remove `stack` from the payload, send it as the `exception.stacktrace` attribute instead
+    // Send these as attributes instead: stack as exception.stacktrace, and the page URL/referrer
+    // scrubbed, since they can hold tokens
     delete loggablePayload.stack
+    delete loggablePayload.pageUrl
+    delete loggablePayload.referrer
     sendLog(EVENT_NAME_ERROR, 'ERROR', loggablePayload, {
       'exception.message': message,
       'exception.stacktrace': stack,
+      'url.template': toUrlTemplate(payload.pageUrl),
+      'url.domain': window.location.hostname,
+      'synapse.referrer.origin':
+        payload.referrer && new URL(payload.referrer).origin,
     })
 
     // eslint-disable-next-line no-console
