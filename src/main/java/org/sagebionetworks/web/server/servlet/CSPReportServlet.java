@@ -4,7 +4,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
 import java.time.Instant;
+import java.util.Arrays;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -106,7 +108,14 @@ public class CSPReportServlet extends HttpServlet {
     String clientAddress
   ) {
     JSONObject attributes = new JSONObject();
-    attributes.put("url.full", url);
+    attributes.put("url.template", toUrlTemplate(url));
+    attributes.put("url.domain", toDomain(url));
+    // Read before scrubbing, which replaces the body's referrer with its template
+    attributes.put(
+      "synapse.referrer.origin",
+      toOrigin(reportBody.optString("referrer", null))
+    );
+    scrubReportBody(reportBody);
 
     JSONObject logRecord = new JSONObject();
     logRecord.put("timestamp", timestamp.toString());
@@ -117,5 +126,82 @@ public class CSPReportServlet extends HttpServlet {
     clientLog.info(
       LogServlet.toLogLine(logRecord, userAgent, clientAddress).toString()
     );
+  }
+
+  /**
+   * Removes sensitive values from the report's URLs. Each list has both the report-to (e.g. documentURL) and
+   * report-uri (e.g. document-uri) field names.
+   */
+  private static void scrubReportBody(JSONObject reportBody) {
+    // Page URLs: the route can hold a token (e.g. /PasswordResetSignedToken:abc), so keep only the template
+    for (String key : new String[] {
+      "documentURL",
+      "document-uri",
+      "referrer",
+    }) {
+      if (reportBody.has(key)) {
+        reportBody.put(key, toUrlTemplate(reportBody.optString(key)));
+      }
+    }
+
+    // Resource URLs: keep the path, drop the query and fragment, which can hold secrets (e.g. S3 signatures)
+    for (String key : new String[] {
+      "blockedURL",
+      "blocked-uri",
+      "sourceFile",
+      "source-file",
+    }) {
+      if (reportBody.has(key)) {
+        reportBody.put(key, reportBody.optString(key).split("[?#]", 2)[0]);
+      }
+    }
+  }
+
+  // '/PasswordResetSignedToken:abc…' → '/PasswordResetSignedToken:{token}'
+  // '/Synapse:syn123/wiki/456'       → '/Synapse:{token}'
+  // '/'                              → '/'
+  public static String toUrlTemplate(String href) {
+    try {
+      URI uri = new URI(href);
+
+      if (!uri.isAbsolute()) {
+        return null;
+      }
+
+      String first = Arrays
+        .stream(uri.getRawPath().split("/"))
+        .filter(segment -> !segment.isEmpty())
+        .findFirst()
+        .orElse("");
+
+      int colon = first.indexOf(':');
+
+      return colon == -1
+        ? "/" + first
+        : "/" + first.substring(0, colon) + ":{token}";
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  /** Returns the URL's host (e.g. www.synapse.org), or null if it isn't an absolute URL. */
+  public static String toDomain(String href) {
+    try {
+      return new URI(href).getHost();
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  /** Returns the URL's origin (e.g. https://www.synapse.org), or null if it isn't an absolute URL. */
+  public static String toOrigin(String href) {
+    try {
+      URI uri = new URI(href);
+      return uri.isAbsolute()
+        ? uri.getScheme() + "://" + uri.getAuthority()
+        : null;
+    } catch (Exception e) {
+      return null;
+    }
   }
 }

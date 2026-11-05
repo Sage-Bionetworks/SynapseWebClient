@@ -82,7 +82,7 @@ public class CSPReportServletTest {
       line.getJSONObject("body").getString("blockedURL")
     );
     JSONObject attributes = line.getJSONObject("attributes");
-    assertEquals("https://www.synapse.org/", attributes.getString("url.full"));
+    assertEquals("/", attributes.getString("url.template"));
     assertEquals("mockUserAgent", attributes.getString("user_agent.original"));
     assertEquals("1.2.3.4", attributes.getString("client.address"));
     verify(mockResponse).setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -152,10 +152,51 @@ public class CSPReportServletTest {
       line.getJSONObject("body").getString("violated-directive")
     );
     assertEquals(
-      "https://www.synapse.org/",
-      line.getJSONObject("attributes").getString("url.full")
+      "/",
+      line.getJSONObject("attributes").getString("url.template")
     );
     verify(mockResponse).setStatus(HttpServletResponse.SC_NO_CONTENT);
+  }
+
+  // Protects a security property: tokens in the page URL must never reach the logs
+  @Test
+  public void sensitiveUrlsScrubbed() throws Exception {
+    String reports =
+      "[{\"type\":\"csp-violation\",\"age\":0," +
+      "\"url\":\"https://www.synapse.org/PasswordResetSignedToken:secret\"," +
+      "\"body\":{\"documentURL\":\"https://www.synapse.org/PasswordResetSignedToken:secret\"," +
+      "\"referrer\":\"https://www.synapse.org/Synapse:syn123/wiki/456\"," +
+      "\"blockedURL\":\"https://bucket.s3.amazonaws.com/f?X-Amz-Signature=secret\"," +
+      "\"sourceFile\":\"https://www.synapse.org/a.js#secret\"}}]";
+
+    mockRequestBody("application/reports+json", reports);
+
+    servlet.doPost(mockRequest, mockResponse);
+
+    verify(mockLogger).info(lineCaptor.capture());
+    assertFalse(lineCaptor.getValue().contains("secret"));
+    JSONObject line = new JSONObject(lineCaptor.getValue());
+    JSONObject attributes = line.getJSONObject("attributes");
+    assertEquals(
+      "/PasswordResetSignedToken:{token}",
+      attributes.getString("url.template")
+    );
+    assertEquals("www.synapse.org", attributes.getString("url.domain"));
+    assertEquals(
+      "https://www.synapse.org",
+      attributes.getString("synapse.referrer.origin")
+    );
+    JSONObject body = line.getJSONObject("body");
+    assertEquals(
+      "/PasswordResetSignedToken:{token}",
+      body.getString("documentURL")
+    );
+    assertEquals("/Synapse:{token}", body.getString("referrer"));
+    assertEquals(
+      "https://bucket.s3.amazonaws.com/f",
+      body.getString("blockedURL")
+    );
+    assertEquals("https://www.synapse.org/a.js", body.getString("sourceFile"));
   }
 
   @Test
