@@ -34,8 +34,8 @@ importers:
         specifier: ^0.0.13
         version: 0.0.13
       '@tanstack/react-query':
-        specifier: 5.80.10
-        version: 5.80.10(react@19.2.7)
+        specifier: 5.105.2
+        version: 5.105.2(@types/react@19.2.14)(react@19.2.7)
       animate.css:
         specifier: ^4.1.1
         version: 4.1.1
@@ -1615,6 +1615,9 @@ packages:
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
+  '@tanstack/query-core@5.105.2':
+    resolution: {integrity: sha512-cyZGOtI1ZZ79mm905PJ42ng43Mwbc9CeqB83XuJmj9ADj/C+dzUXcgMQucRQ8yZs7atHykMzqavAXXhjxAw50g==}
+
   '@tanstack/query-core@5.80.10':
     resolution: {integrity: sha512-mUNQOtzxkjL6jLbyChZoSBP6A5gQDVRUiPvW+/zw/9ftOAz+H754zCj3D8PwnzPKyHzGkQ9JbH48ukhym9LK1Q==}
 
@@ -1626,6 +1629,15 @@ packages:
     peerDependencies:
       '@tanstack/react-query': ^5.80.10
       react: ^19.2.7
+
+  '@tanstack/react-query@5.105.2':
+    resolution: {integrity: sha512-K7MMGdVIgsQ41o6TI0fXD75aRCDNBLEKP80FvhvuwFkgiC36+rd8/JI5BYufLpfbZ3/sFTcYnotWxJqDxV/9dQ==}
+    peerDependencies:
+      '@types/react': 19.2.14
+      react: ^19.2.7
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   '@tanstack/react-query@5.80.10':
     resolution: {integrity: sha512-6zM098J8sLy9oU60XAdzUlAH4wVzoMVsWUWiiE/Iz4fd67PplxeyL4sw/MPcVJJVhbwGGXCsHn9GrQt2mlAzig==}
@@ -7033,6 +7045,8 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
+  '@tanstack/query-core@5.105.2': {}
+
   '@tanstack/query-core@5.80.10': {}
 
   '@tanstack/query-devtools@5.80.0': {}
@@ -7042,6 +7056,13 @@ snapshots:
       '@tanstack/query-devtools': 5.80.0
       '@tanstack/react-query': 5.80.10(react@19.2.7)
       react: 19.2.7
+
+  '@tanstack/react-query@5.105.2(@types/react@19.2.14)(react@19.2.7)':
+    dependencies:
+      '@tanstack/query-core': 5.105.2
+      react: 19.2.7
+    optionalDependencies:
+      '@types/react': 19.2.14
 
   '@tanstack/react-query@5.80.10(react@19.2.7)':
     dependencies:
