@@ -207,8 +207,8 @@ public class CSPReportServletTest {
       "application/reports+json",
       // Unsupported content type
       "application/json",
-      // Missing content type
-      null,
+      // Missing content type, which RPCValidationFilter replaces with this
+      "text/x-gwt-rpc; charset=utf-8",
     };
     for (String contentType : contentTypes) {
       reset(mockResponse);
