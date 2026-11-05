@@ -19,6 +19,7 @@ public class SearchManagementPresenter
   @Inject
   public SearchManagementPresenter(SynapseJSNIUtils jsniUtils) {
     this.view = new ReactComponent();
+    this.view.addStyleName("padding-30");
 
     jsniUtils.setPageTitle("Search Management");
   }
