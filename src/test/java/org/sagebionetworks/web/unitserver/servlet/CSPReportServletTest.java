@@ -68,7 +68,7 @@ public class CSPReportServletTest {
   }
 
   @Test
-  public void reportsJson() throws Exception {
+  public void logsReportToViolation() throws Exception {
     mockRequestBody("application/reports+json", REPORTS_JSON);
 
     servlet.doPost(mockRequest, mockResponse);
@@ -140,7 +140,7 @@ public class CSPReportServletTest {
   }
 
   @Test
-  public void legacyCspReport() throws Exception {
+  public void logsReportUriViolation() throws Exception {
     // A parameter after the content type is still accepted
     mockRequestBody("application/csp-report; charset=utf-8", CSP_REPORT_JSON);
 

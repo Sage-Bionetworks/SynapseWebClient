@@ -44,7 +44,7 @@ public class LogServletTest {
   }
 
   @Test
-  public void validRecord() throws Exception {
+  public void logsRecordAsOpenTelemetryLine() throws Exception {
     String json =
       "{\"severityText\":\"error\",\"eventName\":\"swc.test\",\"body\":{\"buildId\":\"abc\"}}";
     BufferedReader br = new BufferedReader(new StringReader(json));
@@ -57,7 +57,14 @@ public class LogServletTest {
     verify(mockLogger).info(lineCaptor.capture());
     JSONObject jsonObject = new JSONObject(lineCaptor.getValue());
     assertEquals("ERROR", jsonObject.get("severityText").toString());
+    assertEquals(17, jsonObject.getInt("severityNumber"));
     assertEquals("swc.test", jsonObject.get("eventName").toString());
+    assertEquals("abc", jsonObject.getJSONObject("body").getString("buildId"));
+    assertFalse(jsonObject.isNull("observedTimestamp"));
+    assertEquals(
+      "synapse-web-client",
+      jsonObject.getJSONObject("resource").getString("service.name")
+    );
     assertEquals(
       "mockUserAgent",
       jsonObject.getJSONObject("attributes").getString("user_agent.original")
