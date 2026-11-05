@@ -16,6 +16,9 @@ public enum FeatureFlagKey {
   // If enabled, show the query builder control in the QueryWrapperPlotNav for table entities
   QUERY_BUILDER_CONTROL("QUERY_BUILDER_CONTROL"),
 
+  // If enabled, show actions to create/edit SearchIndex entities and manage search configurations
+  SEARCH_INDEX_MANAGEMENT("SEARCH_INDEX_MANAGEMENT"),
+
   // Last flag is used only for tests
   TEST_FLAG_ONLY("TEST_FLAG_ONLY");
 

@@ -166,6 +166,13 @@ public class SRC {
       CreateProjectModalProps
     > CreateProjectModal;
     public static ReactComponentType CuratorDashboard;
+    public static ReactComponentType SearchManagementPage;
+    public static ReactComponentType<
+      SearchIndexEditorModalProps
+    > SearchIndexEditorModal;
+    public static ReactComponentType<
+      SearchConfigBindingModalProps
+    > SearchConfigBindingModal;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.

@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.place.PersonalAccessTokenPlace;
 import org.sagebionetworks.web.client.place.PlansPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Quiz;
+import org.sagebionetworks.web.client.place.SearchManagementPlace;
 import org.sagebionetworks.web.client.place.SearchV2Place;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
@@ -106,6 +107,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
     SearchV2Place.Tokenizer.class,
     LegacySearchPlace.Tokenizer.class,
     CuratorDashboardPlace.Tokenizer.class,
+    SearchManagementPlace.Tokenizer.class,
   }
 )
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {}

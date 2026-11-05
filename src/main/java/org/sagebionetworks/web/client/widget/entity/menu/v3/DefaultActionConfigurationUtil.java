@@ -109,6 +109,18 @@ public class DefaultActionConfigurationUtil {
         "Add Dataset Collection"
       ),
       ActionConfiguration.create(Action.ADD_TABLE, "Table/View"),
+      ActionConfiguration.create(
+        Action.EDIT_SEARCH_INDEX,
+        "Edit Search Index Settings"
+      ),
+      ActionConfiguration.create(
+        Action.EDIT_SEARCH_CONFIGURATION_BINDING,
+        "Search Configuration"
+      ),
+      ActionConfiguration.create(
+        Action.MANAGE_SEARCH_CONFIGURATIONS,
+        "Manage Search Configurations"
+      ),
       ActionConfiguration.create(Action.FOLLOW, "Follow"),
       ActionConfiguration.create(Action.CREATE_THREAD, "Create New Thread"),
       ActionConfiguration.create(
