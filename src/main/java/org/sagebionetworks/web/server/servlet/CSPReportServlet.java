@@ -42,6 +42,9 @@ public class CSPReportServlet extends HttpServlet {
     // valueOf turns a missing content type into "null", which matches neither format below
     String contentType = String.valueOf(request.getContentType());
     String userAgent = request.getHeader("User-Agent");
+    String clientAddress = request.getHeader(
+      SynapseClientBase.X_FORWARDED_FOR_HEADER
+    );
     try {
       String body = IOUtils.toString(request.getReader());
       // startsWith, not equals, in case the browser adds extras like "; charset=utf-8" after the type
@@ -64,7 +67,8 @@ public class CSPReportServlet extends HttpServlet {
             Instant.now().minusMillis(ageMs),
             reportBody,
             report.optString("url", null),
-            userAgent
+            userAgent,
+            clientAddress
           );
         }
       } else if (contentType.startsWith("application/csp-report")) {
@@ -76,7 +80,8 @@ public class CSPReportServlet extends HttpServlet {
           Instant.now(),
           cspReport,
           cspReport.optString("document-uri", null),
-          userAgent
+          userAgent,
+          clientAddress
         );
       } else {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -97,7 +102,8 @@ public class CSPReportServlet extends HttpServlet {
     Instant timestamp,
     JSONObject reportBody,
     String url,
-    String userAgent
+    String userAgent,
+    String clientAddress
   ) {
     JSONObject attributes = new JSONObject();
     attributes.put("url.full", url);
@@ -108,6 +114,8 @@ public class CSPReportServlet extends HttpServlet {
     logRecord.put("eventName", "csp.violation");
     logRecord.put("body", reportBody);
     logRecord.put("attributes", attributes);
-    clientLog.info(LogServlet.toLogLine(logRecord, userAgent).toString());
+    clientLog.info(
+      LogServlet.toLogLine(logRecord, userAgent, clientAddress).toString()
+    );
   }
 }

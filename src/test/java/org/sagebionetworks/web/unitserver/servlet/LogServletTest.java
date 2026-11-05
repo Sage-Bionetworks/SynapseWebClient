@@ -50,6 +50,7 @@ public class LogServletTest {
     BufferedReader br = new BufferedReader(new StringReader(json));
     when(mockRequest.getReader()).thenReturn(br);
     when(mockRequest.getHeader("User-Agent")).thenReturn("mockUserAgent");
+    when(mockRequest.getHeader("X-Forwarded-For")).thenReturn("1.2.3.4");
 
     servlet.doPost(mockRequest, mockResponse);
 
@@ -60,6 +61,10 @@ public class LogServletTest {
     assertEquals(
       "mockUserAgent",
       jsonObject.getJSONObject("attributes").getString("user_agent.original")
+    );
+    assertEquals(
+      "1.2.3.4",
+      jsonObject.getJSONObject("attributes").getString("client.address")
     );
 
     verify(mockResponse).setStatus(HttpServletResponse.SC_NO_CONTENT);

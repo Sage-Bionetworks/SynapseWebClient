@@ -61,7 +61,12 @@ public class LogServlet extends HttpServlet {
     }
 
     clientLog.info(
-      toLogLine(logRecord, request.getHeader("User-Agent")).toString()
+      toLogLine(
+        logRecord,
+        request.getHeader("User-Agent"),
+        request.getHeader(SynapseClientBase.X_FORWARDED_FOR_HEADER)
+      )
+        .toString()
     );
     response.setStatus(HttpServletResponse.SC_NO_CONTENT);
   }
@@ -78,10 +83,14 @@ public class LogServlet extends HttpServlet {
   }
 
   /**
-   * Builds an OpenTelemetry log line from the given record and user agent. put() with a null value leaves the
+   * Builds an OpenTelemetry log line from the given record, user agent, and client address. put() with a null value leaves the
    * key out.
    */
-  static JSONObject toLogLine(JSONObject logRecord, String userAgent) {
+  static JSONObject toLogLine(
+    JSONObject logRecord,
+    String userAgent,
+    String clientAddress
+  ) {
     String severityText = toValidSeverityOrNull(
       logRecord.optString("severityText", "")
     );
@@ -92,6 +101,7 @@ public class LogServlet extends HttpServlet {
     }
     // Set by the server, overriding anything the client sent
     attributes.put("user_agent.original", userAgent);
+    attributes.put("client.address", clientAddress);
 
     JSONObject resource = new JSONObject();
     resource.put("service.name", SERVICE_NAME);

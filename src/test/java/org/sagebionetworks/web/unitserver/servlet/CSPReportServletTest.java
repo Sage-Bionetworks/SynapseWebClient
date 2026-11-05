@@ -56,6 +56,7 @@ public class CSPReportServletTest {
     MockitoAnnotations.initMocks(this);
     servlet = new CSPReportServlet(mockLogger);
     when(mockRequest.getHeader("User-Agent")).thenReturn("mockUserAgent");
+    when(mockRequest.getHeader("X-Forwarded-For")).thenReturn("1.2.3.4");
   }
 
   private void mockRequestBody(String contentType, String body)
@@ -83,6 +84,7 @@ public class CSPReportServletTest {
     JSONObject attributes = line.getJSONObject("attributes");
     assertEquals("https://www.synapse.org/", attributes.getString("url.full"));
     assertEquals("mockUserAgent", attributes.getString("user_agent.original"));
+    assertEquals("1.2.3.4", attributes.getString("client.address"));
     verify(mockResponse).setStatus(HttpServletResponse.SC_NO_CONTENT);
   }
 
