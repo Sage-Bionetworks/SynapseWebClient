@@ -25,11 +25,11 @@ public class CSPReportServlet extends HttpServlet {
   // Limits how many log lines a single request can produce. Entries past this are ignored
   public static final int MAX_REPORTS_PER_REQUEST = 50;
 
-  // Must match the logger in log4j2.xml, which writes these lines to stdout (shipped to CloudWatch Logs) as bare JSON
+  // Same logger as LogServlet; see CLIENT_LOG_NAME
   private final transient Logger clientLog;
 
   public CSPReportServlet() {
-    this(LogManager.getLogger("org.sagebionetworks.web.ClientLog"));
+    this(LogManager.getLogger(LogServlet.CLIENT_LOG_NAME));
   }
 
   /**
