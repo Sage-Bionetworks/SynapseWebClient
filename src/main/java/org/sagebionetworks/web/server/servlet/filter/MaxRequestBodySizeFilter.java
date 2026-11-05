@@ -2,7 +2,6 @@ package org.sagebionetworks.web.server.servlet.filter;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -36,10 +35,4 @@ public class MaxRequestBodySizeFilter implements Filter {
     }
     filterChain.doFilter(request, response);
   }
-
-  @Override
-  public void init(FilterConfig config) throws ServletException {}
-
-  @Override
-  public void destroy() {}
 }
