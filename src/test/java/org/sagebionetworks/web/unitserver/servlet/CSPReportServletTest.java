@@ -202,17 +202,22 @@ public class CSPReportServletTest {
 
   @Test
   public void badRequests() throws Exception {
-    String[] contentTypes = {
+    // { content type, body }
+    String[][] requests = {
       // An object where the report-to array is expected
-      "application/reports+json",
+      { "application/reports+json", CSP_REPORT_JSON },
       // Unsupported content type
-      "application/json",
+      { "application/json", CSP_REPORT_JSON },
       // Missing content type, which RPCValidationFilter replaces with this
-      "text/x-gwt-rpc; charset=utf-8",
+      { "text/x-gwt-rpc; charset=utf-8", CSP_REPORT_JSON },
+      // Missing csp-report key
+      { "application/csp-report", "{}" },
+      // Empty body
+      { "application/csp-report", "" },
     };
-    for (String contentType : contentTypes) {
+    for (String[] request : requests) {
       reset(mockResponse);
-      mockRequestBody(contentType, CSP_REPORT_JSON);
+      mockRequestBody(request[0], request[1]);
 
       servlet.doPost(mockRequest, mockResponse);
 
