@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.presenter.PersonalAccessTokensPresenter;
 import org.sagebionetworks.web.client.presenter.PlansPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
+import org.sagebionetworks.web.client.presenter.SearchManagementPresenter;
 import org.sagebionetworks.web.client.presenter.SearchV2Presenter;
 import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
 import org.sagebionetworks.web.client.presenter.SubscriptionPresenter;
@@ -216,6 +217,8 @@ import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
+import org.sagebionetworks.web.client.widget.search.SearchConfigBindingModalWidget;
+import org.sagebionetworks.web.client.widget.search.SearchIndexEditorModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.AclAddPeoplePanel;
 import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGrid;
@@ -776,6 +779,10 @@ public interface PortalGinInjector {
 
   CreateTableViewWizard getCreateTableViewWizard();
 
+  SearchIndexEditorModalWidget getSearchIndexEditorModalWidget();
+
+  SearchConfigBindingModalWidget getSearchConfigBindingModalWidget();
+
   CreateDatasetOrCollection getCreateDatasetOrCollection();
 
   CreateTableFromCsvDialog getCreateTableFromCsvDialog();
@@ -894,4 +901,6 @@ public interface PortalGinInjector {
   CreateGridSessionDialog getCreateGridSessionDialog();
 
   CuratorDashboardPresenter getCuratorDashboardPresenter();
+
+  SearchManagementPresenter getSearchManagementPresenter();
 }

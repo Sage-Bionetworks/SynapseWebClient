@@ -96,6 +96,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.grid.CreateGridRequest;
+import org.sagebionetworks.repo.model.search.table.SearchIndex;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -132,6 +133,8 @@ import org.sagebionetworks.web.client.jsinterop.CreateTableFromCsvDialogProps;
 import org.sagebionetworks.web.client.jsinterop.CreateTableViewWizardProps;
 import org.sagebionetworks.web.client.jsinterop.EntityUploadModalProps;
 import org.sagebionetworks.web.client.jsinterop.KeyFactory;
+import org.sagebionetworks.web.client.jsinterop.SearchConfigBindingModalProps;
+import org.sagebionetworks.web.client.jsinterop.SearchIndexEditorModalProps;
 import org.sagebionetworks.web.client.jsinterop.SqlDefinedTableEditorModalProps;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
@@ -140,6 +143,7 @@ import org.sagebionetworks.web.client.jsinterop.reactquery.QueryKey;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.SearchManagementPlace;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -179,6 +183,8 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
+import org.sagebionetworks.web.client.widget.search.SearchConfigBindingModalWidget;
+import org.sagebionetworks.web.client.widget.search.SearchIndexEditorModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
@@ -320,6 +326,12 @@ public class EntityActionControllerImplTest {
 
   @Mock
   CreateTableViewWizard mockCreateTableViewWizard;
+
+  @Mock
+  SearchIndexEditorModalWidget mockSearchIndexEditorModalWidget;
+
+  @Mock
+  SearchConfigBindingModalWidget mockSearchConfigBindingModalWidget;
 
   @Mock
   CreateTableFromCsvDialog mockCreateTableFromCsvDialog;
@@ -5490,5 +5502,170 @@ public class EntityActionControllerImplTest {
 
     verify(mockCreateGridSessionDialog)
       .createGridSession(new CreateGridRequest().setRecordSetId(entityId));
+  }
+
+  private void configureSearchIndexManagementTest(
+    Entity entity,
+    EntityArea area,
+    boolean isFlagEnabled
+  ) {
+    entity.setId(entityId);
+    entityBundle.setEntity(entity);
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.SEARCH_INDEX_MANAGEMENT
+      )
+    )
+      .thenReturn(isFlagEnabled);
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      area,
+      mockAddToDownloadListWidget
+    );
+  }
+
+  @Test
+  public void testSearchIndexManagementActionsProjectFlagEnabled() {
+    permissions.setCanCertifiedUserEdit(true);
+    permissions.setCanEdit(true);
+    configureSearchIndexManagementTest(new Project(), null, true);
+
+    verify(mockActionMenu).setActionVisible(Action.EDIT_SEARCH_INDEX, false);
+    verify(mockActionMenu)
+      .setActionVisible(Action.EDIT_SEARCH_CONFIGURATION_BINDING, true);
+    verify(mockActionMenu)
+      .setActionListener(Action.EDIT_SEARCH_CONFIGURATION_BINDING, controller);
+    verify(mockActionMenu)
+      .setActionVisible(Action.MANAGE_SEARCH_CONFIGURATIONS, false);
+  }
+
+  @Test
+  public void testSearchIndexManagementActionsProjectFlagDisabled() {
+    permissions.setCanCertifiedUserEdit(true);
+    permissions.setCanEdit(true);
+    configureSearchIndexManagementTest(new Project(), null, false);
+
+    verify(mockActionMenu).setActionVisible(Action.EDIT_SEARCH_INDEX, false);
+    verify(mockActionMenu)
+      .setActionVisible(Action.EDIT_SEARCH_CONFIGURATION_BINDING, false);
+    verify(mockActionMenu)
+      .setActionVisible(Action.MANAGE_SEARCH_CONFIGURATIONS, false);
+  }
+
+  @Test
+  public void testSearchIndexManagementActionsSearchIndexFlagDisabled() {
+    permissions.setCanCertifiedUserEdit(true);
+    permissions.setCanEdit(true);
+    configureSearchIndexManagementTest(new SearchIndex(), null, false);
+
+    verify(mockActionMenu).setActionVisible(Action.EDIT_SEARCH_INDEX, false);
+    verify(mockActionMenu)
+      .setActionVisible(Action.MANAGE_SEARCH_CONFIGURATIONS, false);
+  }
+
+  @Test
+  public void testSearchIndexManagementActionsProjectNoPermission() {
+    permissions.setCanCertifiedUserEdit(false);
+    permissions.setCanEdit(false);
+    configureSearchIndexManagementTest(new Project(), null, true);
+
+    verify(mockActionMenu)
+      .setActionVisible(Action.EDIT_SEARCH_CONFIGURATION_BINDING, false);
+  }
+
+  @Test
+  public void testSearchIndexManagementActionsFolder() {
+    permissions.setCanEdit(true);
+    configureSearchIndexManagementTest(new Folder(), null, true);
+
+    verify(mockActionMenu)
+      .setActionVisible(Action.EDIT_SEARCH_CONFIGURATION_BINDING, true);
+    verify(mockActionMenu)
+      .setActionVisible(Action.MANAGE_SEARCH_CONFIGURATIONS, false);
+  }
+
+  @Test
+  public void testSearchIndexManagementActionsSearchIndex() {
+    permissions.setCanCertifiedUserEdit(true);
+    permissions.setCanEdit(true);
+    configureSearchIndexManagementTest(new SearchIndex(), null, true);
+
+    verify(mockActionMenu).setActionVisible(Action.EDIT_SEARCH_INDEX, true);
+    verify(mockActionMenu)
+      .setActionVisible(Action.EDIT_SEARCH_CONFIGURATION_BINDING, false);
+    verify(mockActionMenu)
+      .setActionVisible(Action.MANAGE_SEARCH_CONFIGURATIONS, true);
+  }
+
+  @Test
+  public void testSearchIndexManagementActionsSearchIndexCannotEdit() {
+    permissions.setCanCertifiedUserEdit(false);
+    configureSearchIndexManagementTest(new SearchIndex(), null, true);
+
+    verify(mockActionMenu).setActionVisible(Action.EDIT_SEARCH_INDEX, false);
+  }
+
+  @Test
+  public void testSearchIndexManagementActionsNotLoggedIn() {
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+    configureSearchIndexManagementTest(new SearchIndex(), null, true);
+
+    verify(mockActionMenu)
+      .setActionVisible(Action.MANAGE_SEARCH_CONFIGURATIONS, false);
+  }
+
+  @Test
+  public void testEditSearchIndex() {
+    when(mockPortalGinInjector.getSearchIndexEditorModalWidget())
+      .thenReturn(mockSearchIndexEditorModalWidget);
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    permissions.setCanCertifiedUserEdit(true);
+    configureSearchIndexManagementTest(new SearchIndex(), null, true);
+
+    controller.onAction(Action.EDIT_SEARCH_INDEX, null);
+
+    ArgumentCaptor<SearchIndexEditorModalProps.OnComplete> onCompleteCaptor =
+      ArgumentCaptor.forClass(SearchIndexEditorModalProps.OnComplete.class);
+    verify(mockSearchIndexEditorModalWidget)
+      .configure(eq(entityId), onCompleteCaptor.capture(), any());
+    verify(mockSearchIndexEditorModalWidget).setOpen(true);
+
+    onCompleteCaptor.getValue().onComplete(entityId);
+    verify(mockSearchIndexEditorModalWidget).setOpen(false);
+    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+  }
+
+  @Test
+  public void testEditSearchConfigurationBinding() {
+    when(mockPortalGinInjector.getSearchConfigBindingModalWidget())
+      .thenReturn(mockSearchConfigBindingModalWidget);
+    permissions.setCanEdit(true);
+    configureSearchIndexManagementTest(new Folder(), null, true);
+
+    controller.onAction(Action.EDIT_SEARCH_CONFIGURATION_BINDING, null);
+
+    ArgumentCaptor<SearchConfigBindingModalProps.Callback> onCloseCaptor =
+      ArgumentCaptor.forClass(SearchConfigBindingModalProps.Callback.class);
+    verify(mockSearchConfigBindingModalWidget)
+      .configure(eq(entityId), onCloseCaptor.capture());
+    verify(mockSearchConfigBindingModalWidget).setOpen(true);
+
+    onCloseCaptor.getValue().run();
+    verify(mockSearchConfigBindingModalWidget).setOpen(false);
+  }
+
+  @Test
+  public void testManageSearchConfigurations() {
+    configureSearchIndexManagementTest(new SearchIndex(), null, true);
+
+    controller.onAction(Action.MANAGE_SEARCH_CONFIGURATIONS, null);
+
+    verify(mockPlaceChanger).goTo(any(SearchManagementPlace.class));
   }
 }
