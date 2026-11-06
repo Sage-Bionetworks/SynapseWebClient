@@ -45,6 +45,7 @@ public class SynapseReactClientFullContextPropsProviderImpl
       SynapseContextJsObject.create(
         authController.getCurrentUserAccessToken(),
         authController.isLoggedIn(),
+        authController.getCurrentUserRealmId(),
         DisplayUtils.isInTestWebsite(cookies),
         globalApplicationState.isShowingUTCTime(),
         oneSageUtils.getAppIdForOneSage()
