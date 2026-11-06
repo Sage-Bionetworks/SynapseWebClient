@@ -79,12 +79,14 @@
                       </b:InputGroup>
                     </div>
                     <div class="col-xs-12 col-sm-4 createProject">
-                      <b:Button
+                      <MUI:Button
                         ui:field="createProjectButton"
-                        type="DEFAULT"
-                        icon="PLUS"
-                        pull="RIGHT"
-                        text="Create a New Project"
+                        variant="contained"
+                        color="primary"
+                        startIcon="add"
+                        children="Create a New Project"
+                        className="pull-right"
+                        size="small"
                       />
                     </div>
                     <MUI:Grid xs="12">
