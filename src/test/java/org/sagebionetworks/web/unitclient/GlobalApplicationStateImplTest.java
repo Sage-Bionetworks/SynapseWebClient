@@ -53,6 +53,7 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.place.DataAccessManagementPlace;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -614,6 +615,116 @@ public class GlobalApplicationStateImplTest {
 
     assertFalse(isHandled);
     verify(mockPlaceController, never()).goTo(any(Place.class));
+  }
+
+  @Test
+  public void testLeavePopStateToCurrentPageWithinDataAccessManagement() {
+    when(mockPlaceController.getWhere())
+      .thenReturn(new DataAccessManagementPlace("default/Submissions"));
+    when(
+      mockAppPlaceHistoryMapper.getPlace(
+        "DataAccessManagement:default/FormTemplates"
+      )
+    )
+      .thenReturn(new DataAccessManagementPlace("default/FormTemplates"));
+
+    assertTrue(
+      globalApplicationState.leavePopStateToCurrentPage(
+        "DataAccessManagement:default/FormTemplates"
+      )
+    );
+    // so back-forward-nav-handler.js does not reload the page
+    verify(mockSynapseJSNIUtils).setIsInnerProgrammaticHistoryChange();
+  }
+
+  @Test
+  public void testLeavePopStateToCurrentPageLeavingDataAccessManagement() {
+    when(mockPlaceController.getWhere())
+      .thenReturn(new DataAccessManagementPlace("default/Submissions"));
+    when(mockAppPlaceHistoryMapper.getPlace("Synapse:syn123"))
+      .thenReturn(new Synapse("syn123"));
+
+    assertFalse(
+      globalApplicationState.leavePopStateToCurrentPage("Synapse:syn123")
+    );
+    verify(mockSynapseJSNIUtils, never()).setIsInnerProgrammaticHistoryChange();
+  }
+
+  @Test
+  public void testLeavePopStateToCurrentPageEnteringDataAccessManagement() {
+    when(mockPlaceController.getWhere()).thenReturn(new Synapse("syn123"));
+    when(
+      mockAppPlaceHistoryMapper.getPlace(
+        "DataAccessManagement:default/Submissions"
+      )
+    )
+      .thenReturn(new DataAccessManagementPlace("default/Submissions"));
+
+    assertFalse(
+      globalApplicationState.leavePopStateToCurrentPage(
+        "DataAccessManagement:default/Submissions"
+      )
+    );
+    verify(mockSynapseJSNIUtils, never()).setIsInnerProgrammaticHistoryChange();
+  }
+
+  @Test
+  public void testHandleLinkClickWithinDataAccessManagement() {
+    when(mockPlaceController.getWhere())
+      .thenReturn(new DataAccessManagementPlace("default/Submissions"));
+    when(
+      mockAppPlaceHistoryMapper.getPlace(
+        "DataAccessManagement:default/FormTemplates"
+      )
+    )
+      .thenReturn(new DataAccessManagementPlace("default/FormTemplates"));
+
+    boolean isHandled = globalApplicationState.handleLinkClick(
+      "/DataAccessManagement:default/FormTemplates"
+    );
+
+    // Left to the dashboard's router, which asks before discarding unsaved changes.
+    assertFalse(isHandled);
+    verify(mockPlaceController, never()).goTo(any(Place.class));
+  }
+
+  @Test
+  public void testHandleLinkClickLeavingDataAccessManagement() {
+    when(mockPlaceController.getWhere())
+      .thenReturn(new DataAccessManagementPlace("default/Submissions"));
+    Synapse synapsePlace = new Synapse("syn123");
+    when(mockAppPlaceHistoryMapper.getPlace("Synapse:syn123"))
+      .thenReturn(synapsePlace);
+
+    boolean isHandled = globalApplicationState.handleLinkClick(
+      "/Synapse:syn123"
+    );
+
+    assertTrue(isHandled);
+    verify(mockPlaceController).goTo(synapsePlace);
+  }
+
+  @Test
+  public void testHandleRelativePathClickWithinDataAccessManagement() {
+    // Not a link click (e.g. the nav drawer), so GWT still navigates, asking first if the user is editing.
+    when(mockPlaceController.getWhere())
+      .thenReturn(new DataAccessManagementPlace("default/FormTemplates"));
+    DataAccessManagementPlace submissionsPlace = new DataAccessManagementPlace(
+      "default/Submissions"
+    );
+    when(
+      mockAppPlaceHistoryMapper.getPlace(
+        "DataAccessManagement:default/Submissions"
+      )
+    )
+      .thenReturn(submissionsPlace);
+
+    boolean isHandled = globalApplicationState.handleRelativePathClick(
+      "/DataAccessManagement:default/Submissions"
+    );
+
+    assertTrue(isHandled);
+    verify(mockPlaceController).goTo(submissionsPlace);
   }
 
   @Test
