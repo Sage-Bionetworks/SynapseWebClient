@@ -292,7 +292,7 @@ public class WikiSubpageNavigationTreeTest {
   ) {
     tree.reloadWiki(aNode);
     verify(mockReloadWikiPageCallback).invoke(aNode.getWikiPageKey());
-    // pushCurrentPlace called once from configure, and once from reload
+    // reloadWiki pushes the node's place (configure does not push)
     verify(mockGlobalApplicationState).pushCurrentPlace(aNode.getTargetPlace());
     verify(mockView, Mockito.times(time)).resetNavTree(root);
   }
@@ -369,5 +369,7 @@ public class WikiSubpageNavigationTreeTest {
     tree.setPage(pageId);
     verify(mockReloadWikiPageCallback).invoke(pageKeyCaptor.capture());
     assertEquals(pageId, pageKeyCaptor.getValue().getWikiPageId());
+    // the page is shown for the current URL, so this must not add a history entry
+    verify(mockGlobalApplicationState, never()).pushCurrentPlace(any());
   }
 }

@@ -551,6 +551,26 @@ public class TablesTabTest {
   }
 
   @Test
+  public void testSetTableQueryAlreadyInHash() {
+    query.setOffset(1L);
+    when(mockTableEntityWidget.getDefaultQuery()).thenReturn(new Query());
+    String encodedToken = "encoded token";
+    when(mockQueryTokenProvider.queryToToken(any(Query.class)))
+      .thenReturn(encodedToken);
+    // e.g. after Back to this query
+    when(mockJsniUtils.getHash())
+      .thenReturn(AbstractTablesTab.TABLE_QUERY_PREFIX + encodedToken);
+    tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+    tab.configure(mockTableEntityBundle, null, null);
+
+    reset(mockTab);
+    when(mockTab.isTabPaneVisible()).thenReturn(true);
+    tab.onQueryChange(query);
+
+    verify(mockJsniUtils, never()).setHash(anyString());
+  }
+
+  @Test
   public void testGetTableQuery() {
     Long version = null;
     tab.setProject(projectEntityId, mockProjectEntityBundle, null);

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import elemental2.dom.FileList;
 import java.util.List;
@@ -29,7 +28,7 @@ public interface GlobalApplicationState {
    *
    * @param placeController
    */
-  public void setPlaceController(PlaceController placeController);
+  public void setPlaceController(SynapsePlaceController placeController);
 
   /**
    * Holds the last visited place
@@ -114,9 +113,9 @@ public interface GlobalApplicationState {
   public void pushCurrentPlace(Place targetPlace);
 
   /**
-   * This method initializes the handler for on pop state event.
+   * Listens for Back/Forward between two queries of a table, which only change the URL fragment.
    */
-  public void initOnPopStateHandler();
+  public void initHashChangeHandler();
 
   public void refreshPage();
 
