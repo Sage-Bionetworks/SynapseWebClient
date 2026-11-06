@@ -273,7 +273,9 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
           String accessToken = UserDataProvider.getThreadLocalUserToken(
             request
           );
-          SynapseClient synapseClient = synapseProvider.createNewClient();
+          SynapseClient synapseClient = synapseProvider.createNewClient(
+            UserDataProvider.getThreadLocalRequestHost(request)
+          );
           crawlFilter.init(synapseClient);
           if (accessToken != null) synapseClient.setBearerAuthorizationToken(
             accessToken
