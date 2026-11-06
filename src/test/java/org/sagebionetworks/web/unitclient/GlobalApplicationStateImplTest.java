@@ -24,7 +24,6 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
-import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.Date;
 import java.util.HashSet;
@@ -46,6 +45,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapsePlaceController;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -70,7 +70,7 @@ public class GlobalApplicationStateImplTest {
   CookieProvider mockCookieProvider;
 
   @Mock
-  PlaceController mockPlaceController;
+  SynapsePlaceController mockPlaceController;
 
   @Mock
   EventBus mockEventBus;
@@ -485,12 +485,6 @@ public class GlobalApplicationStateImplTest {
     globalApplicationState.replaceCurrentPlace(mockPlace);
     verify(mockGWT).replaceItem(newToken, false);
     verify(mockSynapseJSNIUtils).consoleError(error);
-  }
-
-  @Test
-  public void testInitOnPopStateHandler() {
-    globalApplicationState.initOnPopStateHandler();
-    verify(mockSynapseJSNIUtils).initOnPopStateHandler();
   }
 
   @Test

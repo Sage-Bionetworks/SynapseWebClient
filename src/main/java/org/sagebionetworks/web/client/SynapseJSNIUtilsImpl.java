@@ -455,23 +455,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 
   @Override
-  public void initOnPopStateHandler() {
-    _initOnPopStateHandler();
-  }
-
-  private static native void _initOnPopStateHandler() /*-{
-		// reload the page on pop state
-		//we set the source property of the state if we used pushState or replaceState
-		$wnd.addEventListener("popstate", function(event) {
-			var stateObj = event.state;
-			if (typeof stateObj !== "undefined" && stateObj !== null
-					&& typeof stateObj.source !== "undefined") {
-				$wnd.location.reload(false);
-			}
-		});
-	}-*/;
-
-  @Override
   public boolean elementSupportsAttribute(Element el, String attribute) {
     return _elementSupportsAttribute(el.getTagName(), attribute);
   }
@@ -613,18 +596,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 
   @Override
-  public void setIsInnerProgrammaticHistoryChange() {
-    _setIsInnerProgrammaticHistoryChange();
-  }
-
-  public static native void _setIsInnerProgrammaticHistoryChange() /*-{
-		// see back-forward-nav-handler.js
-		// We don't want the handler to reload the page if we are programmatically changing the history.
-		// Reload when the user manually clicks the browser back/forward button.
-		$wnd.innerDocClick = true;
-	}-*/;
-
-  @Override
   public void showJiraIssueCollector(
     String issueSummary,
     String issueDescription,
@@ -703,7 +674,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   }
 
   private static final native String _setHash(String hash) /*-{
-      $wnd.history.pushState('', '', hash)
+      // Showing the query in the URL again (e.g. after Back to it) must not add a history entry, which would drop the
+      // Forward history
+      if ($wnd.location.hash !== hash) {
+        $wnd.history.pushState('', '', hash)
+      }
     }-*/;
 
   @Override

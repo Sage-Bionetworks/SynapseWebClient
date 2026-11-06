@@ -369,5 +369,7 @@ public class WikiSubpageNavigationTreeTest {
     tree.setPage(pageId);
     verify(mockReloadWikiPageCallback).invoke(pageKeyCaptor.capture());
     assertEquals(pageId, pageKeyCaptor.getValue().getWikiPageId());
+    // the page is shown for the current URL, so this must not add a history entry
+    verify(mockGlobalApplicationState, never()).pushCurrentPlace(any());
   }
 }
