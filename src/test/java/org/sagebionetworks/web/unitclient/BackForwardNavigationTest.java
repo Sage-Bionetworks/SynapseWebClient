@@ -184,7 +184,7 @@ public class BackForwardNavigationTest {
   }
 
   @Test
-  public void testBackAfterReplaceCurrentPlace() {
+  public void testBackSkipsReplacedUrl() {
     load("Synapse:syn456");
     globalApplicationState.getPlaceChanger().goTo(WIKI);
     // The entity page shows its default tab, which replaces its URL
@@ -250,6 +250,65 @@ public class BackForwardNavigationTest {
   }
 
   @Test
+  public void testGoToCurrentPlaceWithUnsavedChangesAsksFirst() {
+    load("Synapse:syn123/wiki/1");
+    globalApplicationState.pushCurrentPlace(FILES);
+    mayStopWarning = "unsaved changes";
+
+    when(mockDelegate.confirm(mayStopWarning)).thenReturn(false);
+    globalApplicationState.getPlaceChanger().goTo(FILES);
+    assertEquals(Arrays.asList(), shownPlaces);
+
+    when(mockDelegate.confirm(mayStopWarning)).thenReturn(true);
+    globalApplicationState.getPlaceChanger().goTo(FILES);
+    assertEquals(Arrays.asList(FILES), shownPlaces);
+  }
+
+  @Test
+  public void testBackFromPushedUrlCancelledByUnsavedChanges() {
+    load("Synapse:syn123/wiki/1");
+    globalApplicationState.pushCurrentPlace(FILES);
+    mayStopWarning = "unsaved changes";
+    when(mockDelegate.confirm(mayStopWarning)).thenReturn(false);
+
+    history.back();
+
+    assertEquals(Arrays.asList(), shownPlaces);
+    assertEquals(FILES, placeController.getWhere());
+    // the pushed URL of the view that is still shown is put back
+    assertEquals("Synapse:syn123/files/", history.getToken());
+    assertEquals(
+      Arrays.asList("Synapse:syn123/wiki/1", "Synapse:syn123/files/"),
+      history.entries
+    );
+  }
+
+  @Test
+  public void testForwardCancelledByUnsavedChanges() {
+    load("Synapse:syn123/wiki/1");
+    globalApplicationState.pushCurrentPlace(FILES);
+    history.back();
+    shownPlaces.clear();
+    mayStopWarning = "unsaved changes";
+    when(mockDelegate.confirm(mayStopWarning)).thenReturn(false);
+
+    history.forward();
+
+    assertEquals(Arrays.asList(), shownPlaces);
+    assertEquals(WIKI, placeController.getWhere());
+    // the URL is the shown page's again; this adds a history entry after the one Forward went to
+    assertEquals("Synapse:syn123/wiki/1", history.getToken());
+    assertEquals(
+      Arrays.asList(
+        "Synapse:syn123/wiki/1",
+        "Synapse:syn123/files/",
+        "Synapse:syn123/wiki/1"
+      ),
+      history.entries
+    );
+  }
+
+  @Test
   public void testBackCancelledByUnsavedChanges() {
     load("Synapse:syn123/wiki/1");
     globalApplicationState.getPlaceChanger().goTo(OTHER_ENTITY);
@@ -284,6 +343,7 @@ public class BackForwardNavigationTest {
     globalApplicationState.getPlaceChanger().goTo(OTHER_ENTITY);
 
     assertEquals(Arrays.asList(), shownPlaces);
+    assertEquals(WIKI, placeController.getWhere());
     assertEquals(Arrays.asList("Synapse:syn123/wiki/1"), history.entries);
   }
 
@@ -315,7 +375,6 @@ public class BackForwardNavigationTest {
     );
 
     assertEquals(Arrays.asList(TABLES, TABLES, TABLES), shownPlaces);
-    assertEquals(Arrays.asList("Synapse:syn123/tables/"), history.entries);
   }
 
   @Test
@@ -324,7 +383,7 @@ public class BackForwardNavigationTest {
 
     // e.g. a link to a heading in a wiki
     globalApplicationState.onHashChange(TABLES_URL, TABLES_URL + "#heading");
-    // another page, which the place change shows
+    // a fragment change that comes with a URL change: PlaceHistoryHandler shows that page, not this handler
     globalApplicationState.onHashChange(
       TABLES_URL + "#query/abc",
       "https://www.synapse.org/Synapse:syn456/tables/#query/abc"

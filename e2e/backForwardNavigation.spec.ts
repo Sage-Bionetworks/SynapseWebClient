@@ -67,6 +67,13 @@ const expectSubpage = async (page: Page) => {
   await expect(page.getByText(rootWikiText)).not.toBeVisible()
 }
 
+const openProjectWiki = async (page: Page) => {
+  await page.goto(`/Synapse:${userProject.id}/wiki/`)
+  await waitForInitialPageLoad(page)
+  await expectWikiTab(page)
+  await setNoReloadMarker(page)
+}
+
 testAuth.describe('Back/Forward navigation', () => {
   testAuth.beforeAll(async ({ browser, storageStatePaths }) => {
     userProject = await setupProject(browser, 'swc-e2e-user', storageStatePaths)
@@ -116,10 +123,7 @@ testAuth.describe('Back/Forward navigation', () => {
 
   testAuth('entity page tabs and folders', async ({ userPage: page }) => {
     await testAuth.step('open the project wiki', async () => {
-      await page.goto(`/Synapse:${userProject.id}/wiki/`)
-      await waitForInitialPageLoad(page)
-      await expectWikiTab(page)
-      await setNoReloadMarker(page)
+      await openProjectWiki(page)
     })
 
     await testAuth.step('open the Files tab, then a folder', async () => {
@@ -157,10 +161,7 @@ testAuth.describe('Back/Forward navigation', () => {
 
   testAuth('wiki subpages', async ({ userPage: page }) => {
     await testAuth.step('open the project wiki', async () => {
-      await page.goto(`/Synapse:${userProject.id}/wiki/`)
-      await waitForInitialPageLoad(page)
-      await expectWikiTab(page)
-      await setNoReloadMarker(page)
+      await openProjectWiki(page)
     })
 
     await testAuth.step('open the subpage', async () => {

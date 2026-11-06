@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
+import com.google.gwt.place.shared.PlaceChangeRequestEvent;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler.Historian;
 import com.google.gwt.place.shared.PlaceHistoryMapper;
@@ -23,6 +24,7 @@ import com.google.web.bindery.event.shared.EventBus;
  */
 public class SynapsePlaceController extends PlaceController {
 
+  private final EventBus eventBus;
   private final RecordingDelegate delegate;
   private final PlaceHistoryMapper historyMapper;
   private final Historian historian;
@@ -44,10 +46,12 @@ public class SynapsePlaceController extends PlaceController {
     Historian historian
   ) {
     super(eventBus, delegate);
+    this.eventBus = eventBus;
     this.delegate = delegate;
     this.historyMapper = historyMapper;
     this.historian = historian;
-    // Also follows place changes that are not made by goTo, e.g. PlaceChanger showing the current place again
+    // Also follows place changes that are not made by goTo (see showAgain). Registered before any other handler, so
+    // handlers of a place change see the new place.
     eventBus.addHandler(
       PlaceChangeEvent.TYPE,
       event -> where = event.getNewPlace()
@@ -68,6 +72,7 @@ public class SynapsePlaceController extends PlaceController {
 
   @Override
   public void goTo(Place newPlace) {
+    // confirm() sets this when the current page asks the user; reset it so that it tells about this goTo only
     delegate.isDeclined = false;
     super.goTo(newPlace);
     if (delegate.isDeclined) {
@@ -77,6 +82,19 @@ public class SynapsePlaceController extends PlaceController {
       if (!where.equals(urlPlace) && token != null) {
         historian.newItem(token, false);
       }
+    }
+  }
+
+  /**
+   * Shows the current place again, e.g. to reload it, which {@link #goTo(Place)} does not do. As for a place change,
+   * the current page may first ask the user to confirm, e.g. to drop unsaved changes.
+   */
+  public void showAgain(Place place) {
+    PlaceChangeRequestEvent request = new PlaceChangeRequestEvent(place);
+    eventBus.fireEvent(request);
+    String warning = request.getWarning();
+    if (warning == null || delegate.confirm(warning)) {
+      eventBus.fireEvent(new PlaceChangeEvent(place));
     }
   }
 

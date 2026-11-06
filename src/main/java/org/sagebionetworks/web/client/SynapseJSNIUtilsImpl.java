@@ -674,11 +674,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   }
 
   private static final native String _setHash(String hash) /*-{
-      // Showing the query in the URL again (e.g. after Back to it) must not add a history entry, which would drop the
-      // Forward history
-      if ($wnd.location.hash !== hash) {
-        $wnd.history.pushState('', '', hash)
-      }
+      $wnd.history.pushState('', '', hash)
     }-*/;
 
   @Override

@@ -10,8 +10,6 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.place.shared.PlaceChangeEvent;
-import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -215,7 +213,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
                 }
               } else {
                 // We are already on this page but we want to force it to reload.
-                eventBus.fireEvent(new PlaceChangeEvent(place));
+                placeController.showAgain(place);
               }
             }
           }
