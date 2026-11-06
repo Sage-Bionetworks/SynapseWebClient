@@ -1,9 +1,11 @@
 import { Page } from '@playwright/test'
-import {
-  ACCESS_TYPE,
+import type {
   AccessControlList,
   ResourceAccess,
 } from '@sage-bionetworks/synapse-types'
+// The synapse-types barrel (dist/index.js) uses extensionless ESM re-exports that
+// Node can't resolve, so runtime values must be imported from their own module.
+import { ACCESS_TYPE } from '@sage-bionetworks/synapse-types/dist/ACCESS_TYPE.js'
 import { waitForSrcEndpointConfig } from './utils'
 
 // https://rest-docs.synapse.org/rest/GET/entity/id/acl.html
