@@ -18,11 +18,14 @@ import {
   enterTableData,
   enterTableValue,
   expectTableDataCorrect,
+  expectTableDescription,
   expectTableItemNumberCorrect,
   expectTablePageLoaded,
   expectTablesPageLoaded,
   getDefaultQuery,
   getTableEditorRows,
+  getTableEntityId,
+  getTableToolsButton,
   getTablesPath,
   openTableEditor,
   runQuery,
@@ -33,7 +36,6 @@ import {
   dismissAlert,
   getAdminPAT,
   goToDashboardPage,
-  toggleIntoExperimentalMode,
 } from './helpers/testUser'
 import { Project } from './helpers/types'
 
@@ -56,7 +58,7 @@ testAuth.describe('Tables', () => {
       await deleteEntity(tableEntityId, true, getAdminPAT(), page)
       await page.close()
     }
-    if (userProject.id) {
+    if (userProject?.id) {
       await teardownProjectsAndFileHandles(
         browser,
         [userProject],
@@ -135,21 +137,9 @@ testAuth.describe('Tables', () => {
       await expect(userPage.getByText(noTablesText)).toBeVisible()
     })
 
-    // TODO: remove this step after table descriptions are visible outide of experimental mode
-    await testAuth.step(
-      'Toggle into Experimental Mode to use react-based table column schema editor',
-      async () => {
-        await toggleIntoExperimentalMode(userPage)
-        await expectTablesPageLoaded(userPage, userProject.id)
-        await expect(userPage.getByText(noTablesText)).toBeVisible()
-      },
-    )
-
     await testAuth.step('User creates a table', async () => {
       await testAuth.step('open table creation modal', async () => {
-        await userPage
-          .getByRole('button', { name: 'Add Table or View' })
-          .click()
+        await userPage.getByRole('button', { name: 'Table/View' }).click()
 
         const dialog = userPage.getByRole('dialog')
         await expect(dialog).toBeVisible()
@@ -182,18 +172,11 @@ testAuth.describe('Tables', () => {
     await testAuth.step(
       'Table has been created with expected schema',
       async () => {
-        await expectTablePageLoaded(userPage, tableName, tableDescription)
+        await expectTablePageLoaded(userPage, tableName)
+        await expectTableDescription(userPage, tableDescription)
 
-        await testAuth.step('get table entity id', async () => {
-          tableEntityId =
-            (await userPage
-              .getByRole('row')
-              .filter({ hasText: 'SynId' })
-              .getByRole('cell')
-              .nth(1)
-              .textContent()) || undefined
-          expect(tableEntityId).not.toBeUndefined()
-        })
+        tableEntityId = await getTableEntityId(userPage)
+        expect(tableEntityId).not.toBeUndefined()
 
         await testAuth.step('table is currently empty', async () => {
           await expect(
@@ -251,7 +234,7 @@ testAuth.describe('Tables', () => {
 
       await saveTableDataChanges(userPage)
 
-      await expectTablePageLoaded(userPage, tableName, tableDescription)
+      await expectTablePageLoaded(userPage, tableName)
 
       await expectTableItemNumberCorrect(userPage, initialTableData)
       await expectTableDataCorrect(
@@ -302,7 +285,7 @@ testAuth.describe('Tables', () => {
           'You made changes to the columns in this Table',
         )
 
-        await expectTablePageLoaded(userPage, tableName, tableDescription)
+        await expectTablePageLoaded(userPage, tableName)
       })
 
       await expectTableSchemaCorrect(userPage, updatedColumnsSchemaConfig)
@@ -404,7 +387,7 @@ testAuth.describe('Tables', () => {
       })
 
       await saveTableDataChanges(userPage)
-      await expectTablePageLoaded(userPage, tableName, tableDescription)
+      await expectTablePageLoaded(userPage, tableName)
 
       await testAuth.step('updated data is displayed', async () => {
         updatedTableData[rowIndex][columnName] = newValue
@@ -419,7 +402,7 @@ testAuth.describe('Tables', () => {
 
     await testAuth.step('User deletes the table', async () => {
       await testAuth.step('delete table', async () => {
-        await userPage.getByRole('button', { name: 'Table Tools' }).click()
+        await getTableToolsButton(userPage).click()
         await userPage.getByRole('menuitem', { name: 'Delete Table' }).click()
       })
 

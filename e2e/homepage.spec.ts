@@ -9,7 +9,9 @@ test.describe('Homepage - Unauthenticated', () => {
     await page.goto('/')
     await waitForInitialPageLoad(page)
 
-    await expect(page.getByRole('button', { name: 'Login' })).toHaveCount(1)
+    await expect(
+      page.getByRole('button', { name: 'Login', exact: true }),
+    ).toHaveCount(1)
     await expect(
       page.getByRole('button', { name: 'View Dashboard' }),
     ).toHaveCount(0)
@@ -23,9 +25,9 @@ testAuth.describe('Homepage - Authenticated', () => {
       await userPage.goto('/Home:x')
       await waitForInitialPageLoad(userPage)
 
-      await expect(userPage.getByRole('button', { name: 'Login' })).toHaveCount(
-        0,
-      )
+      await expect(
+        userPage.getByRole('button', { name: 'Login', exact: true }),
+      ).toHaveCount(0)
       await expect(
         userPage.getByRole('button', { name: 'View Dashboard' }),
       ).toHaveCount(1)

@@ -6,7 +6,7 @@ import {
   cleanupTestUser,
   createTestUser,
   getAdminPAT,
-  getUserIdFromLocalStorage,
+  getUserIdFromAccessTokenCookie,
   loginTestUser,
 } from '../helpers/testUser'
 import {
@@ -135,9 +135,9 @@ export const testAuth = base.extend<
         await base.step(`authenticate: ${user.username}`, async () => {
           await loginTestUser(userPage, user.username, user.password)
 
-          // ensure that session_marker, i.e. user id, is set before saving state
+          // ensure that the access token cookie (which identifies the user) is set before saving state
           await expect(async () => {
-            await getUserIdFromLocalStorage(userPage)
+            await getUserIdFromAccessTokenCookie(userPage)
           }).toPass()
         })
 

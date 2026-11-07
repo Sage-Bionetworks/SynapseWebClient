@@ -1,5 +1,5 @@
 import { Browser } from '@playwright/test'
-import { ACCESS_TYPE } from '@sage-bionetworks/synapse-types'
+import { ACCESS_TYPE } from '@sage-bionetworks/synapse-types/dist/ACCESS_TYPE.js'
 import { StorageStatePaths } from '../fixtures/authenticatedUserPages'
 import { addUserToEntityACL } from './acl'
 import {
@@ -11,7 +11,7 @@ import {
 import {
   getAccessTokenFromCookie,
   getAdminPAT,
-  getUserIdFromLocalStorage,
+  getUserIdFromAccessTokenCookie,
 } from './testUser'
 import { Project } from './types'
 import { UserPrefix } from './userConfig'
@@ -47,7 +47,7 @@ export const setupProjectWithPermissions = async (
     storageState: storageStatePaths[projectAccessor],
   })
   const page = await context.newPage()
-  const userId = await getUserIdFromLocalStorage(page)
+  const userId = await getUserIdFromAccessTokenCookie(page)
   await addUserToEntityACL(
     page,
     project.id,
@@ -74,10 +74,14 @@ export const teardownProjectsAndFileHandles = async (
     await deleteProject(project.id, accessToken, page)
   }
 
-  // delete fileHandles
-  for (const fileHandleId of fileHandleIds) {
-    await deleteFileHandleWithRetry(accessToken, fileHandleId, page)
-  }
+  // delete fileHandles concurrently: each retries for up to 2 minutes while the
+  // deleted entities are purged, so deleting them one at a time can exceed the
+  // hook timeout when there are several
+  await Promise.all(
+    fileHandleIds.map(fileHandleId =>
+      deleteFileHandleWithRetry(accessToken, fileHandleId, page),
+    ),
+  )
 
   await context.close()
 }
