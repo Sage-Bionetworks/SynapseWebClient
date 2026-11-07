@@ -20,6 +20,7 @@ import {
   userPrefix,
   userValidatedPrefix,
 } from './helpers/userConfig'
+import { dismissHoverCards } from './helpers/utils'
 
 const expectMyTeamsPageLoaded = async (page: Page) => {
   await expect(page.getByRole('heading', { name: 'Your Teams' })).toBeVisible()
@@ -107,8 +108,7 @@ testAuth.describe('Teams', () => {
           const inviteMessageBox = userPage.getByLabel('Invitation Message')
           // The mouse rests on the selected user's link, which opens a profile
           // hover card; move it away so the card doesn't interfere with the input.
-          await userPage.mouse.move(0, 0)
-          await expect(userPage.locator('.MuiPopover-root')).toHaveCount(0)
+          await dismissHoverCards(userPage)
           // The message box can be reset while the invite widget initializes, so
           // retry until the value sticks.
           await expect(async () => {
@@ -189,6 +189,8 @@ testAuth.describe('Teams', () => {
         await teamLink.click()
 
         await expectTeamPageLoaded(validatedUserPage, TEAM_NAME)
+        // the cursor is left where the team link was, which may now be a user badge
+        await dismissHoverCards(validatedUserPage)
 
         await responsePromise
         await expect(

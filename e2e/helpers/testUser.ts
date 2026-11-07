@@ -5,7 +5,7 @@ import { testAuth } from '../fixtures/authenticatedUserPages'
 import { entityUrlPathname } from './entities'
 import { BackendDestinationEnum, doDelete, doPost } from './http'
 import { JwtPayload, TestUser } from './types'
-import { waitForInitialPageLoad } from './utils'
+import { dismissHoverCards, waitForInitialPageLoad } from './utils'
 import { deleteVerificationSubmissionIfExists } from './verification'
 
 const BASE64_ENCODING = 'base64'
@@ -265,6 +265,9 @@ export const expectDiscussionThreadLoaded = async (
     await page.waitForURL(
       `${entityUrlPathname(projectId)}/discussion/threadId=${threadId}`,
     )
+    // the thread is usually opened by clicking its title, so the cursor may rest
+    // on the author's badge on the thread page
+    await dismissHoverCards(page)
     await expect(
       page.getByRole('heading', { name: 'Discussion' }),
     ).toBeVisible()

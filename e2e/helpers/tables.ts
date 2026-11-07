@@ -7,6 +7,7 @@ import {
 import { defaultExpectTimeout } from '../../playwright.config'
 import { selectDateUsingGoogUiDatePicker } from './dates'
 import { entityUrlPathname } from './entities'
+import { dismissHoverCards } from './utils'
 import type { ColumnSchemaConfig } from './tableColumnSchemaEditor'
 
 // Types -----------------------------------------------------------------------
@@ -237,15 +238,6 @@ export const saveTableDataChanges = async (page: Page) => {
 // Validate table data ---------------------------------------------------------
 const getTableRows = (page: Page) => {
   return page.getByTestId('SynapseTable').getByRole('row')
-}
-
-// After clicking e.g. the table editor's Save button, the cursor may rest on a
-// user badge (e.g. "Created By" in the entity sidebar). In Firefox/WebKit this opens
-// the badge's hover card, an MUI Popover that aria-hides the rest of the page,
-// so role-based table locators find nothing. Move the cursor off any badge first.
-const dismissHoverCards = async (page: Page) => {
-  await page.mouse.move(0, 0)
-  await expect(page.locator('.MuiPopover-root')).toHaveCount(0)
 }
 
 // header rows may be rendered with <th> (columnheader) or <td> (cell) elements

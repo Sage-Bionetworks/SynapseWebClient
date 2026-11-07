@@ -29,3 +29,12 @@ export async function navigateToHomepageIfPageHasNotBeenLoaded(page: Page) {
     await waitForInitialPageLoad(page)
   }
 }
+
+// The cursor may come to rest on a user badge after a click (e.g. after navigating,
+// the badge renders where the clicked element was). This opens the badge's hover
+// card, an MUI Popover that aria-hides the rest of the page, so role-based locators
+// find nothing. Move the cursor off any badge and wait for the card to close.
+export async function dismissHoverCards(page: Page) {
+  await page.mouse.move(0, 0)
+  await expect(page.locator('.MuiPopover-root')).toHaveCount(0)
+}
