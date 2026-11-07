@@ -7,7 +7,7 @@ import {
 import { defaultExpectTimeout } from '../../playwright.config'
 import { selectDateUsingGoogUiDatePicker } from './dates'
 import { entityUrlPathname } from './entities'
-import { ColumnSchemaConfig } from './tableColumnSchemaEditor'
+import type { ColumnSchemaConfig } from './tableColumnSchemaEditor'
 
 // Types -----------------------------------------------------------------------
 export type TableDataConfig = Record<string, string | number | string[]>
@@ -22,34 +22,61 @@ export const expectTablesPageLoaded = async (page: Page, projectId: string) => {
     await page.waitForURL(getTablesPath(projectId))
     await expect(page.getByRole('heading', { name: 'Tables' })).toBeVisible()
     await expect(
-      page.getByRole('button', { name: 'Upload a Table' }),
+      page.getByRole('button', { name: 'Upload Table' }),
     ).toBeVisible()
-    await expect(
-      page.getByRole('button', { name: 'Add Table Or View' }),
-    ).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Table/View' })).toBeVisible()
   })
 }
 
-export const expectTablePageLoaded = async (
-  page: Page,
-  tableName: string,
-  tableDescription: string,
-) => {
+export const getTableToolsButton = (page: Page) => {
+  return page.getByRole('button', { name: 'Tools', exact: true })
+}
+
+export const expectTablePageLoaded = async (page: Page, tableName: string) => {
   await test.step('table has loaded', async () => {
-    await expect(page.getByRole('button', { name: 'Table Tools' })).toBeVisible(
-      { timeout: defaultExpectTimeout * 2 },
-    )
+    await expect(getTableToolsButton(page)).toBeVisible({
+      timeout: defaultExpectTimeout * 2,
+    })
     await expect(page.getByRole('heading', { name: tableName })).toBeVisible()
-    await expect(
-      page
-        .locator('div')
-        .filter({ hasText: new RegExp(`^${tableDescription}$`, 'i') }),
-    ).toBeVisible()
 
     await expect(page.getByText('Loading provenance...')).not.toBeVisible()
     await expect(
       page.getByRole('progressbar').locator('visible=true'),
     ).toHaveCount(0, { timeout: defaultExpectTimeout * 2 })
+  })
+}
+
+// The table description is not displayed on the table page,
+// ...so confirm it via the "Edit Name and Description" dialog
+export const expectTableDescription = async (
+  page: Page,
+  tableDescription: string,
+) => {
+  await test.step('table has expected description', async () => {
+    await getTableToolsButton(page).click()
+    await page
+      .getByRole('menuitem', { name: 'Edit Name and Description' })
+      .click()
+
+    // GWT modal: no dialog role, and inputs are not associated with their labels
+    const dialog = page
+      .locator('.modal-content')
+      .filter({ has: page.getByRole('heading', { name: 'Rename Table' }) })
+    await expect(dialog).toBeVisible()
+    await expect(dialog.locator('textarea')).toHaveValue(tableDescription)
+    await dialog.getByRole('button', { name: 'Cancel' }).click()
+    await expect(dialog).not.toBeVisible()
+  })
+}
+
+export const getTableEntityId = async (page: Page) => {
+  return await test.step('get table entity id', async () => {
+    const synIdValue = page
+      .getByText('SynID', { exact: true })
+      .locator('xpath=..')
+      .getByText(/^syn\d+$/)
+    await expect(synIdValue).toBeVisible()
+    return (await synIdValue.textContent()) || undefined
   })
 }
 
@@ -62,9 +89,7 @@ const getTableEditorHeader = (page: Page) => {
 
 export const openTableEditor = async (page: Page) => {
   return await test.step('open table editor', async () => {
-    await page
-      .getByRole('button', { name: 'Bulk Edit Table Cell Values' })
-      .click()
+    await page.getByRole('button', { name: 'Edit Table' }).click()
     await expect(getTableEditorHeader(page)).toBeVisible()
   })
 }
@@ -214,13 +239,27 @@ const getTableRows = (page: Page) => {
   return page.getByTestId('SynapseTable').getByRole('row')
 }
 
+// After clicking e.g. the table editor's Save button, the cursor may rest on a
+// user badge (e.g. "Created By" in the entity sidebar). In Firefox/WebKit this opens
+// the badge's hover card, an MUI Popover that aria-hides the rest of the page,
+// so role-based table locators find nothing. Move the cursor off any badge first.
+const dismissHoverCards = async (page: Page) => {
+  await page.mouse.move(0, 0)
+  await expect(page.locator('.MuiPopover-root')).toHaveCount(0)
+}
+
+// header rows may be rendered with <th> (columnheader) or <td> (cell) elements
+export const getHeaderCells = (headerRow: Locator) => {
+  return headerRow.getByRole('columnheader').or(headerRow.getByRole('cell'))
+}
+
 export const expectTableColumnHeaders = async (
   tableRows: Locator,
   columnsSchemaConfig: ColumnSchemaConfig[],
   columnIndexOffset: number,
 ) => {
   await test.step('confirm headers match config', async () => {
-    const headerCells = tableRows.first().getByRole('cell')
+    const headerCells = getHeaderCells(tableRows.first())
     for (
       let columnIndex = 0;
       columnIndex < columnsSchemaConfig.length;
@@ -245,9 +284,7 @@ const expectTableRowCorrect = async (
       colIndex < Object.keys(tableData).length;
       colIndex++
     ) {
-      const columnName = await tableRows
-        .first()
-        .getByRole('cell')
+      const columnName = await getHeaderCells(tableRows.first())
         .nth(colIndex)
         .textContent()
       await test.step(`confirm ${columnName}`, async () => {
@@ -311,6 +348,7 @@ export const expectTableDataCorrect = async (
   tableData: TableDataConfig[],
 ) => {
   await test.step('confirm table data', async () => {
+    await dismissHoverCards(page)
     const tableRows = getTableRows(page)
     await expectTableColumnHeaders(tableRows, columnsSchemaConfig, 0)
 
@@ -396,9 +434,10 @@ export const confirmTableDataDimensions = async (
   nCols: number,
 ) => {
   await test.step('confirm table dimensions', async () => {
+    await dismissHoverCards(page)
     const tableRows = getTableRows(page)
     await expect(
-      tableRows.first().getByRole('cell'),
+      getHeaderCells(tableRows.first()),
       `should have ${nCols} column(s)`,
     ).toHaveCount(nCols)
     await expect(

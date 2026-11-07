@@ -51,6 +51,12 @@ testAuth.describe('Projects', () => {
         await expect(
           userPage.getByText('Create a new Project', { exact: true }),
         ).not.toBeVisible()
+        // The error is a page-level alert that persists until dismissed. It's only
+        // exposed to the accessibility tree once the modal is closed.
+        await dismissAlert(
+          userPage,
+          `An entity with the name: ${PROJECT_NAME} already exists`,
+        )
       },
     )
 

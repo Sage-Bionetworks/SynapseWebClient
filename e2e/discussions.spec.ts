@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test'
+import { Locator, Page, expect } from '@playwright/test'
 import { defaultExpectTimeout } from '../playwright.config'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import {
@@ -16,21 +16,14 @@ import {
 import { Project } from './helpers/types'
 import { UserPrefix, userConfigs } from './helpers/userConfig'
 
-// FIXME: Discussion action icons are not buttons and don't have accessible
-// names, so can't be selected by role + name or by label -- select by
-// classname to differentiate between the icons
-const discussionActionIconClasses = {
-  PIN: '.fa-thumb-tack.imageButton',
-  EDIT: '.fa-pencil.imageButton',
-  DELETE: '.syn-trash-o.imageButton',
-  TOGGLE_FOLLOW: '.fa-eye.imageButton',
-  LINK: '.fa-link.imageButton',
-}
-const discussionThreadSelector = '.discussionThread:visible'
-const discussionReplySelector = '.discussionReply:visible'
+const discussionThreadSelector = '.DiscussionThread:visible'
+const discussionReplySelector = '.reply-container:visible'
 
-const getThreadTextbox = (page: Page) => {
-  return page.locator('.markdownEditor').getByRole('textbox')
+// Reply editors use the React markdown editor
+const getReplyTextbox = (container: Page | Locator) => {
+  return container
+    .locator('.MarkdownEditor')
+    .getByRole('textbox', { name: 'markdown' })
 }
 
 const expectThreadTableLoaded = async (
@@ -61,6 +54,12 @@ const expectThreadTableLoaded = async (
   })
 }
 
+// The thread title in the forum table is a MUI Link without an href (it
+// navigates via onClick), so it does not have the link role
+const getThreadTableTitleLink = (page: Page, threadTitle: string) => {
+  return page.getByRole('cell').getByText(threadTitle, { exact: true })
+}
+
 const expectThreadReplyVisible = async (
   page: Page,
   threadReply: string,
@@ -79,18 +78,15 @@ const expectThreadReplyVisible = async (
   })
 }
 
-const getDiscussionParentActionButtons = (page: Page, threadTitle: string) => {
-  const parentPost = page
-    .locator(discussionThreadSelector)
-    .getByRole('article')
-    .filter({ hasText: threadTitle })
+const getDiscussionParentActionButtons = (page: Page) => {
+  const parentPost = page.locator(discussionThreadSelector)
   return {
-    PIN: parentPost.locator(discussionActionIconClasses.PIN),
-    EDIT: parentPost.locator(discussionActionIconClasses.EDIT),
-    DELETE: parentPost.locator(discussionActionIconClasses.DELETE),
-    TOGGLE_FOLLOW: parentPost.locator(
-      discussionActionIconClasses.TOGGLE_FOLLOW,
-    ),
+    PIN: parentPost.getByRole('button', { name: /^(Pin|Unpin) thread$/ }),
+    EDIT: parentPost.getByRole('button', { name: 'Edit thread' }),
+    DELETE: parentPost.getByRole('button', { name: 'Delete thread' }),
+    TOGGLE_FOLLOW: parentPost.getByRole('button', {
+      name: /^(Follow|Unfollow) thread$/,
+    }),
   }
 }
 
@@ -99,9 +95,9 @@ const getDiscussionReplyActionButtons = (page: Page, threadReply: string) => {
     .locator(discussionReplySelector)
     .filter({ hasText: threadReply })
   return {
-    EDIT: replyPost.locator(discussionActionIconClasses.EDIT),
-    LINK: replyPost.locator(discussionActionIconClasses.LINK),
-    DELETE: replyPost.locator(discussionActionIconClasses.DELETE),
+    EDIT: replyPost.getByRole('button', { name: 'Edit reply' }),
+    LINK: replyPost.getByRole('button', { name: 'Copy link to this reply' }),
+    DELETE: replyPost.getByRole('button', { name: 'Delete reply' }),
   }
 }
 
@@ -161,7 +157,10 @@ testAuth.describe('Discussions', () => {
           await threadTitleInput.fill(threadTitle)
           await expect(threadTitleInput).toHaveValue(threadTitle)
 
-          const threadTextbox = getThreadTextbox(userPage)
+          // New thread modal uses the GWT markdown editor
+          const threadTextbox = userPage
+            .locator('.markdownEditor')
+            .getByRole('textbox')
           await threadTextbox.fill(threadBody)
           await expect(threadTextbox).toHaveValue(threadBody)
         })
@@ -183,15 +182,16 @@ testAuth.describe('Discussions', () => {
       const threadId = await testAuth.step(
         'First user can view thread',
         async () => {
-          const threadLink = userPage.getByRole('link', { name: threadTitle })
+          const threadLink = getThreadTableTitleLink(userPage, threadTitle)
 
-          const threadId = await testAuth.step('Get threadId', async () => {
-            const threadLinkHref = await threadLink.getAttribute('href')
-            return Number(threadLinkHref?.replace(/.*threadId=/, ''))
-          })
-
-          await testAuth.step('Go to thread', async () => {
+          const threadId = await testAuth.step('Go to thread', async () => {
             await threadLink.click()
+
+            const threadId = await testAuth.step('Get threadId', async () => {
+              await userPage.waitForURL(/\/discussion\/threadId=\d+$/)
+              return Number(userPage.url().replace(/.*threadId=/, ''))
+            })
+
             await expectDiscussionThreadLoaded(
               userPage,
               threadId,
@@ -199,6 +199,7 @@ testAuth.describe('Discussions', () => {
               threadBody,
               userProject.id,
             )
+            return threadId
           })
 
           await testAuth.step('Check thread info', async () => {
@@ -252,7 +253,7 @@ testAuth.describe('Discussions', () => {
         )
         await expectDiscussionPageLoaded(validatedUserPage, userProject.id)
         await expectThreadTableLoaded(
-          userPage,
+          validatedUserPage,
           threadTitle,
           userConfigs['swc-e2e-user'].username,
           '0',
@@ -261,7 +262,7 @@ testAuth.describe('Discussions', () => {
       })
 
       await testAuth.step('Second user can view thread', async () => {
-        await validatedUserPage.getByRole('link', { name: threadTitle }).click()
+        await getThreadTableTitleLink(validatedUserPage, threadTitle).click()
         await expectDiscussionThreadLoaded(
           validatedUserPage,
           threadId,
@@ -295,16 +296,12 @@ testAuth.describe('Discussions', () => {
             await expect(replyInput).toHaveCount(1)
 
             await replyInput.click()
-            const threadTextbox = getThreadTextbox(validatedUserPage)
-            await threadTextbox.fill(threadReply)
-            await expect(threadTextbox).toHaveValue(threadReply)
-            await validatedUserPage
+            const replyTextbox = getReplyTextbox(discussionThread)
+            await replyTextbox.fill(threadReply)
+            await expect(replyTextbox).toHaveValue(threadReply)
+            await discussionThread
               .getByRole('button', { name: 'Post', exact: true })
               .click()
-          })
-
-          await testAuth.step('Dismiss alert', async () => {
-            await dismissAlert(validatedUserPage, 'A reply has been created.')
           })
 
           await testAuth.step(
@@ -326,10 +323,8 @@ testAuth.describe('Discussions', () => {
           await testAuth.step(
             'Confirm second user has expected actions available on thread title',
             async () => {
-              const parentPostActions = getDiscussionParentActionButtons(
-                validatedUserPage,
-                threadTitle,
-              )
+              const parentPostActions =
+                getDiscussionParentActionButtons(validatedUserPage)
               await expect(parentPostActions.PIN).not.toBeVisible()
               await expect(parentPostActions.EDIT).not.toBeVisible()
               await expect(parentPostActions.DELETE).not.toBeVisible()
@@ -358,7 +353,7 @@ testAuth.describe('Discussions', () => {
         'First user views the reply',
         async () => {
           await testAuth.step('Go to discussion thread', async () => {
-            await userPage.getByRole('link', { name: threadTitle }).click()
+            await getThreadTableTitleLink(userPage, threadTitle).click()
             await expectDiscussionThreadLoaded(
               userPage,
               threadId,
@@ -377,10 +372,8 @@ testAuth.describe('Discussions', () => {
           await testAuth.step(
             'Confirm first user has expected actions available on thread title',
             async () => {
-              const parentPostActions = getDiscussionParentActionButtons(
-                userPage,
-                threadTitle,
-              )
+              const parentPostActions =
+                getDiscussionParentActionButtons(userPage)
               await expect(parentPostActions.PIN).toBeVisible()
               await expect(parentPostActions.EDIT).toBeVisible()
               await expect(parentPostActions.DELETE).toBeVisible()
@@ -409,19 +402,18 @@ testAuth.describe('Discussions', () => {
       await testAuth.step('Second user edits the reply', async () => {
         await testAuth.step('Edit reply', async () => {
           await secondUserReplyPostActions.EDIT.click()
-          const threadTextbox = getThreadTextbox(validatedUserPage)
-          await threadTextbox.clear()
-          await threadTextbox.fill(threadReplyEdited)
-          await expect(threadTextbox).toHaveValue(threadReplyEdited)
-          await validatedUserPage.getByRole('button', { name: 'Save' }).click()
-        })
-
-        await testAuth.step('Dismiss alert', async () => {
-          // handle case where alert has auto-closed before the test gets to this step
-          const alertText = 'A reply has been edited.'
-          if (await validatedUserPage.getByText(alertText).isVisible()) {
-            await dismissAlert(validatedUserPage, alertText)
-          }
+          const editReplyDialog = validatedUserPage
+            .getByRole('dialog')
+            .filter({ hasText: 'Edit Reply' })
+          const replyTextbox = getReplyTextbox(editReplyDialog)
+          await expect(replyTextbox).toHaveValue(threadReply)
+          await replyTextbox.clear()
+          await replyTextbox.fill(threadReplyEdited)
+          await expect(replyTextbox).toHaveValue(threadReplyEdited)
+          await editReplyDialog
+            .getByRole('button', { name: 'Post', exact: true })
+            .click()
+          await expect(editReplyDialog).not.toBeVisible()
         })
 
         await expectThreadReplyVisible(
@@ -436,7 +428,7 @@ testAuth.describe('Discussions', () => {
             await expect(
               validatedUserPage
                 .locator(discussionReplySelector)
-                .locator(':right-of(:text("posted")):text("Edited")'),
+                .getByText(/^posted \S+ \(Edited\)$/),
             ).toBeVisible()
           },
         )
@@ -445,10 +437,17 @@ testAuth.describe('Discussions', () => {
       await testAuth.step('First user deletes the reply', async () => {
         await testAuth.step('Delete the reply', async () => {
           await firstUserReplyPostActions.DELETE.click()
+          const confirmDialog = userPage
+            .getByRole('dialog')
+            .filter({ hasText: 'Confirm Deletion' })
           await expect(
-            userPage.getByRole('heading', { name: 'Confirm Deletion' }),
+            confirmDialog.getByText(
+              'Are you sure you want to delete this reply?',
+            ),
           ).toBeVisible()
-          await userPage.getByRole('button', { name: 'Delete' }).click()
+          await confirmDialog
+            .getByRole('button', { name: 'Delete', exact: true })
+            .click()
           await dismissAlert(userPage, 'A reply has been deleted.')
         })
 
@@ -461,26 +460,46 @@ testAuth.describe('Discussions', () => {
 
       await testAuth.step('First user deletes the thread', async () => {
         await testAuth.step('Delete thread', async () => {
-          await userPage
-            .getByRole('button', { name: 'Discussion Tools' })
-            .click()
-          await userPage
-            .getByRole('menuitem', { name: 'Delete Thread' })
-            .click()
+          await getDiscussionParentActionButtons(userPage).DELETE.click()
+          const confirmDialog = userPage
+            .getByRole('dialog')
+            .filter({ hasText: 'Confirm Deletion' })
           await expect(
-            userPage.getByRole('heading', { name: 'Confirm Deletion' }),
+            confirmDialog.getByText(
+              'Are you sure you want to delete this thread?',
+            ),
           ).toBeVisible()
-          await expect(
-            userPage.getByText('Are you sure you want to delete this thread?'),
-          ).toBeVisible()
-          await userPage.getByRole('button', { name: 'Delete' }).click()
+          await confirmDialog
+            .getByRole('button', { name: 'Delete', exact: true })
+            .click()
         })
 
         await testAuth.step('Dismiss alert', async () => {
           await dismissAlert(userPage, 'A thread has been deleted.')
         })
 
-        await expectDiscussionPageLoaded(userPage, userProject.id)
+        await testAuth.step(
+          'Thread is shown as deleted and can be restored',
+          async () => {
+            const discussionThread = userPage.locator(discussionThreadSelector)
+            await expect(
+              discussionThread.getByRole('button', {
+                name: 'Restore deleted thread',
+              }),
+            ).toBeVisible()
+            await expect(
+              getDiscussionParentActionButtons(userPage).DELETE,
+            ).not.toBeVisible()
+          },
+        )
+
+        await testAuth.step('Go back to all threads', async () => {
+          // deleting a thread no longer redirects to the thread list
+          await userPage
+            .getByRole('button', { name: /show all threads/i })
+            .click()
+          await expectDiscussionPageLoaded(userPage, userProject.id)
+        })
 
         await testAuth.step('Confirm thread not visible', async () => {
           await expect(userPage.getByText(threadTitle)).not.toBeVisible()

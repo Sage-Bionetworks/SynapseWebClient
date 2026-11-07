@@ -4,7 +4,6 @@ import { defaultExpectTimeout } from '../../playwright.config'
 import { testAuth } from '../fixtures/authenticatedUserPages'
 import { entityUrlPathname } from './entities'
 import { BackendDestinationEnum, doDelete, doPost } from './http'
-import { getLocalStorage } from './localStorage'
 import { JwtPayload, TestUser } from './types'
 import { waitForInitialPageLoad } from './utils'
 import { deleteVerificationSubmissionIfExists } from './verification'
@@ -100,9 +99,18 @@ export async function loginTestUser(
 
   // Login
   await page.getByRole('button', { name: 'Login' }).first().click()
-  await page.getByRole('button', { name: 'Sign in with your email' }).click()
-
+  const emailSignInButton = page.getByRole('button', {
+    name: 'Sign in with your email',
+  })
   const usernameInput = page.getByLabel('Username or Email Address')
+  // The account site may not have hydrated when the button first renders, in which
+  // case the click is dropped -- retry until the email sign-in form appears.
+  await expect(async () => {
+    if (await emailSignInButton.isVisible()) {
+      await emailSignInButton.click()
+    }
+    await expect(usernameInput).toBeVisible({ timeout: 5000 })
+  }).toPass({ timeout: defaultExpectTimeout * 3 })
   await usernameInput.fill(testUserName)
   await expect(usernameInput).toHaveValue(testUserName)
 
@@ -180,14 +188,33 @@ export async function getAccessTokenFromCookie(page: Page) {
   return cookie!.value
 }
 
-export async function getUserIdFromLocalStorage(page: Page) {
-  const id = await getLocalStorage(page, 'SESSION_MARKER')
-  expect(id).not.toBeNull()
-  return id!
+export async function getUserIdFromAccessTokenCookie(page: Page) {
+  return getUserIdFromJwt(await getAccessTokenFromCookie(page))
 }
 
 export async function acceptSiteCookies(page: Page) {
-  await page.getByRole('button', { name: 'ALLOW ALL' }).click()
+  const cookieBanner = page.getByText('Our site uses cookies.')
+  const allowAllButton = page.getByRole('button', { name: 'ALLOW ALL' })
+  await expect(allowAllButton.first()).toBeVisible()
+  // The banner can be (re)mounted while the page initializes, so a click may land
+  // on an instance that is discarded and the banner remains. Retry until it is gone.
+  await expect(async () => {
+    if (await allowAllButton.first().isVisible()) {
+      await allowAllButton.first().click({ timeout: 5_000 })
+    }
+    await expect(cookieBanner).toHaveCount(0, { timeout: 5_000 })
+  }).toPass({ timeout: defaultExpectTimeout })
+  // ensure the consent cookie was actually stored, so it is persisted in storageState
+  await expect(async () => {
+    const cookies = await page.context().cookies()
+    expect(
+      cookies.find(
+        cookie =>
+          cookie.name ===
+          'org.sagebionetworks.security.cookies.portal.preference',
+      ),
+    ).not.toBeUndefined()
+  }).toPass()
 }
 
 export const dismissAlert = async (page: Page, alertText: string) => {
@@ -216,8 +243,10 @@ export const expectDiscussionPageLoaded = async (
     await expect(page.getByRole('button', { name: 'New Thread' })).toBeVisible({
       timeout: expectTimeout,
     })
+    // The discussion action menu is labeled "Tools" (exact, to exclude the
+    // entity-level "Project Tools" menu)
     await expect(
-      page.getByRole('button', { name: 'Discussion Tools' }),
+      page.getByRole('button', { name: 'Tools', exact: true }),
     ).toBeVisible({ timeout: expectTimeout })
     await expect(page.getByPlaceholder('Search discussions')).toBeVisible({
       timeout: expectTimeout,
@@ -243,29 +272,19 @@ export const expectDiscussionThreadLoaded = async (
     await expect(
       page.getByRole('button', { name: /show all threads/i }),
     ).toBeVisible({ timeout: defaultExpectTimeout * 3 }) // extra time for thread response to return
-    await expect(
-      page.getByRole('button', { name: 'Date Posted' }),
-    ).toBeVisible()
-    await expect(
-      page.getByRole('button', { name: 'Most Recent' }),
-    ).toBeVisible()
 
-    const discussionThread = page.locator('.discussionThread:visible')
-    await expect(discussionThread.getByText(threadTitle)).toBeVisible()
+    // The thread (incl. its reply sort controls) is rendered by the React
+    // DiscussionThread component
+    const discussionThread = page.locator('.DiscussionThread:visible')
+    await expect(
+      discussionThread.getByRole('button', { name: 'Date Posted' }),
+    ).toBeVisible()
+    await expect(
+      discussionThread.getByRole('button', { name: 'Most Recent' }),
+    ).toBeVisible()
+    await expect(
+      discussionThread.getByRole('heading', { name: threadTitle }),
+    ).toBeVisible()
     await expect(discussionThread.getByText(threadBody)).toBeVisible()
-  })
-}
-
-export const toggleIntoExperimentalMode = async (page: Page) => {
-  await test.step('toggle into experimental mode', async () => {
-    const experimentalModeLabel = page.getByText('Experimental Mode')
-    const experimentalModeInput = page.getByLabel('Experimental Mode')
-
-    await expect(experimentalModeInput).not.toBeChecked()
-
-    // Because the input element is not visible, we need to click the label
-    await experimentalModeLabel.click()
-
-    await expect(experimentalModeInput).toBeChecked()
   })
 }

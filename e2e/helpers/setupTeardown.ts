@@ -11,7 +11,7 @@ import {
 import {
   getAccessTokenFromCookie,
   getAdminPAT,
-  getUserIdFromLocalStorage,
+  getUserIdFromAccessTokenCookie,
 } from './testUser'
 import { Project } from './types'
 import { UserPrefix } from './userConfig'
@@ -47,7 +47,7 @@ export const setupProjectWithPermissions = async (
     storageState: storageStatePaths[projectAccessor],
   })
   const page = await context.newPage()
-  const userId = await getUserIdFromLocalStorage(page)
+  const userId = await getUserIdFromAccessTokenCookie(page)
   await addUserToEntityACL(
     page,
     project.id,

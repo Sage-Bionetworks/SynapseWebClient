@@ -2,7 +2,6 @@ import { Page, expect } from '@playwright/test'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import { entityUrlPathname } from './helpers/entities'
 import {
-  expectDiscussionPageLoaded,
   goToDashboard,
   goToDashboardPage,
   reloadDashboardPage,
@@ -33,8 +32,11 @@ async function expectProjectPageLoaded(
   projectName: string,
   projectId: string,
 ) {
+  // the default tab depends on the project's content, so only check the project itself
+  await page.waitForURL(url =>
+    url.pathname.startsWith(entityUrlPathname(projectId)),
+  )
   await expect(page.getByRole('heading', { name: projectName })).toBeVisible()
-  await expectDiscussionPageLoaded(page, projectId)
 }
 
 function getFavoriteStarSpiner(page: Page) {
