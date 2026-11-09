@@ -183,7 +183,8 @@ public class HtmlInjectionFilterTest {
       "}"
     );
     filter.init(pageTitleTemplate, mockCrawlFilter);
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapseClient);
+    when(mockSynapseProvider.createNewClient(any()))
+      .thenReturn(mockSynapseClient);
     filter.setSynapseProvider(mockSynapseProvider);
     when(mockRequest.getHeader(HOST_HEADER))
       .thenReturn("www" + SYNAPSE_ORG_SUFFIX);
@@ -386,6 +387,16 @@ public class HtmlInjectionFilterTest {
     assertTrue(outputString.contains(FIRST_NAME));
     assertTrue(outputString.contains(LAST_NAME));
     assertTrue(outputString.contains(SUMMARY));
+  }
+
+  @Test
+  public void testUsesSynapseClientForRequestHost()
+    throws ServletException, IOException {
+    setRequestURL("https://dev.synapse.org/Profile:1234");
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockSynapseProvider).createNewClient("dev.synapse.org");
   }
 
   @Test

@@ -28,6 +28,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.AliasRedirectorServlet;
 import org.sagebionetworks.web.server.servlet.AppConfigServlet;
+import org.sagebionetworks.web.server.servlet.CSPReportServlet;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DataAccessClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
@@ -38,6 +39,7 @@ import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
 import org.sagebionetworks.web.server.servlet.InitSessionServlet;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
+import org.sagebionetworks.web.server.servlet.LogServlet;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
@@ -63,6 +65,7 @@ import org.sagebionetworks.web.server.servlet.filter.HSTSFilter;
 import org.sagebionetworks.web.server.servlet.filter.HtmlInjectionFilter;
 import org.sagebionetworks.web.server.servlet.filter.JavaScriptContentTypeFilter;
 import org.sagebionetworks.web.server.servlet.filter.MHealthFilter;
+import org.sagebionetworks.web.server.servlet.filter.MaxRequestBodySizeFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.RegisterAccountFilter;
 import org.sagebionetworks.web.server.servlet.filter.SSLFilter;
@@ -141,6 +144,12 @@ public class PortalServletModule extends ServletModule {
     // This supports RPC
     filter("/Portal/*").through(RPCValidationFilter.class);
     bind(RPCValidationFilter.class).in(Singleton.class);
+
+    // Limit request body sizes, since these are written straight to CloudWatch
+    filter("/Portal/" + WebConstants.LOG_SERVLET)
+      .through(new MaxRequestBodySizeFilter(64 * 1024));
+    filter("/Portal/" + WebConstants.CSP_REPORT_SERVLET)
+      .through(new MaxRequestBodySizeFilter(256 * 1024));
 
     bind(AmpADFilter.class).in(Singleton.class);
     filter("/ampad").through(AmpADFilter.class);
@@ -222,6 +231,15 @@ public class PortalServletModule extends ServletModule {
     bind(VersionsServlet.class).in(Singleton.class);
     serve("/Portal/" + WebConstants.VERSIONS_SERVLET)
       .with(VersionsServlet.class);
+
+    // Log handler
+    bind(LogServlet.class).in(Singleton.class);
+    serve("/Portal/" + WebConstants.LOG_SERVLET).with(LogServlet.class);
+
+    // CSP report endpoint
+    bind(CSPReportServlet.class).in(Singleton.class);
+    serve("/Portal/" + WebConstants.CSP_REPORT_SERVLET)
+      .with(CSPReportServlet.class);
 
     // Alias resolution
     bind(AliasRedirectorServlet.class).in(Singleton.class);
