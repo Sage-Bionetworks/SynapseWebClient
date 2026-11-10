@@ -57,6 +57,7 @@ import org.sagebionetworks.web.server.servlet.ViteManifestProvider;
 import org.sagebionetworks.web.server.servlet.ViteManifestProviderImpl;
 import org.sagebionetworks.web.server.servlet.filter.AmpADFilter;
 import org.sagebionetworks.web.server.servlet.filter.CORSFilter;
+import org.sagebionetworks.web.server.servlet.filter.ContentSecurityPolicyFilter;
 import org.sagebionetworks.web.server.servlet.filter.DigitalHealthFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.GWTAllCacheFilter;
@@ -138,6 +139,9 @@ public class PortalServletModule extends ServletModule {
 
     filter("/*").through(XFrameOptionsFilter.class);
     bind(XFrameOptionsFilter.class).in(Singleton.class);
+
+    filter("/*").through(ContentSecurityPolicyFilter.class);
+    bind(ContentSecurityPolicyFilter.class).in(Singleton.class);
 
     filter("/Portal/*").through(TimingFilter.class);
     bind(TimingFilter.class).in(Singleton.class);
