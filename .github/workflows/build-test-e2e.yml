@@ -132,7 +132,8 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ github.repository_owner != 'Sage-Bionetworks' && always() }}
         with:
-          name: ${{ env.PW_ALL_BLOBS_DIR }}-${{ github.job }}
+          # include the shard index, so shards don't upload artifacts with the same name
+          name: ${{ env.PW_ALL_BLOBS_DIR }}-${{ github.job }}-${{ strategy.job-index }}
           path: blob-report
           retention-days: 1
       - name: Stop Tomcat

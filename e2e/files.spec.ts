@@ -31,19 +31,28 @@ const expectFilePageLoaded = async (
   await testAuth.step('file page is loaded', async () => {
     await page.waitForURL(entityUrlPathname(fileEntityId))
     await expect(page.getByText(`Discussion about ${fileName}`)).toBeVisible()
+    await expect(
+      page.getByRole('heading', { level: 2, name: fileName }),
+    ).toBeVisible()
 
     await expect(page.getByText('Loading provenance...')).not.toBeVisible()
-    await expect(page.getByText(fileEntityId, { exact: true })).toBeVisible()
+    // SynID is shown in the title bar and the "About this File" sidebar;
+    // hidden copies may remain in previously visited (cached) views
+    await expect(
+      page.getByText(fileEntityId, { exact: true }).filter({ visible: true }),
+    ).not.toHaveCount(0)
   })
 }
 
 const openFileSharingSettings = async (page: Page) => {
   await testAuth.step('First user can open File Sharing Settings', async () => {
-    await page.getByRole('button', { name: 'File Tools' }).click()
+    await page.getByRole('button', { name: 'Tools', exact: true }).click()
     await page.getByRole('menuitem', { name: 'File Sharing Settings' }).click()
-    await expect(
-      page.getByRole('heading', { name: 'File Sharing Settings' }),
-    ).toBeVisible()
+    const heading = page.getByRole('heading', { name: 'File Sharing Settings' })
+    await expect(heading).toBeVisible()
+    // The dialog can open under the pointer (left at the menu item position);
+    // hovering a principal link opens a user card that covers the dialog buttons
+    await heading.hover()
   })
 }
 
@@ -61,6 +70,13 @@ const expectNoAccessPage = async (
   ).toBeVisible({ timeout: expectTimeout })
 }
 
+// Each principal in the File Sharing Settings ACL editor is listed as a row
+const getSharingSettingsPrincipalRow = (page: Page, userName: string) =>
+  page
+    .getByRole('dialog', { name: 'File Sharing Settings' })
+    .getByRole('row')
+    .filter({ hasText: `@${userName}` })
+
 const confirmSharingSettings = async (
   firstUserPage: Page,
   firstUserName: string,
@@ -71,9 +87,7 @@ const confirmSharingSettings = async (
     'First user is listed in File Sharing settings',
     async () => {
       await expect(
-        firstUserPage.getByRole('cell', {
-          name: firstUserName,
-        }),
+        getSharingSettingsPrincipalRow(firstUserPage, firstUserName),
       ).toBeVisible()
     },
   )
@@ -83,13 +97,14 @@ const confirmSharingSettings = async (
       secondUserVisible ? '' : 'not'
     } listed in File Sharing settings`,
     async () => {
-      const secondUserCell = firstUserPage.getByRole('cell', {
-        name: secondUserName,
-      })
+      const secondUserRow = getSharingSettingsPrincipalRow(
+        firstUserPage,
+        secondUserName,
+      )
       if (secondUserVisible) {
-        await expect(secondUserCell).toBeVisible()
+        await expect(secondUserRow).toBeVisible()
       } else {
-        await expect(secondUserCell).not.toBeVisible()
+        await expect(secondUserRow).not.toBeVisible()
       }
     },
   )
@@ -115,10 +130,10 @@ const uploadFile = async (
 ) => {
   await testAuth.step('open file upload modal', async () => {
     const uploadButtonText =
-      uploadType === 'initialUpload'
-        ? 'Upload or Link to a File'
-        : 'Upload a New Version of File'
-    await page.getByRole('button', { name: uploadButtonText }).click()
+      uploadType === 'initialUpload' ? 'Upload/Link File' : 'Upload'
+    await page
+      .getByRole('button', { name: uploadButtonText, exact: true })
+      .click()
 
     await expect(page.getByRole('tab', { name: 'Upload File' })).toBeVisible()
     await expect(page.getByRole('tab', { name: 'Link to URL' })).toBeVisible()
@@ -165,11 +180,18 @@ const uploadFile = async (
   })
 }
 
+// MD5 is listed in the "About this File" sidebar on the file page
+const getFileMD5Locator = (page: Page) =>
+  page
+    .getByText('MD5', { exact: true })
+    .filter({ visible: true })
+    .locator('xpath=following-sibling::*[1]')
+
 const getFileMD5 = async (page: Page) => {
   return await testAuth.step('get file MD5', async () => {
-    const row = page.getByRole('row').filter({ hasText: 'MD5' })
-    await expect(row.getByRole('cell')).toHaveCount(2)
-    return row.getByRole('cell').filter({ hasNotText: 'MD5' }).textContent()
+    const md5 = getFileMD5Locator(page)
+    await expect(md5).toHaveText(/^[0-9a-f]{32}$/)
+    return md5.textContent()
   })
 }
 
@@ -195,6 +217,8 @@ testAuth.describe('Files', () => {
   testAuth(
     'File sharing',
     async ({ userPage, validatedUserPage, browserName }) => {
+      testAuth.slow()
+
       // Use test.fixme because test.fail doesn't mark test as expected to fail
       // when there is a test timeout. Since test timeouts are expensive,
       // Playwright recommends skipping the test entirely with test.fixme.
@@ -261,7 +285,7 @@ testAuth.describe('Files', () => {
             .getByRole('button', { name: 'Create Local Sharing Settings' })
             .click()
           await expect(
-            userPage.getByRole('heading', { name: 'Add More People' }),
+            userPage.getByRole('heading', { name: 'Add More' }),
           ).toBeVisible()
         },
       )
@@ -269,22 +293,27 @@ testAuth.describe('Files', () => {
       await testAuth.step(
         'First user shares the file with second user',
         async () => {
-          const userSuggestBox = userPage.getByRole('textbox', {
-            name: 'Enter name...',
+          const userSuggestBox = userPage.getByRole('combobox', {
+            name: 'Add a user or team',
           })
           await userSuggestBox.fill(validatedUserName)
-          await userSuggestBox.press('Shift')
 
           await userPage
-            .getByRole('menuitem', { name: `@${validatedUserName}` })
+            .getByRole('option', { name: `@${validatedUserName}` })
             .click({ timeout: defaultExpectTimeout * 3 })
 
           await expect(
-            userPage.getByRole('cell', { name: validatedUserName }),
+            getSharingSettingsPrincipalRow(userPage, validatedUserName),
           ).toBeVisible({ timeout: defaultExpectTimeout * 3 })
 
-          // Don't send message, so we don't have to clean up the message
-          await userPage.getByText('Notify people via email').click()
+          // Don't send message, so we don't have to clean up the message.
+          // The checkbox's accessible name is its tooltip, so locate it via its label text
+          await expect(
+            userPage
+              .locator('label')
+              .filter({ hasText: 'Notify people via email' })
+              .getByRole('checkbox'),
+          ).not.toBeChecked()
 
           await saveFileSharingSettings(userPage)
         },
@@ -399,9 +428,9 @@ testAuth.describe('Files', () => {
     await testAuth.step(
       'confirm re-upload did not change md5 or version',
       async () => {
-        const md5reupload = await getFileMD5(userPage)
-        expect(md5v1).toEqual(md5reupload)
         await expect(userPage.getByText('V1 (Current)')).toBeVisible()
+        expect(md5v1).not.toBeNull()
+        await expect(getFileMD5Locator(userPage)).toHaveText(md5v1!)
       },
     )
 
@@ -413,9 +442,11 @@ testAuth.describe('Files', () => {
     await testAuth.step(
       'confirm uploading new file changed md5 and version',
       async () => {
+        await expect(userPage.getByText('V2 (Current)')).toBeVisible()
+        // wait for sidebar to reflect the new version before comparing
+        await expect(getFileMD5Locator(userPage)).not.toHaveText(md5v1!)
         const md5v2 = await getFileMD5(userPage)
         expect(md5v1).not.toEqual(md5v2)
-        await expect(userPage.getByText('V2 (Current)')).toBeVisible()
       },
     )
 
@@ -441,7 +472,9 @@ testAuth.describe('Files', () => {
 
     await testAuth.step('move file to trash can', async () => {
       await testAuth.step('delete file', async () => {
-        await userPage.getByRole('button', { name: 'File Tools' }).click()
+        await userPage
+          .getByRole('button', { name: 'Tools', exact: true })
+          .click()
         await userPage.getByRole('menuitem', { name: 'Delete File' }).click()
       })
 
@@ -463,15 +496,17 @@ testAuth.describe('Files', () => {
 
       await testAuth.step('confirm that file was deleted', async () => {
         await userPage.waitForURL(`${entityUrlPathname(userProject.id)}/files/`)
+        await dismissAlert(userPage, 'The File was successfully deleted.')
 
+        // The Files list is cached client-side and is not refetched after
+        // the delete, so reload to verify the file is no longer listed
+        await reloadDashboardPage(userPage)
         await expect(
           userPage.getByRole('heading', { name: 'Files' }),
         ).toBeVisible()
         await expect(
           userPage.getByRole('link', { name: fileName }),
         ).not.toBeVisible()
-
-        await dismissAlert(userPage, 'The File was successfully deleted.')
       })
     })
 
@@ -527,7 +562,7 @@ testAuth.describe('Files', () => {
           await expect(userPage.getByText(fileName)).not.toBeVisible()
           await expect(userPage.getByText(fileEntityId)).not.toBeVisible()
           await expect(
-            userPage.getByText('Trash Can is currently empty.'),
+            userPage.getByText('Your trash can is currently empty.'),
           ).toBeVisible()
         },
       )

@@ -11,7 +11,7 @@ import {
   dismissAlert,
   getAccessTokenFromCookie,
   getAdminPAT,
-  getUserIdFromLocalStorage,
+  getUserIdFromAccessTokenCookie,
   goToDashboard,
   reloadDashboardPage,
 } from './helpers/testUser'
@@ -20,6 +20,7 @@ import {
   userPrefix,
   userValidatedPrefix,
 } from './helpers/userConfig'
+import { dismissHoverCards } from './helpers/utils'
 
 const expectMyTeamsPageLoaded = async (page: Page) => {
   await expect(page.getByRole('heading', { name: 'Your Teams' })).toBeVisible()
@@ -105,9 +106,17 @@ testAuth.describe('Teams', () => {
           await expect(userPage.getByText('Loading...')).not.toBeVisible()
 
           const inviteMessageBox = userPage.getByLabel('Invitation Message')
-          await inviteMessageBox.click()
-          await inviteMessageBox.fill(INVITATION_MESSAGE)
-          await expect(inviteMessageBox).toHaveValue(INVITATION_MESSAGE)
+          // The mouse rests on the selected user's link, which opens a profile
+          // hover card; move it away so the card doesn't interfere with the input.
+          await dismissHoverCards(userPage)
+          // The message box can be reset while the invite widget initializes, so
+          // retry until the value sticks.
+          await expect(async () => {
+            await inviteMessageBox.fill(INVITATION_MESSAGE)
+            await expect(inviteMessageBox).toHaveValue(INVITATION_MESSAGE, {
+              timeout: 2_000,
+            })
+          }).toPass()
 
           const spinner = userPage.locator('.modal-body > .spinner')
           await userPage
@@ -180,6 +189,8 @@ testAuth.describe('Teams', () => {
         await teamLink.click()
 
         await expectTeamPageLoaded(validatedUserPage, TEAM_NAME)
+        // the cursor is left where the team link was, which may now be a user badge
+        await dismissHoverCards(validatedUserPage)
 
         await responsePromise
         await expect(
@@ -224,11 +235,12 @@ testAuth.describe('Teams', () => {
     // get credentials
     const adminPAT = getAdminPAT()
 
-    const validatedUserId = await getUserIdFromLocalStorage(validatedUserPage)
+    const validatedUserId =
+      await getUserIdFromAccessTokenCookie(validatedUserPage)
     const validatedUserAccessToken =
       await getAccessTokenFromCookie(validatedUserPage)
 
-    const userUserId = await getUserIdFromLocalStorage(userPage)
+    const userUserId = await getUserIdFromAccessTokenCookie(userPage)
     const userAccessToken = await getAccessTokenFromCookie(userPage)
     const userName = userConfigs[userPrefix].username
     expect(userName).not.toBeNull()

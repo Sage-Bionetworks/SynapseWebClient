@@ -1,4 +1,5 @@
 import { Locator, Page, expect, test } from '@playwright/test'
+import { getHeaderCells } from './tables'
 
 // Types -----------------------------------------------------------------------
 type FacetType = 'Range' | 'Values'
@@ -79,9 +80,13 @@ const setColumnDefaultValue = async (
   columnType: string,
 ) => {
   await test.step('set column default value', async () => {
-    const columnDefaultValueField = page
-      .getByLabel('Default Value')
+    // Date columns render a date picker without the 'Default Value' label,
+    // ...so scope to the column's row rather than indexing all 'Default Value' fields
+    const columnRow = page
+      .getByPlaceholder('Column name')
       .nth(columnIndex)
+      .locator('xpath=ancestor::div[.//*[@aria-label="Column Type"]][1]')
+    const columnDefaultValueField = columnRow.getByLabel('Default Value')
     if (columnType === 'Boolean') {
       await columnDefaultValueField.click()
       await page.getByRole('option', { name: defaultValue }).click()
@@ -257,8 +262,17 @@ const expectAllColumnSchemasMatchConfig = async (
 
 export const openTableColumnSchema = async (page: Page) => {
   await test.step('open table column schema', async () => {
-    await page.getByRole('button', { name: 'Show Table Schema' }).click()
-    await expect(page.getByText('Schema', { exact: true })).toBeVisible()
+    const showSchemaButton = page.getByRole('button', { name: 'Show Schema' })
+    const hideSchemaButton = page.getByRole('button', { name: 'Hide Schema' })
+    await expect(showSchemaButton.or(hideSchemaButton)).toBeVisible()
+    // the button toggles schema visibility, so only click if schema is hidden
+    if (await showSchemaButton.isVisible()) {
+      await showSchemaButton.click()
+    }
+    await expect(hideSchemaButton).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'Edit Schema' }),
+    ).toBeVisible()
   })
 }
 
@@ -280,7 +294,7 @@ export const expectTableSchemaCorrect = async (
         const columnSchemaIndexMap: Partial<
           Record<ColumnSchemaKey | 'id', number>
         > = {}
-        const columnNames = schemaRows.nth(0).getByRole('cell')
+        const columnNames = getHeaderCells(schemaRows.nth(0))
         for (let i = 0; i < columnNamesExpected.length; i++) {
           // the initial column is empty in UI, so start from 1
           const columnName = await columnNames.nth(i + 1).textContent()
