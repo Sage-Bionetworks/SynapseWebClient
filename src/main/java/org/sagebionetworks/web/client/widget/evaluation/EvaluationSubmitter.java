@@ -45,6 +45,8 @@ public class EvaluationSubmitter implements Presenter {
 
   public static final String NO_COMMITS_SELECTED_MSG =
     "Please select a commit to submit.";
+  public static final String FORM_NOT_READY_MESSAGE =
+    "The form is still loading. Please try again in a moment.";
   public static final String ZERO_COMMITS_ERROR =
     "This repository has no commits.  You must add at least one commit before submitting it to a challenge.";
   private EvaluationSubmitterView view;
@@ -71,6 +73,8 @@ public class EvaluationSubmitter implements Presenter {
   private Set<String> evaluationIds;
   private SynapseAlert dockerCommitSynAlert;
   private FormParams formParams;
+  // the evaluation chosen when Next was clicked in form mode
+  private Evaluation formEvaluation;
 
   @Inject
   public EvaluationSubmitter(
@@ -116,6 +120,7 @@ public class EvaluationSubmitter implements Presenter {
   ) {
     challenge = null;
     evaluation = null;
+    formEvaluation = null;
     selectedTeam = null;
     // initialize as an individual submission
     isIndividualSubmission = true;
@@ -233,10 +238,23 @@ public class EvaluationSubmitter implements Presenter {
   }
 
   @Override
-  public void onFormSaved(String synId, Evaluation evaluation) {
+  public void onFormNextClicked(Evaluation evaluation) {
+    formEvaluation = evaluation;
+    if (!view.submitForm()) {
+      view.showErrorMessage(FORM_NOT_READY_MESSAGE);
+    }
+  }
+
+  @Override
+  public void onFormSaved(String synId) {
+    if (formEvaluation == null) {
+      // Saved without going through Next, so the target evaluation is unknown
+      view.showErrorMessage(DisplayConstants.NO_EVALUATION_SELECTED);
+      return;
+    }
     Reference savedForm = new Reference();
     savedForm.setTargetId(synId);
-    onNextClicked(savedForm, null, evaluation);
+    onNextClicked(savedForm, null, formEvaluation);
   }
 
   /**

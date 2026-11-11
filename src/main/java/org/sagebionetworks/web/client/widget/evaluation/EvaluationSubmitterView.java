@@ -69,9 +69,14 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
     );
 
     /**
-     * The submission form saved the user's answers to the given entity; submit it to the given evaluation.
+     * Next was clicked in form mode: ask the form to save the user's answers for the given evaluation.
      */
-    void onFormSaved(String synId, Evaluation evaluation);
+    void onFormNextClicked(Evaluation evaluation);
+
+    /**
+     * The submission form saved the user's answers to the given entity; submit it to the evaluation chosen on Next.
+     */
+    void onFormSaved(String synId);
 
     void onDoneClicked();
 
@@ -89,6 +94,12 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 
     void refreshRegisteredTeams();
   }
+
+  /**
+   * Ask the submission form to validate and save the user's answers.
+   * @return false if the form has not loaded yet
+   */
+  boolean submitForm();
 
   void setChallengesSynAlertWidget(Widget synAlert);
 

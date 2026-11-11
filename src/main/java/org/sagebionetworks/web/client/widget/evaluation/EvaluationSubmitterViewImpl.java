@@ -61,10 +61,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
   private Reference selectedReference;
   boolean isForm;
   ReactRefObject<EntityFormHandle> formRef;
-  int formKey = 0;
-
-  public static final String FORM_NOT_READY_MESSAGE =
-    "The form is still loading. Please try again in a moment.";
 
   Widget widget;
 
@@ -220,12 +216,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
           }
         }
         if (isForm) {
-          // ask the form to submit, and wait for the callback (to go to the next page)
-          if (formRef != null && formRef.current != null) {
-            formRef.current.submitForm();
-          } else {
-            showErrorMessage(FORM_NOT_READY_MESSAGE);
-          }
+          // the form saves the answers, then reports the saved entity through onFormSaved
+          presenter.onFormNextClicked(evaluation);
         } else {
           presenter.onNextClicked(
             selectedReference,
@@ -399,11 +391,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
         formParams.getJsonSchemaSynId(),
         formParams.getUiSchemaSynId(),
         false,
-        this::onFormSaved,
+        presenter::onFormSaved,
         formRef
       );
-      // A new key each time the modal opens discards answers from a previous attempt
-      props.key = String.valueOf(++formKey);
       formDiv.render(
         React.createElementWithSynapseContext(
           SRC.SynapseComponents.EntityForm,
@@ -418,8 +408,14 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
     modal1.show();
   }
 
-  private void onFormSaved(String synId) {
-    presenter.onFormSaved(synId, evaluationList.getSelectedEvaluation());
+  @Override
+  public boolean submitForm() {
+    // SRC publishes the handle only once the form has loaded
+    if (formRef == null || formRef.current == null) {
+      return false;
+    }
+    formRef.current.submitForm();
+    return true;
   }
 
   @Override

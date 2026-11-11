@@ -45,6 +45,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -240,7 +241,12 @@ public class EvaluationSubmitterTest {
     submitter.configure(null, null, formParams);
     verify(mockView).showModal1(eq(false), eq(formParams), any());
 
-    submitter.onFormSaved("syn123", e1);
+    when(mockView.submitForm()).thenReturn(true);
+    submitter.onFormNextClicked(e1);
+    verify(mockView).submitForm();
+    verify(mockView, never()).showErrorMessage(anyString());
+
+    submitter.onFormSaved("syn123");
 
     verify(mockSynapseJavascriptClient).getEntity(eq("syn123"), any());
     ArgumentCaptor<Submission> captor = ArgumentCaptor.forClass(
@@ -256,6 +262,52 @@ public class EvaluationSubmitterTest {
     assertEquals("syn123", captor.getValue().getEntityId());
     assertEquals(e1.getId(), captor.getValue().getEvaluationId());
     assertNull(captor.getValue().getName());
+  }
+
+  @Test
+  public void testFormModeNotLoadedYet() throws RestServiceException {
+    submitter.configure(null, null, new FormParams("syn1", "syn2", "syn3"));
+    when(mockView.submitForm()).thenReturn(false);
+
+    submitter.onFormNextClicked(e1);
+
+    verify(mockView)
+      .showErrorMessage(EvaluationSubmitter.FORM_NOT_READY_MESSAGE);
+    verify(mockChallengeClient, never())
+      .createIndividualSubmission(any(), any(), any(), any());
+  }
+
+  @Test
+  public void testFormModeSavedWithoutNext() throws RestServiceException {
+    FormParams formParams = new FormParams("syn1", "syn2", "syn3");
+    submitter.configure(null, null, formParams);
+    when(mockView.submitForm()).thenReturn(true);
+    submitter.onFormNextClicked(e1);
+    // reopening the dialog forgets the evaluation chosen earlier
+    submitter.configure(null, null, formParams);
+
+    submitter.onFormSaved("syn123");
+
+    verify(mockView).showErrorMessage(DisplayConstants.NO_EVALUATION_SELECTED);
+    verify(mockChallengeClient, never())
+      .createIndividualSubmission(any(), any(), any(), any());
+  }
+
+  @Test
+  public void testFormModeSavedEntityLookupFails() throws RestServiceException {
+    submitter.configure(null, null, new FormParams("syn1", "syn2", "syn3"));
+    when(mockView.submitForm()).thenReturn(true);
+    AsyncMockStubber
+      .callFailureWith(new Exception("entity lookup failed"))
+      .when(mockSynapseJavascriptClient)
+      .getEntity(eq("syn123"), any());
+    submitter.onFormNextClicked(e1);
+
+    submitter.onFormSaved("syn123");
+
+    verify(mockView).showErrorMessage("entity lookup failed");
+    verify(mockChallengeClient, never())
+      .createIndividualSubmission(any(), any(), any(), any());
   }
 
   @Test
