@@ -42,6 +42,8 @@ public class CORSFilter extends OncePerRequestFilter {
   // DNS Records pulled from: https://github.com/Sage-Bionetworks/Synapse-Stack-Builder/tree/develop/src/main/resources/templates/dns
   // Note that not all records need to have an explicitly-allowed origin; the subdomains in this list need only be the sites that should persist authentication state between *.synapse.org sites.
   // Since this list is manually maintained, new subdomains that should share auth state across *.synapse.org must be added to the list.
+  // This list also controls which sites may embed Synapse in an iframe (XFrameOptionsFilter and the CSP frame-ancestors
+  // in ContentSecurityPolicyFilter), so adding a subdomain here also allows it to frame Synapse.
   public static final List<String> ALLOWED_SYNAPSE_SUBDOMAINS = Arrays.asList(
     "www",
     "staging",
