@@ -152,6 +152,8 @@ public class SRC {
       GovernanceMarkdownGithubProps
     > GovernanceMarkdownGithub;
     public static ReactComponentType<EntityUploadModalProps> EntityUploadModal;
+    public static ReactComponentType<EntityFormProps> EntityForm;
+    public static ReactComponentType<StatisticsPlotProps> StatisticsPlot;
     public static ReactComponentType<
       CreateOrUpdateDoiModalProps
     > CreateOrUpdateDoiModal;

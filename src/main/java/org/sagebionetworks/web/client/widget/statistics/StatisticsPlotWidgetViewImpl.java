@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.statistics;
 
-import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -11,10 +9,9 @@ import com.google.gwt.user.client.ui.Widget;
 import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
-import org.sagebionetworks.web.client.jsni.FullContextProviderPropsJSNIObject;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.StatisticsPlotProps;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class StatisticsPlotWidgetViewImpl
@@ -40,71 +37,29 @@ public class StatisticsPlotWidgetViewImpl
   Modal statsPlotModal;
 
   Widget widget;
-  SynapseJSNIUtils jsniUtils;
-  SynapseReactClientFullContextPropsProvider propsProvider;
-  String endpoint;
 
   private final StatisticsPlotWidgetViewImplUiBinder binder = GWT.create(
     StatisticsPlotWidgetViewImplUiBinder.class
   );
 
   @Inject
-  public StatisticsPlotWidgetViewImpl(
-    SynapseJSNIUtils jsniUtils,
-    SynapseProperties synapseProperties,
-    SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
+  public StatisticsPlotWidgetViewImpl() {
     widget = binder.createAndBindUi(this);
-    this.jsniUtils = jsniUtils;
-    this.propsProvider = propsProvider;
-    endpoint = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
     closeButton.addClickHandler(event -> {
       statsPlotModal.hide();
     });
   }
 
   @Override
-  public void configureAndShow(String projectId, String accessToken) {
-    _createSRCWidget(
-      srcContainer,
-      projectId,
-      accessToken,
-      endpoint,
-      propsProvider.getJsniContextProps()
+  public void configureAndShow(String projectId) {
+    srcContainer.render(
+      React.createElementWithSynapseContext(
+        SRC.SynapseComponents.StatisticsPlot,
+        StatisticsPlotProps.create(projectId, "Project Statistics")
+      )
     );
     statsPlotModal.show();
   }
-
-  private static native void _createSRCWidget(
-    ReactComponent reactComponent,
-    String projectId,
-    String accessToken,
-    String fullRepoEndpoint,
-    FullContextProviderPropsJSNIObject wrapperProps
-  ) /*-{
-		try {
-			// URL.host returns the domain (that is the hostname) followed by (if a port was specified) a ':' and the port of the URL
-			var repoURL = new URL(fullRepoEndpoint);
-			var rootRepoEndpoint = repoURL.protocol + '//' + repoURL.host;
-
-			var props = {
-				request : {
-					concreteType : 'org.sagebionetworks.repo.model.statistics.ProjectFilesStatisticsRequest',
-					objectId : projectId,
-					fileDownloads : true,
-					fileUploads : true
-				},
-				endpoint : rootRepoEndpoint,
-				title : 'Project Statistics'
-			}
-
-			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.StatisticsPlot, props, null)
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.FullContextProvider, wrapperProps, component)
-			reactComponent.@org.sagebionetworks.web.client.widget.ReactComponent::render(Lorg/sagebionetworks/web/client/jsinterop/ReactElement;)(wrapper);
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
 
   @Override
   public Widget asWidget() {

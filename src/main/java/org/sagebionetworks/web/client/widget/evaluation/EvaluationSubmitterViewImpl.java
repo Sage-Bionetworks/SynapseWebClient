@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -34,10 +33,12 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
-import org.sagebionetworks.web.client.jsni.FullContextProviderPropsJSNIObject;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.jsinterop.EntityFormHandle;
+import org.sagebionetworks.web.client.jsinterop.EntityFormProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactRefObject;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.ReactComponent;
@@ -58,10 +59,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
   private EntityFinderWidget.Builder entityFinderBuilder;
   private boolean showEntityFinder;
   private Reference selectedReference;
-  AuthenticationController authController;
-  SynapseReactClientFullContextPropsProvider propsProvider;
   boolean isForm;
-  JavaScriptObject formRef;
+  ReactRefObject<EntityFormHandle> formRef;
+  int formKey = 0;
 
   Widget widget;
 
@@ -173,16 +173,12 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
   public EvaluationSubmitterViewImpl(
     EntityFinderWidget.Builder entityFinderBuilder,
     EvaluationList evaluationList,
-    PortalGinInjector ginInjector,
-    AuthenticationController authController,
-    SynapseReactClientFullContextPropsProvider propsProvider
+    PortalGinInjector ginInjector
   ) {
     widget = binder.createAndBindUi(this);
     this.entityFinderBuilder = entityFinderBuilder;
     this.evaluationList = evaluationList;
     this.ginInjector = ginInjector;
-    this.authController = authController;
-    this.propsProvider = propsProvider;
     evaluationListContainer.setWidget(evaluationList.asWidget());
     initClickHandlers();
     originalNextButtonText = nextButton.getText();
@@ -222,7 +218,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
         }
         if (isForm) {
           // ask the form to submit, and wait for the callback (to go to the next page)
-          _submitForm(formRef);
+          if (formRef != null && formRef.current != null) {
+            formRef.current.submitForm();
+          }
         } else {
           presenter.onNextClicked(
             selectedReference,
@@ -388,26 +386,34 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
     multipleEvaluationsFormLabel.setVisible(isMoreThanOneEvaluation);
     singleEvaluationFormLabel.setVisible(!isMoreThanOneEvaluation);
     if (isForm) {
-      // here we go! add the SRC entityform component to the formDiv (and listen for detach for cleanup)
       // going to need some space
       modal1.addStyleName("modal-fullscreen");
-      String token = authController.getCurrentUserAccessToken();
-      _showForm(
-        formDiv,
-        token,
+      formRef = React.createRef();
+      EntityFormProps props = EntityFormProps.create(
         formParams.getContainerSynId(),
         formParams.getJsonSchemaSynId(),
         formParams.getUiSchemaSynId(),
-        this,
-        propsProvider.getJsniContextProps()
+        false,
+        this::setFormSynId,
+        formRef
+      );
+      // A new key each time the modal opens discards answers from a previous attempt
+      props.key = String.valueOf(++formKey);
+      formDiv.render(
+        React.createElementWithSynapseContext(
+          SRC.SynapseComponents.EntityForm,
+          props
+        )
       );
     } else {
       modal1.removeStyleName("modal-fullscreen");
+      formRef = null;
+      formDiv.clear();
     }
     modal1.show();
   }
 
-  public void setFormSynId(String synId) {
+  private void setFormSynId(String synId) {
     Evaluation evaluation = evaluationList.getSelectedEvaluation();
     selectedReference = new Reference();
     selectedReference.setTargetId(synId);
@@ -417,48 +423,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
       evaluation
     );
   }
-
-  private static native void _submitForm(JavaScriptObject formRef) /*-{
-		formRef.submitForm();
-	}-*/;
-
-  private static native void _showForm(
-    ReactComponent reactComponent,
-    String accessToken,
-    String parentContainerSynId,
-    String jsonSchemaSynId,
-    String uiSchemaSynId,
-    EvaluationSubmitterViewImpl view,
-    FullContextProviderPropsJSNIObject wrapperProps
-  ) /*-{
-		try {
-			view.@org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl::formRef = $wnd.React
-					.createRef();
-			function setRefFunction(form) {
-				view.@org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl::formRef = form;
-			}
-			;
-			function synIdCallbackFunction(synId) {
-				view.@org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl::setFormSynId(Ljava/lang/String;)(synId);
-			}
-			;
-			var initializeFormData = false;
-			var props = {
-				parentContainerId : parentContainerSynId,
-				formSchemaEntityId : jsonSchemaSynId,
-				formUiSchemaEntityId : uiSchemaSynId,
-				initFormData : initializeFormData,
-				ref : setRefFunction,
-				synIdCallback : synIdCallbackFunction
-			};
-
-			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.EntityForm, props, null);
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.FullContextProvider, wrapperProps, component);
-            reactComponent.@org.sagebionetworks.web.client.widget.ReactComponent::render(Lorg/sagebionetworks/web/client/jsinterop/ReactElement;)(wrapper);
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
 
   @Override
   public void hideModal1() {
