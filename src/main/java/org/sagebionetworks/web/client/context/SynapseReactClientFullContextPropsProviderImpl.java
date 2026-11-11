@@ -10,9 +10,6 @@ import org.sagebionetworks.web.client.jsinterop.IsEditingStore;
 import org.sagebionetworks.web.client.jsinterop.SynapseContextJsObject;
 import org.sagebionetworks.web.client.jsinterop.SynapseReactClientFullContextProviderProps;
 import org.sagebionetworks.web.client.jsinterop.SynapseSessionManagerJs;
-import org.sagebionetworks.web.client.jsni.FullContextProviderPropsJSNIObject;
-import org.sagebionetworks.web.client.jsni.QueryClientJSNIObject;
-import org.sagebionetworks.web.client.jsni.SynapseReactClientFullContextJSNIObject;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 public class SynapseReactClientFullContextPropsProviderImpl
@@ -78,23 +75,5 @@ public class SynapseReactClientFullContextPropsProviderImpl
       return false;
     }
     return mgr.getSnapshot().hasInitializedSession;
-  }
-
-  @Override
-  public FullContextProviderPropsJSNIObject getJsniContextProps() {
-    SynapseReactClientFullContextJSNIObject synapseContext =
-      SynapseReactClientFullContextJSNIObject.create();
-    synapseContext.setAccessToken(authController.getCurrentUserAccessToken());
-    synapseContext.setIsInExperimentalMode(
-      DisplayUtils.isInTestWebsite(cookies)
-    );
-    synapseContext.setUtcTime(globalApplicationState.isShowingUTCTime());
-    synapseContext.setDownloadCartPageUrl("/DownloadCart:0");
-
-    FullContextProviderPropsJSNIObject props =
-      FullContextProviderPropsJSNIObject.create();
-    props.setSynapseContext(synapseContext);
-    props.setQueryClient(QueryClientJSNIObject.getQueryClientSingleton());
-    return props;
   }
 }

@@ -51,7 +51,6 @@
     >
       <b:ModalBody>
         <bh:Div>
-          <w:ReactComponent ui:field="formDiv" />
           <b:FormGroup ui:field="entityFinderUI">
             <b:FormGroup>
               <b:FormLabel>
@@ -86,6 +85,7 @@
             </b:FormGroup>
           </b:FormGroup>
           <g:SimplePanel ui:field="challengeListSynAlertPanel" />
+          <w:ReactComponent ui:field="formDiv" />
           <b:FormGroup ui:field="submissionNameUi">
             <b:FormLabel>Submission name (optional)</b:FormLabel>
             <b:TextBox ui:field="submissionNameField" />
