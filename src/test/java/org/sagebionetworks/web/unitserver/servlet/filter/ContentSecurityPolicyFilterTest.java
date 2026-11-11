@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitserver.servlet.filter;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 
@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.web.server.servlet.filter.CORSFilter;
 import org.sagebionetworks.web.server.servlet.filter.ContentSecurityPolicyFilter;
 
 public class ContentSecurityPolicyFilterTest {
@@ -49,10 +50,39 @@ public class ContentSecurityPolicyFilterTest {
   @Test
   public void policyContent() {
     String policy = ContentSecurityPolicyFilter.CONTENT_SECURITY_POLICY;
-    assertTrue(policy.contains("report-to csp-endpoint"));
-    assertTrue(policy.contains("report-uri /Portal/csp-report"));
-    assertTrue(policy.contains("frame-ancestors 'self' localhost "));
-    assertTrue(policy.contains(" https://www.synapse.org"));
-    assertFalse(policy.contains("https://*.synapse.org"));
+
+    // frame-ancestors allows exactly the same subdomains as XFrameOptionsFilter, plus our own site and localhost
+    StringBuilder expectedFrameAncestors = new StringBuilder(
+      "'self' localhost"
+    );
+    for (String subdomain : CORSFilter.ALLOWED_SYNAPSE_SUBDOMAINS) {
+      expectedFrameAncestors
+        .append(" https://")
+        .append(subdomain)
+        .append(CORSFilter.SYNAPSE_ORG_SUFFIX);
+    }
+    assertEquals(
+      expectedFrameAncestors.toString(),
+      ContentSecurityPolicyFilter.FRAME_ANCESTORS
+    );
+    assertTrue(
+      policy.contains(
+        "frame-ancestors " + ContentSecurityPolicyFilter.FRAME_ANCESTORS + ";"
+      )
+    );
+
+    // report-to must name the endpoint defined in Reporting-Endpoints, or browsers send no reports
+    assertTrue(
+      policy.contains(
+        "report-to " +
+        ContentSecurityPolicyFilter.CSP_REPORTING_ENDPOINT_NAME +
+        ";"
+      )
+    );
+    assertTrue(
+      ContentSecurityPolicyFilter.REPORTING_ENDPOINTS_VALUE.startsWith(
+        ContentSecurityPolicyFilter.CSP_REPORTING_ENDPOINT_NAME + "="
+      )
+    );
   }
 }
