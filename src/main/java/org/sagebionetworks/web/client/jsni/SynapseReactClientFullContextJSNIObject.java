@@ -19,6 +19,10 @@ public class SynapseReactClientFullContextJSNIObject extends JavaScriptObject {
         this.accessToken = accessToken;
     }-*/;
 
+  public final native void setIsAuthenticated(boolean isAuthenticated) /*-{
+        this.isAuthenticated = isAuthenticated;
+    }-*/;
+
   public final native void setIsInExperimentalMode(
     boolean isInExperimentalMode
   ) /*-{

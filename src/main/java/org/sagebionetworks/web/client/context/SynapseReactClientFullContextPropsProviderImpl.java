@@ -85,6 +85,7 @@ public class SynapseReactClientFullContextPropsProviderImpl
     SynapseReactClientFullContextJSNIObject synapseContext =
       SynapseReactClientFullContextJSNIObject.create();
     synapseContext.setAccessToken(authController.getCurrentUserAccessToken());
+    synapseContext.setIsAuthenticated(authController.isLoggedIn());
     synapseContext.setIsInExperimentalMode(
       DisplayUtils.isInTestWebsite(cookies)
     );
