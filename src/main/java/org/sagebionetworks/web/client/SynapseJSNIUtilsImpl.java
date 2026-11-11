@@ -524,6 +524,29 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   }
 
   @Override
+  public void logClientError(String eventName, Throwable t) {
+    _logClientError(eventName, t.getMessage(), getStackTrace(t));
+  }
+
+  public static String getStackTrace(Throwable t) {
+    StringBuilder sb = new StringBuilder();
+    for (StackTraceElement element : t.getStackTrace()) {
+      sb.append(element.toString()).append("\n");
+    }
+    return sb.toString();
+  }
+
+  private static final native void _logClientError(
+    String eventName,
+    String message,
+    String stacktrace
+  ) /*-{
+		if ($wnd._swcLogClientError) {
+			$wnd._swcLogClientError(eventName, message, stacktrace);
+		}
+	}-*/;
+
+  @Override
   public String getProtocol(String url) {
     return _getProtocol(url);
   }

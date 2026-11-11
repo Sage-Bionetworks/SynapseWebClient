@@ -86,6 +86,11 @@ public interface SynapseJSNIUtils {
 
   public String getCurrentHostName();
 
+  /**
+   * Sends the error to /Portal/log (CloudWatch) as an eventName log line.
+   */
+  public void logClientError(String eventName, Throwable t);
+
   String getProtocol(String url);
 
   String getHost(String url);

@@ -485,6 +485,38 @@ function toUrlTemplate(href) {
   }
 }
 
+// Called from GWT (SynapseJSNIUtilsImpl.logClientError) to send uncaught errors and upload failures to
+// /Portal/log. Each distinct error is sent once per page load, and at most MAX_CLIENT_ERRORS in total, so a
+// repeating error can't flood the logs (see PLFM-9565)
+const MAX_CLIENT_ERRORS = 25
+const seenClientErrors = new Set()
+window._swcLogClientError = function (eventName, message, stacktrace) {
+  try {
+    const key = `${eventName}|${message}`
+    if (
+      seenClientErrors.has(key) ||
+      seenClientErrors.size >= MAX_CLIENT_ERRORS
+    ) {
+      return
+    }
+    seenClientErrors.add(key)
+    sendLog(
+      eventName,
+      'ERROR',
+      { message },
+      {
+        'exception.message': message,
+        'exception.stacktrace': stacktrace || undefined,
+        'url.template': toUrlTemplate(window.location.href),
+        'url.domain': window.location.hostname,
+      },
+    )
+  } catch {
+    // Ignore failures here: this runs inside SWC's uncaught error handler, so throwing would raise another
+    // error (and could trigger another log attempt)
+  }
+}
+
 /** Build the payload reported for one failure/boundary combination. */
 function buildPayload(kind, message, stack, url) {
   return {

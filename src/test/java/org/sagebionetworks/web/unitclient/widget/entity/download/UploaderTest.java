@@ -1071,6 +1071,8 @@ public class UploaderTest {
   public void testUploadFailed() {
     String message = "meow there's an error.";
     uploader.uploadFailed(message);
+    verify(mockSynapseJsniUtils)
+      .logClientError(eq(Uploader.UPLOAD_ERROR_EVENT), any(Exception.class));
   }
 
   @Test
