@@ -68,6 +68,11 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
       Evaluation evaluation
     );
 
+    /**
+     * The submission form saved the user's answers to the given entity; submit it to the given evaluation.
+     */
+    void onFormSaved(String synId, Evaluation evaluation);
+
     void onDoneClicked();
 
     void onTeamSelected(int index);

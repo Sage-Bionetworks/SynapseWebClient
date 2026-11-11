@@ -235,6 +235,30 @@ public class EvaluationSubmitterTest {
   }
 
   @Test
+  public void testFormModeSubmitsSavedFormEntity() throws RestServiceException {
+    FormParams formParams = new FormParams("syn1", "syn2", "syn3");
+    submitter.configure(null, null, formParams);
+    verify(mockView).showModal1(eq(false), eq(formParams), any());
+
+    submitter.onFormSaved("syn123", e1);
+
+    verify(mockSynapseJavascriptClient).getEntity(eq("syn123"), any());
+    ArgumentCaptor<Submission> captor = ArgumentCaptor.forClass(
+      Submission.class
+    );
+    verify(mockChallengeClient)
+      .createIndividualSubmission(
+        captor.capture(),
+        any(),
+        eq(HOST_PAGE_URL),
+        any()
+      );
+    assertEquals("syn123", captor.getValue().getEntityId());
+    assertEquals(e1.getId(), captor.getValue().getEvaluationId());
+    assertNull(captor.getValue().getName());
+  }
+
+  @Test
   public void testSubmitToEvaluationsWithSubmissionName()
     throws RestServiceException, JSONObjectAdapterException {
     String submissionName = "my custom submission name";

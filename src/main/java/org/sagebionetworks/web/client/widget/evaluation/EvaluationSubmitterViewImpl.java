@@ -63,6 +63,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
   ReactRefObject<EntityFormHandle> formRef;
   int formKey = 0;
 
+  public static final String FORM_NOT_READY_MESSAGE =
+    "The form is still loading. Please try again in a moment.";
+
   Widget widget;
 
   @UiField
@@ -220,6 +223,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
           // ask the form to submit, and wait for the callback (to go to the next page)
           if (formRef != null && formRef.current != null) {
             formRef.current.submitForm();
+          } else {
+            showErrorMessage(FORM_NOT_READY_MESSAGE);
           }
         } else {
           presenter.onNextClicked(
@@ -394,7 +399,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
         formParams.getJsonSchemaSynId(),
         formParams.getUiSchemaSynId(),
         false,
-        this::setFormSynId,
+        this::onFormSaved,
         formRef
       );
       // A new key each time the modal opens discards answers from a previous attempt
@@ -413,15 +418,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
     modal1.show();
   }
 
-  private void setFormSynId(String synId) {
-    Evaluation evaluation = evaluationList.getSelectedEvaluation();
-    selectedReference = new Reference();
-    selectedReference.setTargetId(synId);
-    presenter.onNextClicked(
-      selectedReference,
-      submissionNameField.getValue(),
-      evaluation
-    );
+  private void onFormSaved(String synId) {
+    presenter.onFormSaved(synId, evaluationList.getSelectedEvaluation());
   }
 
   @Override

@@ -232,6 +232,13 @@ public class EvaluationSubmitter implements Presenter {
     queryForChallenge();
   }
 
+  @Override
+  public void onFormSaved(String synId, Evaluation evaluation) {
+    Reference savedForm = new Reference();
+    savedForm.setTargetId(synId);
+    onNextClicked(savedForm, null, evaluation);
+  }
+
   /**
    * Look for a challenge associated with the selected evaluation
    */
