@@ -8,6 +8,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.place.shared.PlaceHistoryHandler.Historian;
 import com.google.gwt.user.client.Window;
+import java.util.function.Predicate;
 
 /**
  * An {@link Historian} using HTML5's {@code pushState} and {@code onpopstate}.
@@ -19,8 +20,18 @@ public class Html5Historian
     HasValueChangeHandlers<String> {
 
   private final SimpleEventBus handlers = new SimpleEventBus();
+  private final Predicate<String> isLeftToCurrentPage;
 
   public Html5Historian() {
+    this(token -> false);
+  }
+
+  /**
+   * @param isLeftToCurrentPage whether Back/Forward to the URL for a token is left to the page being shown (see
+   *     {@link GlobalApplicationState#leavePopStateToCurrentPage(String)}), so is not reported as a history change
+   */
+  public Html5Historian(Predicate<String> isLeftToCurrentPage) {
+    this.isLeftToCurrentPage = isLeftToCurrentPage;
     initEvent();
   }
 
@@ -77,7 +88,10 @@ public class Html5Historian
   }-*/;
 
   private void onPopState() {
-    ValueChangeEvent.fire(this, getToken());
+    String token = getToken();
+    if (!isLeftToCurrentPage.test(token)) {
+      ValueChangeEvent.fire(this, token);
+    }
   }
 
   private native void pushState(String url) /*-{

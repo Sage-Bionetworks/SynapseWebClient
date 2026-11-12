@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.context.ContextUtils;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.place.DataAccessManagementPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -428,6 +429,42 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     this.synapseJSNIUtils.initOnPopStateHandler();
   }
 
+  @Override
+  public boolean leavePopStateToCurrentPage(String placeToken) {
+    if (!isRoutedByCurrentPage(placeToken)) {
+      return false;
+    }
+    // back-forward-nav-handler.js runs after GWT's popstate handler; keep it from reloading the page.
+    synapseJSNIUtils.setIsInnerProgrammaticHistoryChange();
+    return true;
+  }
+
+  /**
+   * Handles a click on a link to a place in the app. Returns false, leaving the click to the page, when the current
+   * page routes the link itself.
+   */
+  public boolean handleLinkClick(String href) {
+    String placeToken = StringUtils.getGWTPlaceTokenFromURL(href);
+    if (placeToken != null && isRoutedByCurrentPage(placeToken)) {
+      return false;
+    }
+    return handleRelativePathClick(href);
+  }
+
+  /**
+   * True if the URL for this token is another URL of the page being shown, and that page's own (React) router moves
+   * between its URLs. GWT leaves that navigation to the page, so the page keeps its state and can ask before
+   * discarding unsaved changes.
+   */
+  private boolean isRoutedByCurrentPage(String placeToken) {
+    // The Data Access Management dashboard (SRC's ReviewerDashboard) routes between its own URLs with react-router.
+    return (
+      placeController.getWhere() instanceof DataAccessManagementPlace &&
+      appPlaceHistoryMapper.getPlace(placeToken) instanceof
+        DataAccessManagementPlace
+    );
+  }
+
   public String getSynapseVersion() {
     return synapseVersion;
   }
@@ -647,7 +684,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
                   String href = targetElement.getAttribute("href");
                   String target = targetElement.getAttribute("target");
                   if (target == null || target.equals("_self")) {
-                    boolean handled = handleRelativePathClick(href);
+                    boolean handled = handleLinkClick(href);
                     if (handled) {
                       event.cancel();
                     }
