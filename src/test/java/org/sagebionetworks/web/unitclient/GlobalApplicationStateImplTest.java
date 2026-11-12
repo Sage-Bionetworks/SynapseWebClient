@@ -23,8 +23,6 @@ import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.place.shared.PlaceChangeEvent;
-import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.Date;
 import java.util.HashSet;
@@ -46,6 +44,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapsePlaceController;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -70,7 +69,7 @@ public class GlobalApplicationStateImplTest {
   CookieProvider mockCookieProvider;
 
   @Mock
-  PlaceController mockPlaceController;
+  SynapsePlaceController mockPlaceController;
 
   @Mock
   EventBus mockEventBus;
@@ -291,8 +290,9 @@ public class GlobalApplicationStateImplTest {
     PlaceChanger changer = globalApplicationState.getPlaceChanger();
     assertNotNull(changer);
     changer.goTo(currenPlace);
-    // Since we are already there then just reload the page by firing an event
-    verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
+    // Since we are already there then just show the page again
+    verify(mockPlaceController).showAgain(currenPlace);
+    verify(mockPlaceController, never()).goTo(any(Place.class));
   }
 
   @SuppressWarnings("unchecked")
@@ -443,6 +443,7 @@ public class GlobalApplicationStateImplTest {
     verify(mockSessionStorage)
       .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), any());
     verify(mockGWT).newItem(newToken, false);
+    verify(mockPlaceController).setWhere(mockPlace);
 
     // if I push the same place again, it should not push the history state again
     when(mockAppPlaceHistoryMapper.getPlace(any())).thenReturn(mockPlace);
@@ -463,6 +464,7 @@ public class GlobalApplicationStateImplTest {
     verify(mockSessionStorage)
       .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), any());
     verify(mockGWT).replaceItem(newToken, false);
+    verify(mockPlaceController).setWhere(mockPlace);
 
     // if I push the same place again, it should not push the history state again
     when(mockAppPlaceHistoryMapper.getPlace(any())).thenReturn(mockPlace);
@@ -485,12 +487,6 @@ public class GlobalApplicationStateImplTest {
     globalApplicationState.replaceCurrentPlace(mockPlace);
     verify(mockGWT).replaceItem(newToken, false);
     verify(mockSynapseJSNIUtils).consoleError(error);
-  }
-
-  @Test
-  public void testInitOnPopStateHandler() {
-    globalApplicationState.initOnPopStateHandler();
-    verify(mockSynapseJSNIUtils).initOnPopStateHandler();
   }
 
   @Test

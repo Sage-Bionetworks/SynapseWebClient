@@ -177,20 +177,29 @@ public class WikiSubpageNavigationTree
   @Override
   public void reloadWiki(SubpageNavTreeNode node) {
     if (reloadWikiPageCallback != null) {
-      reloadWikiPageCallback.invoke(node.getWikiPageKey());
-      this.currentWikiKey = node.getWikiPageKey();
-      view.resetNavTree(this.overallRoot);
+      showPage(node);
       globalApplicationState.pushCurrentPlace(node.getTargetPlace());
     }
+  }
+
+  private void showPage(SubpageNavTreeNode node) {
+    reloadWikiPageCallback.invoke(node.getWikiPageKey());
+    this.currentWikiKey = node.getWikiPageKey();
+    view.resetNavTree(this.overallRoot);
   }
 
   public boolean contains(String wikiPageKey) {
     return idToNode.containsKey(wikiPageKey);
   }
 
+  /**
+   * Shows this page of the tree, for the URL the page is being shown for. Unlike clicking the page in the tree, this
+   * does not push a URL: e.g. for Back to the root page, the root's link has no wiki ID, so pushing it would drop the
+   * Forward history.
+   */
   public void setPage(String wikiPageKey) {
-    if (contains(wikiPageKey)) {
-      reloadWiki(idToNode.get(wikiPageKey));
+    if (contains(wikiPageKey) && reloadWikiPageCallback != null) {
+      showPage(idToNode.get(wikiPageKey));
     }
   }
 

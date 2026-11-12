@@ -77,11 +77,6 @@ public interface SynapseJSNIUtils {
 
   public String[] getSrcPersistentLocalStorageKeys();
 
-  /**
-   * initialize the behavior for on pop state
-   */
-  public void initOnPopStateHandler();
-
   public String getCurrentURL();
 
   public String getCurrentHostName();
@@ -126,8 +121,6 @@ public interface SynapseJSNIUtils {
   String getAppConfigServletUrl();
 
   long getLastModified(JavaScriptObject blob);
-
-  void setIsInnerProgrammaticHistoryChange();
 
   String setHash(String hash);
 
