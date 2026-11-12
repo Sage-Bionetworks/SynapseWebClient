@@ -183,9 +183,8 @@ const uploadFile = async (
 // MD5 is listed in the "About this File" sidebar on the file page
 const getFileMD5Locator = (page: Page) =>
   page
-    .getByText('MD5', { exact: true })
+    .getByRole('definition', { name: 'MD5', exact: true })
     .filter({ visible: true })
-    .locator('xpath=following-sibling::*[1]')
 
 const getFileMD5 = async (page: Page) => {
   return await testAuth.step('get file MD5', async () => {
