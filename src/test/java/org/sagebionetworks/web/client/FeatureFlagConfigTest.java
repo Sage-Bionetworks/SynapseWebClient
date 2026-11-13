@@ -81,6 +81,49 @@ public class FeatureFlagConfigTest {
   }
 
   @Test
+  public void testFeatureNullValueIndividuallyEnabled() {
+    when(mockCookieProvider.getCookie(eq("SynapseExperimentalFeatures")))
+      .thenReturn("OTHER_FLAG," + FeatureFlagKey.TEST_FLAG_ONLY.getKey());
+    when(mockJsonObject.get(FeatureFlagKey.TEST_FLAG_ONLY.getKey()))
+      .thenReturn(null);
+    featureFlagConfig =
+      new FeatureFlagConfig(mockJsonObject, mockCookieProvider);
+
+    assertTrue(
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.TEST_FLAG_ONLY)
+    );
+  }
+
+  @Test
+  public void testFeatureNullValueOnlyOtherFlagsIndividuallyEnabled() {
+    when(mockCookieProvider.getCookie(eq("SynapseExperimentalFeatures")))
+      .thenReturn("OTHER_FLAG");
+    when(mockJsonObject.get(FeatureFlagKey.TEST_FLAG_ONLY.getKey()))
+      .thenReturn(null);
+    featureFlagConfig =
+      new FeatureFlagConfig(mockJsonObject, mockCookieProvider);
+
+    assertFalse(
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.TEST_FLAG_ONLY)
+    );
+  }
+
+  @Test
+  public void testFeatureDisabledButIndividuallyEnabled() {
+    // false flag value disables the feature even when the user opted into it
+    when(mockCookieProvider.getCookie(eq("SynapseExperimentalFeatures")))
+      .thenReturn(FeatureFlagKey.TEST_FLAG_ONLY.getKey());
+    when(mockJsonObject.get(FeatureFlagKey.TEST_FLAG_ONLY.getKey()))
+      .thenReturn(JSONBoolean.getInstance(false));
+    featureFlagConfig =
+      new FeatureFlagConfig(mockJsonObject, mockCookieProvider);
+
+    assertFalse(
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.TEST_FLAG_ONLY)
+    );
+  }
+
+  @Test
   public void testExperimentalModeValueReturnedOnException() {
     when(mockJsonObject.get(FeatureFlagKey.TEST_FLAG_ONLY.getKey()))
       .thenThrow(new RuntimeException("Test exception"));

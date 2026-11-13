@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
+import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -47,7 +48,20 @@ public class FeatureFlagConfig {
     } catch (Exception e) {
       // fall through to experimental mode check
     }
-    // null/undefined: follow experimental mode
-    return DisplayUtils.isInTestWebsite(cookieProvider);
+    // null/undefined: on if the user enabled all experimental features, or opted into this one individually
+    return (
+      DisplayUtils.isInTestWebsite(cookieProvider) ||
+      isIndividuallyEnabled(feature)
+    );
+  }
+
+  private boolean isIndividuallyEnabled(FeatureFlagKey feature) {
+    String enabledFeatures = cookieProvider.getCookie(
+      DisplayUtils.SYNAPSE_EXPERIMENTAL_FEATURES_COOKIE_KEY
+    );
+    if (enabledFeatures == null) {
+      return false;
+    }
+    return Arrays.asList(enabledFeatures.split(",")).contains(feature.getKey());
   }
 }

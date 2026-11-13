@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.footer;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -78,11 +79,8 @@ public class FooterViewImpl implements FooterView, IsWidget {
             ginInjector.getGlobalApplicationState();
           globalAppState.handleRelativePathClick(href);
         },
-        newMode -> {
-          GlobalApplicationState globalAppState =
-            ginInjector.getGlobalApplicationState();
-          globalAppState.refreshPage();
-        }
+        // A full reload is required: the footer is not re-rendered on place changes, so it would keep stale feature flag state
+        () -> Window.Location.reload()
       );
       ReactElement component = React.createElementWithSynapseContext(
         SRC.SynapseComponents.SynapseFooter,
