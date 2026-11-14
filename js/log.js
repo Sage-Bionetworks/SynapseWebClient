@@ -76,6 +76,7 @@ export function sendLog(eventName, severityText, body, attributes) {
               body,
               attributes: {
                 ...attributes,
+                'synapse.portal.version': versions.portalVersion,
                 'synapse.repo.version': versions.repoVersion,
               },
             }),
