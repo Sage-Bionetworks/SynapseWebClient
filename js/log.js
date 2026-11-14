@@ -132,6 +132,16 @@ function saveClientErrorCounts() {
   }
 }
 
+// /Portal/log rejects request bodies over 64 KB, so an error that is too long would never be logged. Cap the
+// message (sent twice) and the stack trace so a record stays well under that, about 40 KB in the worst case.
+const MAX_MESSAGE_LENGTH = 1000
+const MAX_STACKTRACE_LENGTH = 8000
+
+function truncate(value, maxLength) {
+  if (typeof value !== 'string' || value.length <= maxLength) return value
+  return value.slice(0, maxLength) + '…[truncated]'
+}
+
 window._swcLogClientError = function (eventName, message, stacktrace) {
   try {
     const key = `${eventName}|${message}`
@@ -142,13 +152,15 @@ window._swcLogClientError = function (eventName, message, stacktrace) {
     seenClientErrors.add(key)
     clientErrorCounts[eventName] = count + 1
     saveClientErrorCounts()
+    const loggedMessage = truncate(message, MAX_MESSAGE_LENGTH)
     sendLog(
       eventName,
       'ERROR',
-      { message },
+      { message: loggedMessage },
       {
-        'exception.message': message,
-        'exception.stacktrace': stacktrace || undefined,
+        'exception.message': loggedMessage,
+        'exception.stacktrace':
+          truncate(stacktrace, MAX_STACKTRACE_LENGTH) || undefined,
         'url.template': toUrlTemplate(window.location.href),
         'url.domain': window.location.hostname,
       },
