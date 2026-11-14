@@ -1106,8 +1106,9 @@ public class Uploader
 
   @Override
   public void uploadFailed(String string) {
-    this.uploadError(string, new Exception(string));
-    synapseJsniUtils.logClientError(UPLOAD_ERROR_EVENT, new Exception(string));
+    Exception e = new Exception(string);
+    this.uploadError(string, e);
+    synapseJsniUtils.logClientError(UPLOAD_ERROR_EVENT, e);
   }
 
   /**
