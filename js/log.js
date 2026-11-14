@@ -109,11 +109,12 @@ export function pageAttributes() {
   }
 }
 
-// Called from GWT (SynapseJSNIUtilsImpl.logClientError) to send uncaught errors and upload failures to
-// /Portal/log. Each distinct error is sent once per page load, and at most MAX_CLIENT_ERRORS_PER_EVENT per
-// eventName per tab, so a repeating error can't flood the logs (see PLFM-9565). Counts are kept per eventName
-// so one kind of error can't use up the budget for the others, and are stored in sessionStorage so reloading
-// the page doesn't reset them.
+// Called from GWT (SynapseJSNIUtilsImpl.logClientError) to send uncaught errors
+// and upload failures to /Portal/log. Each distinct error is sent once per page
+// load, and at most MAX_CLIENT_ERRORS_PER_EVENT per eventName per tab, so a
+// repeating error can't flood the logs (see PLFM-9565). Counts are kept per
+// eventName so one kind of error can't use up the budget for the others, and
+// are stored in sessionStorage so reloading the page doesn't reset them.
 const MAX_CLIENT_ERRORS_PER_EVENT = 25
 const CLIENT_ERROR_COUNTS_KEY = 'swcClientErrorCounts'
 const seenClientErrors = new Set()
@@ -136,12 +137,14 @@ function saveClientErrorCounts() {
       JSON.stringify(clientErrorCounts),
     )
   } catch {
-    // sessionStorage is unavailable or full: counts still apply for this page load
+    // sessionStorage is unavailable or full: counts still apply for this page
+    // load
   }
 }
 
-// /Portal/log rejects request bodies over 64 KB, so an error that is too long would never be logged. Cap the
-// message (sent twice) and the stack trace so a record stays well under that, about 40 KB in the worst case.
+// /Portal/log rejects request bodies over 64 KB, so an error that is too long
+// would never be logged. Cap the message (sent twice) and the stack trace so a
+// record stays well under that, about 40 KB in the worst case.
 const MAX_MESSAGE_LENGTH = 1000
 const MAX_STACKTRACE_LENGTH = 8000
 
@@ -150,8 +153,9 @@ function truncate(value, maxLength) {
   return value.slice(0, maxLength) + '…[truncated]'
 }
 
-// Removes secrets from URLs in error text: drops query/fragment (e.g. S3 signatures) and replaces route tokens
-// with {token}. Same rules as CSPReportServlet.scrubReportBody.
+// Removes secrets from URLs in error text: drops query/fragment (e.g. S3
+// signatures) and replaces route tokens with {token}. Same rules as
+// CSPReportServlet.scrubReportBody.
 function scrub(value) {
   if (typeof value !== 'string') return value
   return value
@@ -182,7 +186,8 @@ window.__swcLogClientError = function (eventName, message, stacktrace) {
       },
     )
   } catch {
-    // Ignore failures here: this runs inside SWC's uncaught error handler, so throwing would raise another
-    // error (and could trigger another log attempt)
+    // Ignore failures here: this runs inside SWC's uncaught error handler, so
+    // throwing would raise another error (and could trigger another log
+    // attempt)
   }
 }
