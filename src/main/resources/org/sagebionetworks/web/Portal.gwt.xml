@@ -61,8 +61,9 @@
   <add-linker name="xsiframe" />
   <set-configuration-property name="devModeRedirectEnabled" value="true" />
   <set-property name="compiler.useSourceMaps" value="true" />
-  <!-- "native" gives stack traces for errors logged to /Portal/log (parsed from Error.stack only
-       when getStackTrace() is called). "strip" returns no stack; "emulated" is slow. -->
+  <!-- "native" gives stack traces for errors logged to /Portal/log (parsed
+       from Error.stack only when getStackTrace() is called). "strip" returns
+       no stack; "emulated" is slow. -->
   <set-property name="compiler.stackMode" value="native" />
 
   <!-- Specify the paths for translatable code -->
