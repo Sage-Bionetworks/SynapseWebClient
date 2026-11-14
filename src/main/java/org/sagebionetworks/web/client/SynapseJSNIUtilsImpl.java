@@ -13,6 +13,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 import elemental2.dom.Blob;
 import javax.inject.Inject;
+import jsinterop.annotations.JsFunction;
+import jsinterop.annotations.JsPackage;
+import jsinterop.annotations.JsProperty;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -523,28 +526,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
     return Location.getHostName();
   }
 
+  @JsFunction
+  interface ClientErrorLogger {
+    void log(String eventName, String message, String stacktrace);
+  }
+
+  // Defined in js/moduleLoadDiagnostics.js. Undefined until that module has run.
+  @JsProperty(namespace = JsPackage.GLOBAL, name = "_swcLogClientError")
+  private static native ClientErrorLogger getClientErrorLogger();
+
   @Override
   public void logClientError(String eventName, Throwable t) {
-    _logClientError(eventName, t.getMessage(), getStackTrace(t));
-  }
-
-  public static String getStackTrace(Throwable t) {
-    StringBuilder sb = new StringBuilder();
-    for (StackTraceElement element : t.getStackTrace()) {
-      sb.append(element.toString()).append("\n");
+    ClientErrorLogger logger = getClientErrorLogger();
+    if (logger != null) {
+      logger.log(eventName, t.getMessage(), DisplayUtils.getStackTrace(t));
     }
-    return sb.toString();
   }
-
-  private static final native void _logClientError(
-    String eventName,
-    String message,
-    String stacktrace
-  ) /*-{
-		if ($wnd._swcLogClientError) {
-			$wnd._swcLogClientError(eventName, message, stacktrace);
-		}
-	}-*/;
 
   @Override
   public String getProtocol(String url) {
