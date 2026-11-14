@@ -532,7 +532,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   }
 
   // Defined in js/log.js. Undefined until that module has run.
-  @JsProperty(namespace = JsPackage.GLOBAL, name = "_swcLogClientError")
+  @JsProperty(namespace = JsPackage.GLOBAL, name = "__swcLogClientError")
   private static native ClientErrorLogger getClientErrorLogger();
 
   @Override

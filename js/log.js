@@ -1,7 +1,7 @@
 /**
  * Client-side logging to the Portal's log servlet (`POST /Portal/log`).
  *
- * Also defines `window._swcLogClientError`, which GWT calls (see
+ * Also defines `window.__swcLogClientError`, which GWT calls (see
  * SynapseJSNIUtilsImpl.logClientError) to log uncaught errors and upload
  * failures.
  */
@@ -151,7 +151,7 @@ function scrub(value) {
     .replace(/(https?:\/\/[^\s/]+\/[A-Za-z]+:)[^\s'")]*/g, '$1{token}')
 }
 
-window._swcLogClientError = function (eventName, message, stacktrace) {
+window.__swcLogClientError = function (eventName, message, stacktrace) {
   try {
     const key = `${eventName}|${message}`
     const count = clientErrorCounts[eventName] || 0
