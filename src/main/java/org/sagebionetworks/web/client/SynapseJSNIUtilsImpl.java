@@ -531,7 +531,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
     void log(String eventName, String message, String stacktrace);
   }
 
-  // Defined in js/moduleLoadDiagnostics.js. Undefined until that module has run.
+  // Defined in js/log.js. Undefined until that module has run.
   @JsProperty(namespace = JsPackage.GLOBAL, name = "_swcLogClientError")
   private static native ClientErrorLogger getClientErrorLogger();
 

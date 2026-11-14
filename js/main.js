@@ -8,6 +8,9 @@
  */
 // vite/modulepreload-polyfill should be included per https://vite.dev/guide/backend-integration
 import 'vite/modulepreload-polyfill'
+// Client-side logging to /Portal/log; also defines the global GWT calls to log
+// uncaught errors and upload failures.
+import './log.js'
 // Install lazy-module load/link error diagnostics before anything else loads, so the
 // listeners are registered before any dynamically imported chunk can fail.
 import './moduleLoadDiagnostics.js'
