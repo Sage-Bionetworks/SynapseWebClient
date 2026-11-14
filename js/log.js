@@ -142,6 +142,15 @@ function truncate(value, maxLength) {
   return value.slice(0, maxLength) + '…[truncated]'
 }
 
+// Removes secrets from URLs in error text: drops query/fragment (e.g. S3 signatures) and replaces route tokens
+// with {token}. Same rules as CSPReportServlet.scrubReportBody.
+function scrub(value) {
+  if (typeof value !== 'string') return value
+  return value
+    .replace(/(https?:\/\/[^\s?#'")]+)[?#][^\s'")]*/g, '$1')
+    .replace(/(https?:\/\/[^\s/]+\/[A-Za-z]+:)[^\s'")]*/g, '$1{token}')
+}
+
 window._swcLogClientError = function (eventName, message, stacktrace) {
   try {
     const key = `${eventName}|${message}`
@@ -152,7 +161,7 @@ window._swcLogClientError = function (eventName, message, stacktrace) {
     seenClientErrors.add(key)
     clientErrorCounts[eventName] = count + 1
     saveClientErrorCounts()
-    const loggedMessage = truncate(message, MAX_MESSAGE_LENGTH)
+    const loggedMessage = truncate(scrub(message), MAX_MESSAGE_LENGTH)
     sendLog(
       eventName,
       'ERROR',
@@ -160,7 +169,7 @@ window._swcLogClientError = function (eventName, message, stacktrace) {
       {
         'exception.message': loggedMessage,
         'exception.stacktrace':
-          truncate(stacktrace, MAX_STACKTRACE_LENGTH) || undefined,
+          truncate(scrub(stacktrace), MAX_STACKTRACE_LENGTH) || undefined,
         'url.template': toUrlTemplate(window.location.href),
         'url.domain': window.location.hostname,
       },
