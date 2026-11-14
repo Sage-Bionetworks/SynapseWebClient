@@ -24,7 +24,7 @@
  *
  * This module must never throw or interfere with the app: every path is guarded.
  */
-import { sendLog, toUrlTemplate } from './log.js'
+import { pageAttributes, sendLog } from './log.js'
 
 const MAX_REPORTS = 25
 const seen = new Set()
@@ -495,8 +495,7 @@ function report(kind, message, stack) {
     sendLog(EVENT_NAME_ERROR, 'ERROR', loggablePayload, {
       'exception.message': message,
       'exception.stacktrace': stack,
-      'url.template': toUrlTemplate(payload.pageUrl),
-      'url.domain': window.location.hostname,
+      ...pageAttributes(),
       'synapse.referrer.origin':
         payload.referrer && new URL(payload.referrer).origin,
     })

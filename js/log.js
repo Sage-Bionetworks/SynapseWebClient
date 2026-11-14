@@ -91,13 +91,21 @@ export function sendLog(eventName, severityText, body, attributes) {
 // '/PasswordResetSignedToken:abc…' → '/PasswordResetSignedToken:{token}'
 // '/Synapse:syn123/wiki/456'       → '/Synapse:{token}'
 // '/'                              → '/'
-export function toUrlTemplate(href) {
+function toUrlTemplate(href) {
   try {
     const first = new URL(href).pathname.split('/').find(Boolean) || ''
     const colon = first.indexOf(':')
     return colon === -1 ? `/${first}` : `/${first.slice(0, colon)}:{token}`
   } catch {
     return undefined
+  }
+}
+
+// Log attributes for the current page: its URL template (no tokens) and domain
+export function pageAttributes() {
+  return {
+    'url.template': toUrlTemplate(window.location.href),
+    'url.domain': window.location.hostname,
   }
 }
 
@@ -170,8 +178,7 @@ window.__swcLogClientError = function (eventName, message, stacktrace) {
         'exception.message': loggedMessage,
         'exception.stacktrace':
           truncate(scrub(stacktrace), MAX_STACKTRACE_LENGTH) || undefined,
-        'url.template': toUrlTemplate(window.location.href),
-        'url.domain': window.location.hostname,
+        ...pageAttributes(),
       },
     )
   } catch {
