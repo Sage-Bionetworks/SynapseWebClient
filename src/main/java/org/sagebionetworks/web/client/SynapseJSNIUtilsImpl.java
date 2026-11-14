@@ -13,6 +13,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 import elemental2.dom.Blob;
 import javax.inject.Inject;
+import jsinterop.annotations.JsFunction;
+import jsinterop.annotations.JsPackage;
+import jsinterop.annotations.JsProperty;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -521,6 +524,23 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   @Override
   public String getCurrentHostName() {
     return Location.getHostName();
+  }
+
+  @JsFunction
+  interface ClientErrorLogger {
+    void log(String eventName, String message, String stacktrace);
+  }
+
+  // Defined in js/log.js. Undefined until that module has run.
+  @JsProperty(namespace = JsPackage.GLOBAL, name = "__swcLogClientError")
+  private static native ClientErrorLogger getClientErrorLogger();
+
+  @Override
+  public void logClientError(String eventName, Throwable t) {
+    ClientErrorLogger logger = getClientErrorLogger();
+    if (logger != null) {
+      logger.log(eventName, t.getMessage(), DisplayUtils.getStackTrace(t));
+    }
   }
 
   @Override

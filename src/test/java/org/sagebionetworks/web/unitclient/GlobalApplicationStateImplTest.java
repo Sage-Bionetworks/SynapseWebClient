@@ -197,6 +197,11 @@ public class GlobalApplicationStateImplTest {
     Throwable t = new RuntimeException("uncaught");
     globalApplicationState.handleUncaughtException(t);
     verify(mockSynapseJSNIUtils).consoleError(t);
+    verify(mockSynapseJSNIUtils)
+      .logClientError(
+        eq(GlobalApplicationStateImpl.UNCAUGHT_ERROR_EVENT),
+        eq(t)
+      );
   }
 
   @Test
