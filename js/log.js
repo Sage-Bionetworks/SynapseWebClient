@@ -102,20 +102,46 @@ export function toUrlTemplate(href) {
 }
 
 // Called from GWT (SynapseJSNIUtilsImpl.logClientError) to send uncaught errors and upload failures to
-// /Portal/log. Each distinct error is sent once per page load, and at most MAX_CLIENT_ERRORS in total, so a
-// repeating error can't flood the logs (see PLFM-9565)
-const MAX_CLIENT_ERRORS = 25
+// /Portal/log. Each distinct error is sent once per page load, and at most MAX_CLIENT_ERRORS_PER_EVENT per
+// eventName per tab, so a repeating error can't flood the logs (see PLFM-9565). Counts are kept per eventName
+// so one kind of error can't use up the budget for the others, and are stored in sessionStorage so reloading
+// the page doesn't reset them.
+const MAX_CLIENT_ERRORS_PER_EVENT = 25
+const CLIENT_ERROR_COUNTS_KEY = 'swcClientErrorCounts'
 const seenClientErrors = new Set()
+const clientErrorCounts = loadClientErrorCounts()
+
+function loadClientErrorCounts() {
+  try {
+    const counts = JSON.parse(sessionStorage.getItem(CLIENT_ERROR_COUNTS_KEY))
+    if (counts && typeof counts === 'object') return counts
+  } catch {
+    // sessionStorage is unavailable or the value is corrupt: start from zero
+  }
+  return {}
+}
+
+function saveClientErrorCounts() {
+  try {
+    sessionStorage.setItem(
+      CLIENT_ERROR_COUNTS_KEY,
+      JSON.stringify(clientErrorCounts),
+    )
+  } catch {
+    // sessionStorage is unavailable or full: counts still apply for this page load
+  }
+}
+
 window._swcLogClientError = function (eventName, message, stacktrace) {
   try {
     const key = `${eventName}|${message}`
-    if (
-      seenClientErrors.has(key) ||
-      seenClientErrors.size >= MAX_CLIENT_ERRORS
-    ) {
+    const count = clientErrorCounts[eventName] || 0
+    if (seenClientErrors.has(key) || count >= MAX_CLIENT_ERRORS_PER_EVENT) {
       return
     }
     seenClientErrors.add(key)
+    clientErrorCounts[eventName] = count + 1
+    saveClientErrorCounts()
     sendLog(
       eventName,
       'ERROR',
