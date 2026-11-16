@@ -67,6 +67,7 @@ public class LogServlet extends HttpServlet {
       toLogLine(
         logRecord,
         request.getHeader("User-Agent"),
+        // Only the rightmost entry is trustworthy; clients can set the rest. (On Beanstalk, getRemoteAddr() is the proxy.)
         request.getHeader(SynapseClientBase.X_FORWARDED_FOR_HEADER)
       )
         .toString()
