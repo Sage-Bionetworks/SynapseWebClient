@@ -1071,8 +1071,14 @@ public class UploaderTest {
   public void testUploadFailed() {
     String message = "meow there's an error.";
     uploader.uploadFailed(message);
+    ArgumentCaptor<Throwable> loggedCaptor = ArgumentCaptor.forClass(
+      Throwable.class
+    );
     verify(mockSynapseJsniUtils)
-      .logClientError(eq(Uploader.UPLOAD_ERROR_EVENT), any(Exception.class));
+      .logClientError(eq(Uploader.UPLOAD_ERROR_EVENT), loggedCaptor.capture());
+    assertEquals(message, loggedCaptor.getValue().getMessage());
+    // the user still sees the error
+    verifyUploadError();
   }
 
   @Test
