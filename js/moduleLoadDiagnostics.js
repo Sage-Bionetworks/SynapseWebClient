@@ -597,7 +597,15 @@ async function attemptRecovery(message, inspectionPromise) {
     ])
 
     const attempt = count + 1
-    sessionStorage.setItem(RELOAD_COUNT_KEY, String(attempt))
+    try {
+      sessionStorage.setItem(RELOAD_COUNT_KEY, String(attempt))
+    } catch {
+      // Without the saved count, reloading could loop forever, so show the
+      // banner instead of leaving the page broken with no way out.
+      pushRecoveryEvent('banner_shown', count, url)
+      showReloadBanner()
+      return
+    }
     pushRecoveryEvent('reloaded', attempt, url)
     window.location.reload()
   } catch {
