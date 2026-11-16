@@ -24,7 +24,7 @@
  *
  * This module must never throw or interfere with the app: every path is guarded.
  */
-import { pageAttributes, sendLog } from './log.js'
+import { pageAttributes, scrub, sendLog } from './log.js'
 
 const MAX_REPORTS = 25
 const seen = new Set()
@@ -429,7 +429,7 @@ function runInspectionAndReport(url, payload) {
       const cached = inspection.cached || {}
       const network = inspection.network || {}
       sendLog(EVENT_NAME_INSPECTION, 'INFO', {
-        url,
+        url: scrub(url),
         expectedExport: payload.expectedExport,
         messageShape: payload.messageShape,
         buildId: BUILD_ID,
@@ -457,7 +457,10 @@ function runInspectionAndReport(url, payload) {
         cachedError: cached.error,
         networkError: network.error,
         fetchCount: timing.fetchCount,
-        resourceTimingEntries: timing.entries,
+        resourceTimingEntries: timing.entries.map(e => ({
+          ...e,
+          name: scrub(e.name),
+        })),
       })
       // eslint-disable-next-line no-console
       console.error('[swc-module-load-error] inspection', enriched)
@@ -492,9 +495,11 @@ function report(kind, message, stack) {
     delete loggablePayload.stack
     delete loggablePayload.pageUrl
     delete loggablePayload.referrer
+    loggablePayload.url = scrub(url)
+    loggablePayload.message = scrub(message)
     sendLog(EVENT_NAME_ERROR, 'ERROR', loggablePayload, {
-      'exception.message': message,
-      'exception.stacktrace': stack,
+      'exception.message': scrub(message),
+      'exception.stacktrace': scrub(stack),
       ...pageAttributes(),
       'synapse.referrer.origin':
         payload.referrer && new URL(payload.referrer).origin,
@@ -556,7 +561,7 @@ function showReloadBanner() {
  * underlying bug occurs, not whether this mitigation works.
  */
 function pushRecoveryEvent(outcome, attempt, url) {
-  sendLog(EVENT_NAME_RECOVERY, 'INFO', { outcome, attempt, url })
+  sendLog(EVENT_NAME_RECOVERY, 'INFO', { outcome, attempt, url: scrub(url) })
 }
 
 /**

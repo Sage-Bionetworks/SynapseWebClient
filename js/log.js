@@ -157,7 +157,7 @@ function truncate(value, maxLength) {
 // Removes secrets from URLs in error text: drops query/fragment (e.g. S3
 // signatures) and replaces route tokens with {token}. Same rules as
 // CSPReportServlet.scrubReportBody.
-function scrub(value) {
+export function scrub(value) {
   if (typeof value !== 'string') return value
   return value
     .replace(/(https?:\/\/[^\s?#'")]+)[?#][^\s'")]*/g, '$1')
