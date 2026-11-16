@@ -180,11 +180,12 @@ const uploadFile = async (
   })
 }
 
-// MD5 is listed in the "About this File" sidebar on the file page
+// MD5 is listed in the "About this File" sidebar on the file page, where each
+// <dd> value is aria-labelledby its <dt> title. getByRole('definition', { name })
+// can't match: ARIA prohibits naming the definition role, so Playwright computes
+// an empty name. getByLabel follows aria-labelledby without that restriction.
 const getFileMD5Locator = (page: Page) =>
-  page
-    .getByRole('definition', { name: 'MD5', exact: true })
-    .filter({ visible: true })
+  page.getByLabel('MD5', { exact: true }).filter({ visible: true })
 
 const getFileMD5 = async (page: Page) => {
   return await testAuth.step('get file MD5', async () => {
