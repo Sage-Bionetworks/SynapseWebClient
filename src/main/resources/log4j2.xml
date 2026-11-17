@@ -56,6 +56,11 @@
         <SizeBasedTriggeringPolicy size="250 MB" />
       </Policies>
     </RollingFile>
+    <!-- Writes ClientLog lines to portal.log off the request thread. If the queue is full, lines are dropped
+         instead of blocking requests. -->
+    <Async name="ClientLogAsync" blocking="false">
+      <appender-ref ref="portal" />
+    </Async>
   </appenders>
   <loggers>
     <!-- This allows us to track outgoing http connection issues. See: http://blog.nigelsim.org/2011/06/17/debugging-connection-pool-leak-in-apache-http-client/ -->
@@ -82,7 +87,7 @@
       level="info"
       additivity="false"
     >
-      <appender-ref ref="portal" />
+      <appender-ref ref="ClientLogAsync" />
     </logger>
     <root level="error">
       <appender-ref ref="Console" />
