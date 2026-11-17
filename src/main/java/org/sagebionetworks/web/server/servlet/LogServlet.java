@@ -38,7 +38,8 @@ public class LogServlet extends HttpServlet {
   );
 
   // Must match the logger in log4j2.xml, which writes these lines to portal.log (shipped to CloudWatch Logs)
-  static final String CLIENT_LOG_NAME = "org.sagebionetworks.web.ClientLog";
+  public static final String CLIENT_LOG_NAME =
+    "org.sagebionetworks.web.ClientLog";
 
   private final transient Logger clientLog;
 
