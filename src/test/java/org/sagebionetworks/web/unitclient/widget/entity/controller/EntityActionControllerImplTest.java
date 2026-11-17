@@ -29,6 +29,7 @@ import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ACCESS_REQUIREMENT_GUIDANCE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.AUTHENTICATE_WITH_IDENTITY_PROVIDER_GUIDANCE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_CONTAINER_EXPLANATION_END;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_CONTAINER_EXPLANATION_START;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
@@ -89,6 +90,7 @@ import org.sagebionetworks.repo.model.download.ActionRequiredList;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
 import org.sagebionetworks.repo.model.download.AddToDownloadListStatsRequest;
 import org.sagebionetworks.repo.model.download.AddToDownloadListStatsResponse;
+import org.sagebionetworks.repo.model.download.AuthenticateWithIdentityProvider;
 import org.sagebionetworks.repo.model.download.EnableTwoFa;
 import org.sagebionetworks.repo.model.download.MeetAccessRequirement;
 import org.sagebionetworks.repo.model.download.RequestDownload;
@@ -4782,6 +4784,8 @@ public class EntityActionControllerImplTest {
   public void testConfigureFileDownloadCannotDownload() {
     RequestDownload requestAclAction = new RequestDownload();
     EnableTwoFa enableTwoFaAction = new EnableTwoFa();
+    AuthenticateWithIdentityProvider authenticateWithIdpAction =
+      new AuthenticateWithIdentityProvider();
     MeetAccessRequirement meetAccessRequirementAction1 =
       new MeetAccessRequirement();
     MeetAccessRequirement meetAccessRequirementAction2 =
@@ -4791,6 +4795,7 @@ public class EntityActionControllerImplTest {
     actionsRequiredForDownload.setActions(
       Arrays.asList(
         enableTwoFaAction,
+        authenticateWithIdpAction,
         requestAclAction,
         meetAccessRequirementAction1,
         meetAccessRequirementAction2
@@ -4822,6 +4827,7 @@ public class EntityActionControllerImplTest {
     String tooltip = tooltipCaptor.getAllValues().get(1);
     assertTrue(tooltip.contains(NO_PERMISSION_TO_DOWNLOAD));
     assertTrue(tooltip.contains(ENABLE_2FA_GUIDANCE));
+    assertTrue(tooltip.contains(AUTHENTICATE_WITH_IDENTITY_PROVIDER_GUIDANCE));
     assertTrue(tooltip.contains(ACCESS_REQUIREMENT_GUIDANCE));
     assertTrue(tooltip.contains(REQUEST_DOWNLOAD_GUIDANCE));
 
