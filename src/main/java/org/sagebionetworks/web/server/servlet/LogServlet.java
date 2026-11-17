@@ -14,8 +14,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Accepts log entries from the browser and writes each one to stdout (shipped to CloudWatch) as a single
- * JSON line, using OpenTelemetry field names.
+ * Accepts log records from the browser and logs each as an OpenTelemetry-style JSON line
+ * to portal.log (shipped to CloudWatch).
  */
 public class LogServlet extends HttpServlet {
 
@@ -37,7 +37,7 @@ public class LogServlet extends HttpServlet {
     21
   );
 
-  // Must match the logger in log4j2.xml, which writes these lines to stdout (shipped to CloudWatch Logs) as bare JSON
+  // Must match the logger in log4j2.xml, which writes these lines to portal.log (shipped to CloudWatch Logs)
   static final String CLIENT_LOG_NAME = "org.sagebionetworks.web.ClientLog";
 
   private final transient Logger clientLog;

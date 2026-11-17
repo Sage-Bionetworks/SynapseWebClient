@@ -6,9 +6,6 @@
     </property>
   </properties>
   <appenders>
-    <Console name="ClientLogConsole" target="SYSTEM_OUT">
-      <PatternLayout pattern="%msg%n" />
-    </Console>
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout
         pattern="%d{ISO8601}{GMT+0} [%t] %-5level %logger{36} - %msg%n"
@@ -85,7 +82,7 @@
       level="info"
       additivity="false"
     >
-      <appender-ref ref="ClientLogConsole" />
+      <appender-ref ref="portal" />
     </logger>
     <root level="error">
       <appender-ref ref="Console" />
