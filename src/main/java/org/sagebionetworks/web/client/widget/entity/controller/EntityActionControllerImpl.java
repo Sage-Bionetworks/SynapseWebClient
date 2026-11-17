@@ -47,6 +47,7 @@ import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResp
 import org.sagebionetworks.repo.model.download.AddToDownloadListRequest;
 import org.sagebionetworks.repo.model.download.AddToDownloadListStatsRequest;
 import org.sagebionetworks.repo.model.download.AddToDownloadListStatsResponse;
+import org.sagebionetworks.repo.model.download.AuthenticateWithIdentityProvider;
 import org.sagebionetworks.repo.model.download.EnableTwoFa;
 import org.sagebionetworks.repo.model.download.MeetAccessRequirement;
 import org.sagebionetworks.repo.model.download.RequestDownload;
@@ -253,6 +254,8 @@ public class EntityActionControllerImpl
     "This controlled data has additional requirements. Click \"Request Access\" underneath the SynID and follow the instructions.";
   public static final String ENABLE_2FA_GUIDANCE =
     "You must enable two-factor authentication to download this file.";
+  public static final String AUTHENTICATE_WITH_IDENTITY_PROVIDER_GUIDANCE =
+    "You must sign in with an approved identity provider to download this file.";
   public static final String NO_PERMISSION_TO_DOWNLOAD =
     "You don't have permission to download this file.";
 
@@ -3116,6 +3119,8 @@ public class EntityActionControllerImpl
       return ACCESS_REQUIREMENT_GUIDANCE;
     } else if (EnableTwoFa.class.equals(clazz)) {
       return ENABLE_2FA_GUIDANCE;
+    } else if (AuthenticateWithIdentityProvider.class.equals(clazz)) {
+      return AUTHENTICATE_WITH_IDENTITY_PROVIDER_GUIDANCE;
     }
     return "";
   }

@@ -197,6 +197,34 @@ public class GlobalApplicationStateImplTest {
     Throwable t = new RuntimeException("uncaught");
     globalApplicationState.handleUncaughtException(t);
     verify(mockSynapseJSNIUtils).consoleError(t);
+    verify(mockSynapseJSNIUtils)
+      .logClientError(
+        eq(GlobalApplicationStateImpl.UNCAUGHT_ERROR_EVENT),
+        eq(t)
+      );
+  }
+
+  @Test
+  public void testIgnoredUncaughtExceptionNotLogged() {
+    Throwable t = new RuntimeException("ResizeObserver loop limit exceeded");
+    globalApplicationState.handleUncaughtException(t);
+    verify(mockSynapseJSNIUtils, never()).consoleError(any(Throwable.class));
+    verify(mockSynapseJSNIUtils, never()).logClientError(anyString(), any());
+  }
+
+  @Test
+  public void testUncaughtExceptionLoggingFailureIsContained() {
+    Throwable t = new RuntimeException("uncaught");
+    doThrow(new RuntimeException("log failed"))
+      .when(mockSynapseJSNIUtils)
+      .logClientError(anyString(), any());
+
+    // Must not throw: this runs inside GWT's uncaught exception handler
+    globalApplicationState.handleUncaughtException(t);
+
+    verify(mockSynapseJSNIUtils).consoleError(t);
+    verify(mockSynapseJSNIUtils)
+      .consoleError("Unable to log uncaught exception to server: log failed");
   }
 
   @Test
