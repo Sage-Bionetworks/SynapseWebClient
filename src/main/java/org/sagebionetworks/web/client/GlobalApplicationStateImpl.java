@@ -49,6 +49,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   public static final String RECENTLY_CHECKED_SYNAPSE_VERSION =
     "org.sagebionetworks.web.client.recently-checked-synapse-version";
   public static final String DEFAULT_REFRESH_PLACE = "Home:0";
+  // eventName sent to /Portal/log for uncaught errors
+  public static final String UNCAUGHT_ERROR_EVENT = "swc.uncaught_error";
   private PlaceController placeController;
   private CookieProvider cookieProvider;
   private AppPlaceHistoryMapper appPlaceHistoryMapper;
@@ -167,6 +169,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
       if (!isIgnoredErrorMessage(e.getMessage())) {
         GWT.debugger();
         synapseJSNIUtils.consoleError(e);
+        synapseJSNIUtils.logClientError(UNCAUGHT_ERROR_EVENT, unwrap(e));
       } else {
         synapseJSNIUtils.consoleLog("Ignoring error: " + e.getMessage());
       }

@@ -10,7 +10,7 @@
  * regardless of the boundary (Vite's `vite:preloadError`, global `error`, and
  * `unhandledrejection`) to answer two questions:
  *   1. How often and when is this happening? (logged to CloudWatch via
- *      `POST /Portal/log`, see `sendLog`, and to the console)
+ *      `POST /Portal/log`, see `sendLog` in log.js, and to the console)
  *   2. Why? When a failing chunk URL is known, we re-fetch BOTH the cached copy and a fresh
  *      network copy and record status / size / head+tail bytes / encoding / how many times the
  *      URL was actually requested on this page (via Resource Timing) / whether the *specific*
@@ -24,6 +24,8 @@
  *
  * This module must never throw or interfere with the app: every path is guarded.
  */
+import { pageAttributes, scrub, sendLog } from './log.js'
+
 const MAX_REPORTS = 25
 const seen = new Set()
 // Separate from `seen`: which (url, message) pairs have already been counted
@@ -194,7 +196,7 @@ function extractUrl(message) {
   ]
   for (const re of patterns) {
     const m = message.match(re)
-    if (m && m[1]) return m[1].replace(/[).,'"]+$/, '')
+    if (m && m[1]) return m[1].replace(/[).,'"]+$/, '').split(/[?#]/)[0]
   }
   return undefined
 }
@@ -380,110 +382,17 @@ async function inspectModule(url, expectedExport) {
 
 // --- logging --------------------------------------------------
 //
-// LogServlet writes each record to stdout as one JSON line following the
+// LogServlet writes each record to portal.log as one JSON line following the
 // OpenTelemetry Logs Data Model (eventName, severityText, body, attributes,
-// resource). Logs Insights discovers JSON fields automatically. A typical query:
+// resource), after the portal.log prefix. A typical Logs Insights query:
 //   fields @timestamp, @message
-//   | filter eventName = "swc.module_load.error"
-//   | stats count(*) by `body.buildId`
+//   | filter @message like /swc.module_load.error/
+//   | parse @message '"buildId":"*"' as buildId
+//   | stats count(*) by buildId
 
-const LOG_SERVLET_PATH = 'Portal/log'
 const EVENT_NAME_ERROR = 'swc.module_load.error'
 const EVENT_NAME_INSPECTION = 'swc.module_load.inspection'
 const EVENT_NAME_RECOVERY = 'swc.module_load.recovery'
-// Mirrors the fallback in synapse-react-client's getEndpoint(): if GWT
-// hasn't set `window.SRC_OVERRIDE_ENDPOINT_CONFIG` yet (this module can run
-// before GWT bootstraps), assume the production Portal origin. Used for both
-// `GET /Portal/versions` and `POST /Portal/log` below.
-const PRODUCTION_PORTAL_ENDPOINT = 'https://www.synapse.org/'
-const PORTAL_VERSIONS_PATH = 'Portal/versions'
-
-function getPortalEndpoint() {
-  try {
-    const override =
-      window.SRC_OVERRIDE_ENDPOINT_CONFIG &&
-      window.SRC_OVERRIDE_ENDPOINT_CONFIG.PORTAL
-    return override || PRODUCTION_PORTAL_ENDPOINT
-  } catch {
-    return PRODUCTION_PORTAL_ENDPOINT
-  }
-}
-
-let versionsPromise = null
-
-/**
- * Fetch and cache `{ portalVersion, repoVersion }`.
- */
-function getVersions() {
-  if (!versionsPromise) {
-    versionsPromise = fetch(
-      `${getPortalEndpoint().replace(/\/+$/, '')}/${PORTAL_VERSIONS_PATH}`,
-      { mode: 'cors', credentials: 'omit', keepalive: true },
-    )
-      .then(res => res.text())
-      .then(text => {
-        const [portalVersion, repoVersion] = text.split(',')
-        return { portalVersion, repoVersion }
-      })
-      .catch(() => ({}))
-  }
-  return versionsPromise
-}
-
-/**
- * Send one OpenTelemetry-shaped log record to the Portal's log servlet
- * (`POST /Portal/log`), which writes it to stdout for CloudWatch Logs. Timestamp
- * is captured before the async version lookup, so it records when the event
- * happened. `keepalive` lets the request
- * survive a page reload (e.g. the one `attemptRecovery` triggers) without
- * needing to be awaited first.
- */
-function sendLog(eventName, severityText, body, attributes) {
-  try {
-    const timestamp = new Date().toISOString()
-    return getVersions()
-      .then(versions => {
-        return fetch(
-          `${getPortalEndpoint().replace(/\/+$/, '')}/${LOG_SERVLET_PATH}`,
-          {
-            method: 'POST',
-            mode: 'cors',
-            credentials: 'omit',
-            keepalive: true,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              timestamp,
-              severityText,
-              eventName,
-              body,
-              attributes: {
-                ...attributes,
-                'synapse.repo.version': versions.repoVersion,
-              },
-            }),
-          },
-        )
-      })
-      .catch(() => {})
-  } catch {
-    return Promise.resolve()
-  }
-}
-
-// '/PasswordResetSignedToken:abc…' → '/PasswordResetSignedToken:{token}'
-// '/Synapse:syn123/wiki/456'       → '/Synapse:{token}'
-// '/'                              → '/'
-function toUrlTemplate(href) {
-  try {
-    const first = new URL(href).pathname.split('/').find(Boolean) || ''
-    const colon = first.indexOf(':')
-    return colon === -1 ? `/${first}` : `/${first.slice(0, colon)}:{token}`
-  } catch {
-    return undefined
-  }
-}
 
 /** Build the payload reported for one failure/boundary combination. */
 function buildPayload(kind, message, stack, url) {
@@ -521,7 +430,7 @@ function runInspectionAndReport(url, payload) {
       const cached = inspection.cached || {}
       const network = inspection.network || {}
       sendLog(EVENT_NAME_INSPECTION, 'INFO', {
-        url,
+        url: scrub(url),
         expectedExport: payload.expectedExport,
         messageShape: payload.messageShape,
         buildId: BUILD_ID,
@@ -549,7 +458,10 @@ function runInspectionAndReport(url, payload) {
         cachedError: cached.error,
         networkError: network.error,
         fetchCount: timing.fetchCount,
-        resourceTimingEntries: timing.entries,
+        resourceTimingEntries: timing.entries.map(e => ({
+          ...e,
+          name: scrub(e.name),
+        })),
       })
       // eslint-disable-next-line no-console
       console.error('[swc-module-load-error] inspection', enriched)
@@ -584,11 +496,12 @@ function report(kind, message, stack) {
     delete loggablePayload.stack
     delete loggablePayload.pageUrl
     delete loggablePayload.referrer
+    loggablePayload.url = scrub(url)
+    loggablePayload.message = scrub(message)
     sendLog(EVENT_NAME_ERROR, 'ERROR', loggablePayload, {
-      'exception.message': message,
-      'exception.stacktrace': stack,
-      'url.template': toUrlTemplate(payload.pageUrl),
-      'url.domain': window.location.hostname,
+      'exception.message': scrub(message),
+      'exception.stacktrace': scrub(stack),
+      ...pageAttributes(),
       'synapse.referrer.origin':
         payload.referrer && new URL(payload.referrer).origin,
     })
@@ -649,7 +562,7 @@ function showReloadBanner() {
  * underlying bug occurs, not whether this mitigation works.
  */
 function pushRecoveryEvent(outcome, attempt, url) {
-  sendLog(EVENT_NAME_RECOVERY, 'INFO', { outcome, attempt, url })
+  sendLog(EVENT_NAME_RECOVERY, 'INFO', { outcome, attempt, url: scrub(url) })
 }
 
 /**
@@ -685,7 +598,15 @@ async function attemptRecovery(message, inspectionPromise) {
     ])
 
     const attempt = count + 1
-    sessionStorage.setItem(RELOAD_COUNT_KEY, String(attempt))
+    try {
+      sessionStorage.setItem(RELOAD_COUNT_KEY, String(attempt))
+    } catch {
+      // Without the saved count, reloading could loop forever, so show the
+      // banner instead of leaving the page broken with no way out.
+      pushRecoveryEvent('banner_shown', count, url)
+      showReloadBanner()
+      return
+    }
     pushRecoveryEvent('reloaded', attempt, url)
     window.location.reload()
   } catch {

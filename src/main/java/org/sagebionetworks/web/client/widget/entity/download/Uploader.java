@@ -68,6 +68,8 @@ public class Uploader
 
   public static final long OLD_BROWSER_MAX_SIZE =
     (long) ClientProperties.MB * 5; // 5MB
+  // eventName sent to /Portal/log for failed uploads
+  public static final String UPLOAD_ERROR_EVENT = "swc.upload_error";
   private UploaderView view;
   private UploadSuccessHandler successHandler;
   private CancelHandler cancelHandler;
@@ -1104,7 +1106,9 @@ public class Uploader
 
   @Override
   public void uploadFailed(String string) {
-    this.uploadError(string, new Exception(string));
+    Exception e = new Exception(string);
+    this.uploadError(string, e);
+    synapseJsniUtils.logClientError(UPLOAD_ERROR_EVENT, e);
   }
 
   /**
