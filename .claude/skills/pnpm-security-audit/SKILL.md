@@ -1,6 +1,6 @@
 ---
 name: pnpm-security-audit
-description: Systematically patches security vulnerabilities in pnpm projects. Use this skill whenever the user wants to fix CVEs, address pnpm audit findings, update vulnerable dependencies, or patch security vulnerabilities. Trigger on phrases like "fix vulnerabilities", "patch CVEs", "address security audit", "update vulnerable deps", "investigate <package> dependency", or any mention of pnpm audit results or GHSA advisories.
+description: Patches security vulnerabilities in this pnpm project one package group at a time. Use whenever the user wants to fix CVEs or GHSA advisories, act on `pnpm audit` results, update vulnerable dependencies, or investigate why a vulnerable version of a package is installed.
 ---
 
 # pnpm Security Audit & Patch Workflow
@@ -10,14 +10,14 @@ Patch security vulnerabilities one package group at a time — preferring lockfi
 ## Step 1: Run the audit, triage, and initialize the doc
 
 ```bash
-pnpm audit 2>&1 | tee /tmp/pnpm-audit.txt; echo "Exit: $?"
+set -o pipefail; pnpm audit 2>&1 | tee /tmp/pnpm-audit.txt; echo "Exit: $?"
 ```
 
-Capture the output to `/tmp/pnpm-audit.txt` so you can re-read specific sections without re-running the audit. The `tee` also prints to terminal so you see it live. Use the Read tool on `/tmp/pnpm-audit.txt` if you need to revisit any section — don't re-run `pnpm audit`.
+Capture the output to `/tmp/pnpm-audit.txt` so you can go back to any section (read or grep the file) without re-running the audit.
 
 **Group all findings by package name** before doing anything — multiple CVEs for the same package should be fixed together. Sort groups by severity: critical → high → moderate → low.
 
-**Important: do all grouping and triage from this single audit run.** The full output is in your context — do not run `pnpm audit` again, do not grep its output for individual packages. Extract every package name, severity, vulnerable range, patched version, and dependency path from the output you already have. Only move on to `pnpm why` (Step 2) once you've fully triaged and presented the complete grouped summary to the user.
+Do all grouping and triage from this one audit run: extract every package name, severity, vulnerable range, patched version, and dependency path from `/tmp/pnpm-audit.txt`. Present the complete grouped summary to the user before moving on to `pnpm why` (Step 2).
 
 ### Initialize DEPENDENCIES_UPDATE.md
 
@@ -108,7 +108,7 @@ pnpm info <parent> versions --json
 pnpm info <parent>@latest dependencies --json | grep <vulnerable-package>
 ```
 
-**Before applying a parent update, check for breaking changes** — especially for major version bumps or core tools (eslint, vite, storybook, typescript-eslint):
+**Before applying a parent update, check for breaking changes** — especially for major version bumps or core tools (eslint, vite, typescript, typescript-eslint, playwright):
 
 ```bash
 # Check the changelog or release notes
@@ -206,12 +206,12 @@ Document:
 Before choosing a test command, check what scripts are available in `package.json`. Don't assume commands exist — use only what's actually defined there. Scope tests to the impact:
 
 - **Production dep changed** → run the project's test script
-- **Dev tooling dep** (eslint, vitest, rollup, storybook) → run the relevant lint or build script
+- **Dev tooling dep** (eslint, vite, playwright) → run the relevant lint or build script
 - **CLI tool dep** → run the relevant generate/build command
 
 If no applicable test script exists, note that and move on.
 
-If tests fail, check: API breaking change in the updated package, accidentally too-broad override bumping a major version, or pre-existing failure on `main`.
+If tests fail, check: API breaking change in the updated package, accidentally too-broad override bumping a major version, or pre-existing failure on `develop`.
 
 ## Step 8: Draft the commit message
 
