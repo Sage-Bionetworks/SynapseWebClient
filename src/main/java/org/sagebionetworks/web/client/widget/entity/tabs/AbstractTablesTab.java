@@ -265,8 +265,15 @@ public abstract class AbstractTablesTab
       String synId = QueryBundleUtils.getTableIdFromSql(newQuery.getSql());
       Query defaultQuery = tableEntityWidget.getDefaultQuery();
       // SWC-6854: update query value in the hash
-      if (token != null && !newQuery.equals(defaultQuery)) {
-        jsniUtils.setHash(TABLE_QUERY_PREFIX + token);
+      String hash = TABLE_QUERY_PREFIX + token;
+      // Showing the query that is already in the URL (e.g. after Back to it) must not add a history entry, which would
+      // drop the Forward history
+      if (
+        token != null &&
+        !newQuery.equals(defaultQuery) &&
+        !hash.equals(jsniUtils.getHash())
+      ) {
+        jsniUtils.setHash(hash);
       }
       updateVersionAndAreaToken(synId, versionNumber, areaToken);
       tab.showTab(true);

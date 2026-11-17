@@ -112,9 +112,17 @@ public class Portal implements EntryPoint {
                           e1.printStackTrace();
                         }
                         EventBus eventBus = ginjector.getEventBus();
-                        PlaceController placeController = new PlaceController(
-                          eventBus
+                        AppPlaceHistoryMapper historyMapper = GWT.create(
+                          AppPlaceHistoryMapper.class
                         );
+                        Html5Historian historian = new Html5Historian();
+                        SynapsePlaceController placeController =
+                          new SynapsePlaceController(
+                            eventBus,
+                            GWT.create(PlaceController.DefaultDelegate.class),
+                            historyMapper,
+                            historian
+                          );
 
                         // Start ActivityManager for the main widget with our ActivityMapper
                         AppActivityMapper activityMapper =
@@ -133,14 +141,8 @@ public class Portal implements EntryPoint {
                         appWidget.addStyleName("rootPanel");
 
                         // Start PlaceHistoryHandler with our PlaceHistoryMapper
-                        AppPlaceHistoryMapper historyMapper = GWT.create(
-                          AppPlaceHistoryMapper.class
-                        );
                         final PlaceHistoryHandler historyHandler =
-                          new PlaceHistoryHandler(
-                            historyMapper,
-                            new Html5Historian()
-                          );
+                          new PlaceHistoryHandler(historyMapper, historian);
                         historyHandler.register(
                           placeController,
                           eventBus,
@@ -194,9 +196,7 @@ public class Portal implements EntryPoint {
                                         registerWindowClosingHandler(
                                           globalApplicationState
                                         );
-                                        registerOnPopStateHandler(
-                                          globalApplicationState
-                                        );
+                                        globalApplicationState.initHashChangeHandler();
 
                                         // start version timer
                                         ginjector.getVersionTimer().start();
@@ -303,12 +303,6 @@ public class Portal implements EntryPoint {
         }
       }
     );
-  }
-
-  private void registerOnPopStateHandler(
-    final GlobalApplicationState globalApplicationState
-  ) {
-    globalApplicationState.initOnPopStateHandler();
   }
 
   /**

@@ -10,8 +10,6 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.place.shared.PlaceChangeEvent;
-import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -24,10 +22,12 @@ import elemental2.dom.DragEvent;
 import elemental2.dom.EventListener;
 import elemental2.dom.FileList;
 import elemental2.dom.HTMLDivElement;
+import elemental2.dom.HashChangeEvent;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
+import jsinterop.base.Js;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.tabs.AbstractTablesTab;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
@@ -49,7 +50,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   public static final String RECENTLY_CHECKED_SYNAPSE_VERSION =
     "org.sagebionetworks.web.client.recently-checked-synapse-version";
   public static final String DEFAULT_REFRESH_PLACE = "Home:0";
-  private PlaceController placeController;
+  private SynapsePlaceController placeController;
   private CookieProvider cookieProvider;
   private AppPlaceHistoryMapper appPlaceHistoryMapper;
   private StackConfigServiceAsync stackConfigService;
@@ -203,7 +204,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
           @Override
           public void goTo(Place place) {
             if (place != null) {
-              synapseJSNIUtils.setIsInnerProgrammaticHistoryChange();
               // If we are not already on this page, go there.
               if (!placeController.getWhere().equals(place)) {
                 try {
@@ -213,7 +213,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
                 }
               } else {
                 // We are already on this page but we want to force it to reload.
-                eventBus.fireEvent(new PlaceChangeEvent(place));
+                placeController.showAgain(place);
               }
             }
           }
@@ -223,7 +223,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   }
 
   @Override
-  public void setPlaceController(PlaceController placeController) {
+  public void setPlaceController(SynapsePlaceController placeController) {
     this.placeController = placeController;
   }
 
@@ -418,14 +418,52 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
           gwt.replaceItem(token, false);
         }
       }
+      if (targetPlace != null) {
+        // The page now shows this place, so Back/Forward to another of its URLs is a place change
+        placeController.setWhere(targetPlace);
+      }
     } catch (Throwable t) {
       synapseJSNIUtils.consoleError(t.getMessage());
     }
   }
 
   @Override
-  public void initOnPopStateHandler() {
-    this.synapseJSNIUtils.initOnPopStateHandler();
+  public void initHashChangeHandler() {
+    DomGlobal.window.addEventListener(
+      "hashchange",
+      event -> {
+        HashChangeEvent hashChangeEvent = Js.uncheckedCast(event);
+        onHashChange(hashChangeEvent.oldURL, hashChangeEvent.newURL);
+      }
+    );
+  }
+
+  /**
+   * A table keeps its query in the URL fragment, and each new query pushes a history entry (see
+   * {@link AbstractTablesTab#onQueryChange}). Back/Forward between two queries only changes the fragment, which is not a
+   * place change, so this shows the page again to run the query in the URL.
+   */
+  public void onHashChange(String oldUrl, String newUrl) {
+    if (
+      !isEditing &&
+      getUrlWithoutFragment(oldUrl).equals(getUrlWithoutFragment(newUrl)) &&
+      (isTableQueryUrl(oldUrl) || isTableQueryUrl(newUrl))
+    ) {
+      getPlaceChanger().goTo(getCurrentPlace());
+    }
+  }
+
+  private static String getUrlWithoutFragment(String url) {
+    int fragmentIndex = url.indexOf('#');
+    return fragmentIndex < 0 ? url : url.substring(0, fragmentIndex);
+  }
+
+  private static boolean isTableQueryUrl(String url) {
+    int fragmentIndex = url.indexOf('#');
+    return (
+      fragmentIndex >= 0 &&
+      url.startsWith(AbstractTablesTab.TABLE_QUERY_PREFIX, fragmentIndex)
+    );
   }
 
   public String getSynapseVersion() {
