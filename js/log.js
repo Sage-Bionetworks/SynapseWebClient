@@ -166,7 +166,8 @@ export function scrub(value) {
 
 window.__swcLogClientError = function (eventName, message, stacktrace) {
   try {
-    const key = `${eventName}|${message}`
+    const scrubbedMessage = scrub(message)
+    const key = `${eventName}|${scrubbedMessage}`
     const count = clientErrorCounts[eventName] || 0
     if (seenClientErrors.has(key) || count >= MAX_CLIENT_ERRORS_PER_EVENT) {
       return
@@ -174,7 +175,7 @@ window.__swcLogClientError = function (eventName, message, stacktrace) {
     seenClientErrors.add(key)
     clientErrorCounts[eventName] = count + 1
     saveClientErrorCounts()
-    const loggedMessage = truncate(scrub(message), MAX_MESSAGE_LENGTH)
+    const loggedMessage = truncate(scrubbedMessage, MAX_MESSAGE_LENGTH)
     sendLog(
       eventName,
       'ERROR',

@@ -196,7 +196,7 @@ function extractUrl(message) {
   ]
   for (const re of patterns) {
     const m = message.match(re)
-    if (m && m[1]) return m[1].replace(/[).,'"]+$/, '')
+    if (m && m[1]) return m[1].replace(/[).,'"]+$/, '').split(/[?#]/)[0]
   }
   return undefined
 }
