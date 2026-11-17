@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,6 +42,15 @@ public class LogServlet extends HttpServlet {
   public static final String CLIENT_LOG_NAME =
     "org.sagebionetworks.web.ClientLog";
 
+  // The event names SWC sends. Anything else is rejected, so clients can't add arbitrary events to the log
+  static final Set<String> ALLOWED_EVENT_NAMES = Set.of(
+    "swc.uncaught_error",
+    "swc.upload_error",
+    "swc.module_load.error",
+    "swc.module_load.inspection",
+    "swc.module_load.recovery"
+  );
+
   private final transient Logger clientLog;
 
   public LogServlet() {
@@ -60,6 +70,10 @@ public class LogServlet extends HttpServlet {
     try {
       logRecord = new JSONObject(IOUtils.toString(request.getReader()));
     } catch (IOException | JSONException e) {
+      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      return;
+    }
+    if (!ALLOWED_EVENT_NAMES.contains(logRecord.optString("eventName"))) {
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       return;
     }
