@@ -80,7 +80,7 @@ public class LogServletTest {
   @Test
   public void serverAttributesOverrideClientValues() throws Exception {
     String json =
-      "{\"eventName\":\"swc.uncaught_error\",\"attributes\":{\"user_agent.original\":\"fromClient\",\"client.address\":\"fromClient\"}}";
+      "{\"eventName\":\"swc.uncaught_error\",\"timestamp\":\"2000-01-01T00:00:00Z\",\"attributes\":{\"user_agent.original\":\"fromClient\",\"client.address\":\"fromClient\",\"client.timestamp\":\"fromClient\"}}";
     when(mockRequest.getReader())
       .thenReturn(new BufferedReader(new StringReader(json)));
     when(mockRequest.getHeader("User-Agent")).thenReturn("mockUserAgent");
@@ -89,10 +89,16 @@ public class LogServletTest {
     servlet.doPost(mockRequest, mockResponse);
 
     verify(mockLogger).info(lineCaptor.capture());
-    JSONObject attributes = new JSONObject(lineCaptor.getValue())
-      .getJSONObject("attributes");
+    JSONObject line = new JSONObject(lineCaptor.getValue());
+    JSONObject attributes = line.getJSONObject("attributes");
     assertEquals("mockUserAgent", attributes.getString("user_agent.original"));
     assertEquals("1.2.3.4", attributes.getString("client.address"));
+    // The client's timestamp is kept only as an attribute
+    assertEquals(
+      "2000-01-01T00:00:00Z",
+      attributes.getString("client.timestamp")
+    );
+    assertFalse(line.has("timestamp"));
   }
 
   @Test

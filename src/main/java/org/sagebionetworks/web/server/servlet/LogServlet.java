@@ -124,6 +124,7 @@ public class LogServlet extends HttpServlet {
     // Set by the server, overriding anything the client sent
     attributes.put("user_agent.original", userAgent);
     attributes.put("client.address", clientAddress);
+    attributes.put("client.timestamp", logRecord.optString("timestamp", null));
 
     JSONObject resource = new JSONObject();
     resource.put("service.name", SERVICE_NAME);
@@ -133,7 +134,6 @@ public class LogServlet extends HttpServlet {
     );
 
     JSONObject logLine = new JSONObject();
-    logLine.put("timestamp", logRecord.optString("timestamp", null));
     logLine.put("observedTimestamp", Instant.now().toString());
     // Map.of() maps throw on a null key, so only look up the number when there's a severity
     if (severityText != null) {
