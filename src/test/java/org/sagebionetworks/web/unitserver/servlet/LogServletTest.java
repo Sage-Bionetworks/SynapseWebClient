@@ -46,7 +46,7 @@ public class LogServletTest {
   @Test
   public void logsRecordAsOpenTelemetryLine() throws Exception {
     String json =
-      "{\"severityText\":\"error\",\"eventName\":\"swc.test\",\"body\":{\"buildId\":\"abc\"}}";
+      "{\"severityText\":\"error\",\"eventName\":\"swc.uncaught_error\",\"body\":{\"buildId\":\"abc\"}}";
     BufferedReader br = new BufferedReader(new StringReader(json));
     when(mockRequest.getReader()).thenReturn(br);
     when(mockRequest.getHeader("User-Agent")).thenReturn("mockUserAgent");
@@ -58,7 +58,7 @@ public class LogServletTest {
     JSONObject jsonObject = new JSONObject(lineCaptor.getValue());
     assertEquals("ERROR", jsonObject.get("severityText").toString());
     assertEquals(17, jsonObject.getInt("severityNumber"));
-    assertEquals("swc.test", jsonObject.get("eventName").toString());
+    assertEquals("swc.uncaught_error", jsonObject.get("eventName").toString());
     assertEquals("abc", jsonObject.getJSONObject("body").getString("buildId"));
     assertFalse(jsonObject.isNull("observedTimestamp"));
     assertEquals(
@@ -80,7 +80,7 @@ public class LogServletTest {
   @Test
   public void serverAttributesOverrideClientValues() throws Exception {
     String json =
-      "{\"attributes\":{\"user_agent.original\":\"fromClient\",\"client.address\":\"fromClient\"}}";
+      "{\"eventName\":\"swc.uncaught_error\",\"timestamp\":\"2000-01-01T00:00:00Z\",\"attributes\":{\"user_agent.original\":\"fromClient\",\"client.address\":\"fromClient\",\"client.timestamp\":\"fromClient\"}}";
     when(mockRequest.getReader())
       .thenReturn(new BufferedReader(new StringReader(json)));
     when(mockRequest.getHeader("User-Agent")).thenReturn("mockUserAgent");
@@ -89,16 +89,46 @@ public class LogServletTest {
     servlet.doPost(mockRequest, mockResponse);
 
     verify(mockLogger).info(lineCaptor.capture());
-    JSONObject attributes = new JSONObject(lineCaptor.getValue())
-      .getJSONObject("attributes");
+    JSONObject line = new JSONObject(lineCaptor.getValue());
+    JSONObject attributes = line.getJSONObject("attributes");
     assertEquals("mockUserAgent", attributes.getString("user_agent.original"));
     assertEquals("1.2.3.4", attributes.getString("client.address"));
+    // The client's timestamp is kept only as an attribute
+    assertEquals(
+      "2000-01-01T00:00:00Z",
+      attributes.getString("client.timestamp")
+    );
+    assertFalse(line.has("timestamp"));
   }
 
   @Test
   public void invalidJson() throws Exception {
     BufferedReader br = new BufferedReader(new StringReader("not json"));
     when(mockRequest.getReader()).thenReturn(br);
+
+    servlet.doPost(mockRequest, mockResponse);
+
+    verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    verifyNoInteractions(mockLogger);
+  }
+
+  @Test
+  public void unknownEventNameRejected() throws Exception {
+    String json = "{\"severityText\":\"ERROR\",\"eventName\":\"swc.made_up\"}";
+    when(mockRequest.getReader())
+      .thenReturn(new BufferedReader(new StringReader(json)));
+
+    servlet.doPost(mockRequest, mockResponse);
+
+    verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    verifyNoInteractions(mockLogger);
+  }
+
+  @Test
+  public void missingEventNameRejected() throws Exception {
+    String json = "{\"severityText\":\"ERROR\",\"body\":\"no event name\"}";
+    when(mockRequest.getReader())
+      .thenReturn(new BufferedReader(new StringReader(json)));
 
     servlet.doPost(mockRequest, mockResponse);
 
@@ -118,7 +148,8 @@ public class LogServletTest {
 
   @Test
   public void unknownSeverityIsLeftOut() throws Exception {
-    String json = "{\"severityText\":\"LOUD\",\"eventName\":\"swc.test\"}";
+    String json =
+      "{\"severityText\":\"LOUD\",\"eventName\":\"swc.uncaught_error\"}";
     BufferedReader br = new BufferedReader(new StringReader(json));
     when(mockRequest.getReader()).thenReturn(br);
 

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,8 +15,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Accepts log entries from the browser and writes each one to stdout (shipped to CloudWatch) as a single
- * JSON line, using OpenTelemetry field names.
+ * Accepts log records from the browser and logs each as an OpenTelemetry-style JSON line
+ * to portal.log (shipped to CloudWatch). Each line is the portal.log prefix, then " - {json}".
+ * See devdocs/ClientLogs.md.
  */
 public class LogServlet extends HttpServlet {
 
@@ -37,8 +39,18 @@ public class LogServlet extends HttpServlet {
     21
   );
 
-  // Must match the logger in log4j2.xml, which writes these lines to stdout (shipped to CloudWatch Logs) as bare JSON
-  static final String CLIENT_LOG_NAME = "org.sagebionetworks.web.ClientLog";
+  // Must match the logger in log4j2.xml, which writes these lines to portal.log (shipped to CloudWatch Logs)
+  public static final String CLIENT_LOG_NAME =
+    "org.sagebionetworks.web.ClientLog";
+
+  // The event names SWC sends. Anything else is rejected, so clients can't add arbitrary events to the log
+  static final Set<String> ALLOWED_EVENT_NAMES = Set.of(
+    "swc.uncaught_error",
+    "swc.upload_error",
+    "swc.module_load.error",
+    "swc.module_load.inspection",
+    "swc.module_load.recovery"
+  );
 
   private final transient Logger clientLog;
 
@@ -59,6 +71,10 @@ public class LogServlet extends HttpServlet {
     try {
       logRecord = new JSONObject(IOUtils.toString(request.getReader()));
     } catch (IOException | JSONException e) {
+      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      return;
+    }
+    if (!ALLOWED_EVENT_NAMES.contains(logRecord.optString("eventName"))) {
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       return;
     }
@@ -109,6 +125,7 @@ public class LogServlet extends HttpServlet {
     // Set by the server, overriding anything the client sent
     attributes.put("user_agent.original", userAgent);
     attributes.put("client.address", clientAddress);
+    attributes.put("client.timestamp", logRecord.optString("timestamp", null));
 
     JSONObject resource = new JSONObject();
     resource.put("service.name", SERVICE_NAME);
@@ -118,7 +135,6 @@ public class LogServlet extends HttpServlet {
     );
 
     JSONObject logLine = new JSONObject();
-    logLine.put("timestamp", logRecord.optString("timestamp", null));
     logLine.put("observedTimestamp", Instant.now().toString());
     // Map.of() maps throw on a null key, so only look up the number when there's a severity
     if (severityText != null) {

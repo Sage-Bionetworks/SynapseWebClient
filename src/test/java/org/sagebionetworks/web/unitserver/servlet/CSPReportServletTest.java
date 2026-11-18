@@ -111,7 +111,9 @@ public class CSPReportServletTest {
     assertEquals("b", second.getJSONObject("body").getString("blockedURL"));
     // The negative age is clamped, so the timestamp isn't in the future
     assertFalse(
-      Instant.parse(second.getString("timestamp")).isAfter(Instant.now())
+      Instant
+        .parse(second.getJSONObject("attributes").getString("client.timestamp"))
+        .isAfter(Instant.now())
     );
     verify(mockResponse).setStatus(HttpServletResponse.SC_NO_CONTENT);
   }
