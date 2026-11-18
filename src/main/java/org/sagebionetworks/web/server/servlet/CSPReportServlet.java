@@ -16,8 +16,8 @@ import org.json.JSONObject;
 
 /**
  * Accepts CSP violation reports from the browser and writes each one to portal.log (shipped to CloudWatch) as a
- * single JSON line, in the same OpenTelemetry format as LogServlet. Accepts both the report-to format
- * (application/reports+json) and the older report-uri format (application/csp-report).
+ * single line (the portal.log prefix, then the JSON), in the same OpenTelemetry format as LogServlet. Accepts
+ * both the report-to format (application/reports+json) and the older report-uri format (application/csp-report).
  */
 public class CSPReportServlet extends HttpServlet {
 
