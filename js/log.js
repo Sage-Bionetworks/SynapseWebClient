@@ -48,11 +48,10 @@ function getVersions() {
 
 /**
  * Send one OpenTelemetry-shaped log record to the Portal's log servlet
- * (`POST /Portal/log`), which writes it to portal.log for CloudWatch Logs. Timestamp
- * is captured before the async version lookup, so it records when the event
- * happened. `keepalive` lets the request
- * survive a page reload (e.g. the one `attemptRecovery` triggers) without
- * needing to be awaited first.
+ * (`POST /Portal/log`), which writes it to portal.log for CloudWatch Logs.
+ * Timestamp is captured before the async version lookup, so it records when the
+ * event happened. `keepalive` lets the request survive a page reload (e.g. the
+ * one `attemptRecovery` triggers) without needing to be awaited first.
  */
 export function sendLog(eventName, severityText, body, attributes) {
   try {
