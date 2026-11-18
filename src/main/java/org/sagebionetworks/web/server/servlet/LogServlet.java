@@ -17,6 +17,7 @@ import org.json.JSONObject;
 /**
  * Accepts log records from the browser and logs each as an OpenTelemetry-style JSON line
  * to portal.log (shipped to CloudWatch). Each line is the portal.log prefix, then " - {json}".
+ * See devdocs/ClientLogs.md.
  */
 public class LogServlet extends HttpServlet {
 

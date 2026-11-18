@@ -384,11 +384,8 @@ async function inspectModule(url, expectedExport) {
 //
 // LogServlet writes each record to portal.log as one JSON line following the
 // OpenTelemetry Logs Data Model (eventName, severityText, body, attributes,
-// resource), after the portal.log prefix. A typical Logs Insights query:
-//   fields @timestamp, @message
-//   | filter @message like /swc.module_load.error/
-//   | parse @message '"buildId":"*"' as buildId
-//   | stats count(*) by buildId
+// resource), after the portal.log prefix. For Logs Insights queries, see
+// devdocs/ClientLogs.md.
 
 const EVENT_NAME_ERROR = 'swc.module_load.error'
 const EVENT_NAME_INSPECTION = 'swc.module_load.inspection'
