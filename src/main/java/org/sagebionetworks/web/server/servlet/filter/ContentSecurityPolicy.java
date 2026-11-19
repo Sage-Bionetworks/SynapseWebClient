@@ -187,10 +187,18 @@ public final class ContentSecurityPolicy {
       "Google Fonts font files",
       GOOGLE
     ),
+    // Contentsquare documents *.contentsquare.net (https://docs.contentsquare.com/en/web/content-security-policy/);
+    // these are the hosts the survey uses on Synapse. A host it adds later shows up as a Report-Only violation
     new AllowedSource(
-      "https://*.contentsquare.net",
+      "https://t.contentsquare.net",
+      List.of(SCRIPT_SRC),
+      "Contentsquare tag loader and runtime for the Hotjar NPS survey, loaded by the Tag Manager container (SWC-7749)",
+      "Contentsquare (Hotjar)"
+    ),
+    new AllowedSource(
+      "https://script.hj.contentsquare.net",
       List.of(SCRIPT_SRC, FONT_SRC),
-      "Hotjar NPS survey loaded by the Tag Manager container (SWC-7749). Contentsquare documents its hosts as wildcards; seen: script.hj.contentsquare.net, t.contentsquare.net",
+      "Hotjar NPS survey widget script and fonts (SWC-7749)",
       "Contentsquare (Hotjar)"
     ),
     new AllowedSource(
@@ -212,7 +220,9 @@ public final class ContentSecurityPolicy {
       "Video widget Vimeo embeds (SWC-8150)",
       "Vimeo"
     ),
-    // Frames: External Website widget (ShinySiteWidget.VALID_URL_BASES)
+    // Frames: External Website widget (ShinySiteWidget.VALID_URL_BASES). Two of its bases are not allowed:
+    // http://spark.rstudio.com/ (plain http, blocked as mixed content) and https://dce.seattlebiosoftware.com/
+    // (blocked by every CSP since July 2023 without a reported problem)
     new AllowedSource(
       "https://*.synapse.org",
       List.of(FRAME_SRC),
@@ -266,12 +276,6 @@ public final class ContentSecurityPolicy {
       List.of(FRAME_SRC),
       "External Website widget: published Smartsheets",
       "Smartsheet"
-    ),
-    new AllowedSource(
-      "https://dce.seattlebiosoftware.com",
-      List.of(FRAME_SRC),
-      "External Website widget: Seattle Biosoftware DCE",
-      "Seattle Biosoftware"
     ),
     new AllowedSource(
       "https://airtable.com",
