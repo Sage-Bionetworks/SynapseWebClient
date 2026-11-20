@@ -99,7 +99,9 @@ public class CORSFilter extends OncePerRequestFilter {
     "classicportal",
     "staging.classicportal",
     "arcusbio",
-    "staging.arcusbio"
+    "staging.arcusbio",
+    "twintecc",
+    "staging.twintecc"
   );
 
   public static final String SYNAPSE_ORG_SUFFIX = ".synapse.org";
