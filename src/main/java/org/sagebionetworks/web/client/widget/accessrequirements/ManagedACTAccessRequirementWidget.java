@@ -165,7 +165,7 @@ public class ManagedACTAccessRequirementWidget
       view.setCoveredEntitiesHeadingVisible(isACT);
       // show the subjects defined by annotations UI if isACT and this flag is set
       view.setSubjectsDefinedByAnnotations(
-        isACT && ar.getSubjectsDefinedByAnnotations()
+        isACT && Boolean.TRUE.equals(ar.getSubjectsDefinedByAnnotations())
       );
     });
     view.setAccessRequirementName(ar.getName());

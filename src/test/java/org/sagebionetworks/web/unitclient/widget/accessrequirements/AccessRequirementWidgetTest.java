@@ -138,7 +138,6 @@ public class AccessRequirementWidgetTest {
   public void testConfigureJsonSchemaAccessRequirement() {
     JsonSchemaAccessRequirement jsonSchemaAccessRequirement =
       new JsonSchemaAccessRequirement();
-    jsonSchemaAccessRequirement.setId(666L);
 
     widget.configure(
       jsonSchemaAccessRequirement,

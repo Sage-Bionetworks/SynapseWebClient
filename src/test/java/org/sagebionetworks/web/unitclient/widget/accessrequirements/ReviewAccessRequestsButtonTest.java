@@ -15,10 +15,12 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.JsonSchemaAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
+import org.sagebionetworks.web.client.place.DataAccessManagementPlace;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessRequestsButton;
@@ -105,6 +107,24 @@ public class ReviewAccessRequestsButtonTest {
       ((ACTDataAccessSubmissionsPlace) place).getParam(
           ACTDataAccessSubmissionsPlace.ACCESS_REQUIREMENT_ID_PARAM
         )
+    );
+  }
+
+  @Test
+  public void testClickWithJsonSchemaARGoesToSubmissionDashboard() {
+    JsonSchemaAccessRequirement jsonSchemaAccessRequirement =
+      new JsonSchemaAccessRequirement();
+    jsonSchemaAccessRequirement.setId(AR_ID);
+    widget.configure(jsonSchemaAccessRequirement);
+
+    onButtonClickHandler.onClick(null);
+
+    verify(mockPlaceChanger).goTo(placeCaptor.capture());
+    Place place = placeCaptor.getValue();
+    assertTrue(place instanceof DataAccessManagementPlace);
+    assertEquals(
+      "default/Submissions?accessRequirementId=87654444",
+      ((DataAccessManagementPlace) place).toToken()
     );
   }
 }
