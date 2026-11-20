@@ -21,7 +21,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import org.apache.commons.io.IOUtils;
@@ -185,19 +184,22 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     //        return false;
   }
 
+  /**
+   * Returns the CDN host that serves static resources for the given request Host (e.g. cdn-www.synapse.org), or null
+   * if that site has no CDN.
+   */
+  public static String getCdnHost(String host) {
+    return host != null && CDN_HOSTS_REGEX.matcher(host).matches()
+      ? "cdn-" + host
+      : null;
+  }
+
   private void addCdnEndpoint(
     Map<String, String> dataModel,
     HttpServletRequest request
   ) {
-    String host = request.getHeader(HOST_HEADER);
-    if (host != null) {
-      Matcher matcher = CDN_HOSTS_REGEX.matcher(host);
-      if (matcher.matches()) {
-        dataModel.put(CDN_ENDPOINT_KEY, "//cdn-" + host);
-        return;
-      }
-    }
-    dataModel.put(CDN_ENDPOINT_KEY, "");
+    String cdnHost = getCdnHost(request.getHeader(HOST_HEADER));
+    dataModel.put(CDN_ENDPOINT_KEY, cdnHost == null ? "" : "//" + cdnHost);
   }
 
   /**
