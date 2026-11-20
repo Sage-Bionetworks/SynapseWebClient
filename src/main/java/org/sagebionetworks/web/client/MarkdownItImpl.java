@@ -37,7 +37,10 @@ public class MarkdownItImpl implements MarkdownIt {
 					highlight : function(str, lang) {
 						if (lang && $wnd.hljs.getLanguage(lang)) {
 							try {
-								return $wnd.hljs.highlight(lang, str, true).value;
+								return $wnd.hljs.highlight(str, {
+									language : lang,
+									ignoreIllegals : true
+								}).value;
 							} catch (_err) {
 								console.error(_err);
 							}

@@ -68,7 +68,7 @@ public class ClientProperties {
    * JavaScript WebResources
    */
   public static final WebResource AWS_SDK_JS = new WebResource(
-    "js/aws-sdk-2.494.0.min.js"
+    "js/aws-sdk-2.1693.0.min.js"
   );
   public static final String QUERY_SERVICE_PREFIX = "/query?query=";
   public static final String EVALUATION_QUERY_SERVICE_PREFIX =

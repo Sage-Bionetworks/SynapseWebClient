@@ -500,6 +500,16 @@
                   file="${project.basedir}/node_modules/katex/dist/katex.css"
                   tofile="src/main/webapp/generated/katex.css"
                 />
+                <!-- highlight.js: core "common" bundle + the extra languages the old custom pack included -->
+                <concat
+                  destfile="src/main/webapp/generated/highlight.min.js"
+                  fixlastline="yes"
+                >
+                  <filelist
+                    dir="${project.basedir}/node_modules/@highlightjs/cdn-assets"
+                    files="highlight.min.js,languages/awk.min.js,languages/c-like.min.js,languages/dart.min.js,languages/dockerfile.min.js,languages/dos.min.js,languages/julia.min.js,languages/julia-repl.min.js,languages/latex.min.js,languages/lisp.min.js,languages/mathematica.min.js,languages/matlab.min.js,languages/pgsql.min.js,languages/powershell.min.js"
+                  />
+                </concat>
               </target>
             </configuration>
           </execution>
@@ -549,6 +559,14 @@
         <groupId>software.amazon.ion</groupId>
         <artifactId>ion-java</artifactId>
         <version>1.11.0</version>
+      </dependency>
+      <!-- netty via lib-stackConfiguration > cloudwatch > netty-nio-client -->
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-bom</artifactId>
+        <version>4.1.141.Final</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -752,6 +770,13 @@
       <artifactId>gwt-codeserver</artifactId>
       <version>${gwtVersion}</version>
       <scope>provided</scope>
+      <!-- Security: HtmlUnit 2.x (+ xalan, commons-text, commons-net) is only used by GWTTestCase's HtmlUnit run style; this project has no GWTTestCase tests -->
+      <exclusions>
+        <exclusion>
+          <groupId>net.sourceforge.htmlunit</groupId>
+          <artifactId>htmlunit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.google.inject</groupId>
@@ -788,6 +813,16 @@
         <exclusion>
           <groupId>com.google.gwt</groupId>
           <artifactId>gwt-user</artifactId>
+        </exclusion>
+        <!-- Security: stale GWT 2.8.0 compiler (duplicates org.gwtproject:gwt-dev) drags in HtmlUnit 2.19 + xalan -->
+        <exclusion>
+          <groupId>com.google.gwt</groupId>
+          <artifactId>gwt-dev</artifactId>
+        </exclusion>
+        <!-- Security: Velocity 1.7 (+ commons-lang 2.4) is only used by GWTP code generators; no GWTP types are GWT.create()d here -->
+        <exclusion>
+          <groupId>org.apache.velocity</groupId>
+          <artifactId>velocity</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -857,12 +892,6 @@
       <groupId>net.sourceforge.htmlunit</groupId>
       <artifactId>neko-htmlunit</artifactId>
       <version>2.70.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.james</groupId>
-      <artifactId>apache-mime4j</artifactId>
-      <version>0.8.9</version>
-      <type>pom</type>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>

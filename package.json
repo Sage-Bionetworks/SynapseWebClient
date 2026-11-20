@@ -6,6 +6,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@highlightjs/cdn-assets": "10.7.3",
     "@mui/material": "^7.3.11",
     "@sage-bionetworks/markdown-it-container": "^4.0.2",
     "@sage-bionetworks/synapse-types": "^0.0.13",
