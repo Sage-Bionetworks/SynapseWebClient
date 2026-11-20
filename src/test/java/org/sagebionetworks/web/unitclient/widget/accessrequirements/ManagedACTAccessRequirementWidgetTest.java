@@ -20,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.JsonSchemaAccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -33,6 +34,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementRelatedProjectsList;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
@@ -227,6 +229,32 @@ public class ManagedACTAccessRequirementWidgetTest {
     verify(mockWikiPageWidget).configure(any(), eq(false), any());
     verify(mockView).setWikiTermsWidgetVisible(true);
     verify(mockView).setAccessRequirementName(ACCESS_REQUIREMENT_NAME);
+  }
+
+  @Test
+  public void testSetJsonSchemaRequirementForACTWithoutAnnotationSubjectsFlag() {
+    JsonSchemaAccessRequirement jsonSchemaAccessRequirement =
+      new JsonSchemaAccessRequirement();
+    jsonSchemaAccessRequirement.setId(123L);
+    jsonSchemaAccessRequirement.setName(ACCESS_REQUIREMENT_NAME);
+    jsonSchemaAccessRequirement.setSubjectIds(mockSubjectIds);
+    // subjectsDefinedByAnnotations is optional and has no server-side default
+    jsonSchemaAccessRequirement.setSubjectsDefinedByAnnotations(null);
+
+    widget.setRequirement(jsonSchemaAccessRequirement, mockRefreshCallback);
+    ArgumentCaptor<CallbackP<Boolean>> isACTCallback = ArgumentCaptor.forClass(
+      CallbackP.class
+    );
+    verify(mockIsACTMemberAsyncHandler)
+      .isACTActionAvailable(isACTCallback.capture());
+    isACTCallback.getValue().invoke(true);
+
+    verify(mockView).setAccessRequirementID("123");
+    verify(mockView).setAccessRequirementIDVisible(true);
+    verify(mockView).setSubjectsDefinedByAnnotations(false);
+    verify(mockView).setAccessRequirementName(ACCESS_REQUIREMENT_NAME);
+    verify(mockReviewAccessRequestsButton)
+      .configure(jsonSchemaAccessRequirement);
   }
 
   @Test

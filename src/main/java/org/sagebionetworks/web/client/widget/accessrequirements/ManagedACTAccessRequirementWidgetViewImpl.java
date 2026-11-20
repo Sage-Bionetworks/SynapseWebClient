@@ -15,7 +15,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.ACTAccessRequirementInterface;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -377,7 +377,7 @@ public class ManagedACTAccessRequirementWidgetViewImpl
 
   @Override
   public void showRequestAccessModal(
-    ManagedACTAccessRequirement accessRequirement,
+    ACTAccessRequirementInterface accessRequirement,
     @Nullable RestrictableObjectDescriptor targetSubject
   ) {
     AccessRequirementListProps.Callback onHide = () -> {
