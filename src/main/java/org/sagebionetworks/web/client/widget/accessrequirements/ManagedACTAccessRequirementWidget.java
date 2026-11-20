@@ -6,7 +6,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import javax.inject.Inject;
-import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.ACTAccessRequirementInterface;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
@@ -34,7 +34,7 @@ public class ManagedACTAccessRequirementWidget
   DataAccessClientAsync dataAccessClient;
   SynapseAlert synAlert;
   WikiPageWidget wikiPageWidget;
-  ManagedACTAccessRequirement ar;
+  ACTAccessRequirementInterface ar;
   PortalGinInjector ginInjector;
   CreateAccessRequirementButton createAccessRequirementButton;
   IntendedDataUseReportButton iduReportButton;
@@ -116,8 +116,12 @@ public class ManagedACTAccessRequirementWidget
     lazyLoadHelper.configure(loadDataCallback, view);
   }
 
+  /**
+   * Configures the widget for a requirement that is satisfied by an ACT-reviewed
+   * submission: a ManagedACTAccessRequirement or a JsonSchemaAccessRequirement.
+   */
   public void setRequirement(
-    final ManagedACTAccessRequirement ar,
+    final ACTAccessRequirementInterface ar,
     Callback refreshCallback
   ) {
     this.ar = ar;

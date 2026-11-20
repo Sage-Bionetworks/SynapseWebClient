@@ -5,7 +5,9 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import javax.inject.Inject;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ACTAccessRequirementInterface;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.JsonSchemaAccessRequirement;
 import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -77,11 +79,14 @@ public class AccessRequirementWidget implements IsWidget {
     Callback refreshCallback
   ) {
     div.clear();
-    if (requirement instanceof ManagedACTAccessRequirement) {
+    if (
+      requirement instanceof ManagedACTAccessRequirement ||
+      requirement instanceof JsonSchemaAccessRequirement
+    ) {
       ManagedACTAccessRequirementWidget w =
         ginInjector.getManagedACTAccessRequirementWidget();
       w.setRequirement(
-        (ManagedACTAccessRequirement) requirement,
+        (ACTAccessRequirementInterface) requirement,
         refreshCallback
       );
       w.setTargetSubject(targetSubject);

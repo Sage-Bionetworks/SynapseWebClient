@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.accessrequirements;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -13,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.JsonSchemaAccessRequirement;
 import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -130,6 +132,25 @@ public class AccessRequirementWidgetTest {
       .setRequirement(eq(mockManagedACTAccessRequirement), any(Callback.class));
     verify(mockManagedACTAccessRequirementWidget).setTargetSubject(mockSubject);
     verify(mockView).add(mockManagedACTAccessRequirementWidget);
+  }
+
+  @Test
+  public void testConfigureJsonSchemaAccessRequirement() {
+    JsonSchemaAccessRequirement jsonSchemaAccessRequirement =
+      new JsonSchemaAccessRequirement();
+    jsonSchemaAccessRequirement.setId(666L);
+
+    widget.configure(
+      jsonSchemaAccessRequirement,
+      mockSubject,
+      mockRefreshCallback
+    );
+
+    verify(mockManagedACTAccessRequirementWidget)
+      .setRequirement(jsonSchemaAccessRequirement, mockRefreshCallback);
+    verify(mockManagedACTAccessRequirementWidget).setTargetSubject(mockSubject);
+    verify(mockView).add(mockManagedACTAccessRequirementWidget);
+    verify(mockSynAlert, never()).handleException(any(Throwable.class));
   }
 
   @Test
