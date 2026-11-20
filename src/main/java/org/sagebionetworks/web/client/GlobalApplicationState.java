@@ -118,6 +118,14 @@ public interface GlobalApplicationState {
    */
   public void initOnPopStateHandler();
 
+  /**
+   * Called for Back/Forward (popstate) to the URL for this history token. If that URL is another URL of the page being
+   * shown, and the page's own (React) router moves between its URLs, this returns true: the navigation is not a GWT
+   * place change and the page is not reloaded, so the page keeps its state and can ask before discarding unsaved
+   * changes.
+   */
+  boolean leavePopStateToCurrentPage(String placeToken);
+
   public void refreshPage();
 
   void replaceCurrentPlace(Place targetPlace);
