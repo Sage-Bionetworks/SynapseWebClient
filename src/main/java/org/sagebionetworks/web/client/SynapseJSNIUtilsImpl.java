@@ -43,7 +43,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   public static native void _highlightCodeBlocks() /*-{
 		try {
 			$wnd.jQuery('pre code').each(function(i, e) {
-				$wnd.hljs.highlightBlock(e)
+				$wnd.hljs.highlightElement(e)
 			});
 		} catch (err) {
 			console.error(err);

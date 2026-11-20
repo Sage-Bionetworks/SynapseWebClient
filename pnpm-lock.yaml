@@ -25,6 +25,9 @@ importers:
       '@emotion/styled':
         specifier: ^11.14.1
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7)
+      '@highlightjs/cdn-assets':
+        specifier: 10.7.3
+        version: 10.7.3
       '@mui/material':
         specifier: ^7.3.11
         version: 7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -32,8 +35,8 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2
       '@sage-bionetworks/synapse-types':
-        specifier: ^0.0.13
-        version: 0.0.13
+        specifier: ^0.0.14
+        version: 0.0.14
       '@tanstack/react-query':
         specifier: 5.105.2
         version: 5.105.2(@types/react@19.2.14)(react@19.2.7)
@@ -122,8 +125,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       synapse-react-client:
-        specifier: 4.0.52
-        version: 4.0.52(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(csstype@3.2.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.31.0)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)
+        specifier: 4.0.53
+        version: 4.0.53(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(csstype@3.2.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.31.0)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)
       xss:
         specifier: ^1.0.15
         version: 1.0.15
@@ -320,10 +323,6 @@ packages:
     resolution: {integrity: sha512-hnORnjP/1P/zFEndoeX+n+t1RwWRJiJpM/jO7FW32Kn9r5+sJB2JWOdYo4L6k78j15eCwY3Gm/7364B1EMwtNg==}
     engines: {node: '>=6.0.0'}
     hasBin: true
-
-  '@babel/runtime@7.29.10':
-    resolution: {integrity: sha512-NpugTzbKgGrNe45Ui32cN8vCFFMxVtP/9rtfwv0nP5FRDAjvYBxJcLVpYA9mr1jxP6cnIT7x9LUzuDTbWYYNRA==}
-    engines: {node: '>=6.9.0'}
 
   '@babel/runtime@7.29.13':
     resolution: {integrity: sha512-v+oN26xP4YIlQsbQ/CbTH1WG5m/l/DjKKZNy/Kp3f/AFvbgt7Em/D0FeMM3O2hX0YzeN2M16W8lOpyhIkfCBcQ==}
@@ -727,6 +726,9 @@ packages:
   '@hapi/topo@6.0.2':
     resolution: {integrity: sha512-KR3rD5inZbGMrHmgPxsJ9dbi6zEK+C3ZwUwTa+eMwWLz7oijWUTWD2pMSNNYJAU6Qq+65NkxXjqHr/7LM2Xkqg==}
 
+  '@highlightjs/cdn-assets@10.7.3':
+    resolution: {integrity: sha512-Bz1c7NOPQE1h/0S3lYaDyA5wTimP9b8ppeN3HBfv+SF0IEeLsu86xneMcBvCaXBMwcwLc6/xGpyPOmPhCM8hAg==}
+
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
     engines: {node: '>=18.18.0'}
@@ -751,9 +753,6 @@ packages:
     resolution: {integrity: sha512-AbtynPyALR2wkN3ngYIiMEc21cZhP170zb5y3YIje4kTZ0J515GDgxeCK8D+PjyMhER7idU2Q3d0Zk0z/W1QLQ==}
     engines: {node: '>=18.0.0'}
 
-  '@hyperjump/json-pointer@1.1.3':
-    resolution: {integrity: sha512-GVSs+wzefSO5VOEVMuOz118MDJrJtMdm8h+2vlghzMG/5QpboTSQ12gaMKvGQo7S4oPMw9rCyFWNAJ9DUEdA5Q==}
-
   '@hyperjump/json-pointer@1.1.4':
     resolution: {integrity: sha512-c6slpSqSiNL10JA78HdQOx50xaXHy1dKsPZOiEVjr/RqcVg5MgnWcP7vbvpxa42CD7pMkU6TtTCS+redjpjc2w==}
 
@@ -767,9 +766,6 @@ packages:
 
   '@hyperjump/pact@1.4.0':
     resolution: {integrity: sha512-01Q7VY6BcAkp9W31Fv+ciiZycxZHGlR2N6ba9BifgyclHYHdbaZgITo0U6QMhYRlem4k8pf8J31/tApxvqAz8A==}
-
-  '@hyperjump/uri@1.3.9':
-    resolution: {integrity: sha512-cxG5vyIdx3gUb/OQD/FDruQQcGNzF2aKTXWJ6LzlAC1kh97YZQSRsF3hL274xlTDJ1nWGJGRtknlW6ZpU3Ch+A==}
 
   '@hyperjump/uri@1.4.0':
     resolution: {integrity: sha512-A6eBnSLNb6GdJHnYnA0sDutV950mWNmmlWgASwIoZvXqtXcYKBeEhbGrXpHeyHHInC/LHVt8zNanILp2S2oRXg==}
@@ -1601,20 +1597,17 @@ packages:
   '@sage-bionetworks/markdown-it-container@4.0.2':
     resolution: {integrity: sha512-T8YbrblYLhiHasFBqnyIgOZHQ3yCM2EjhH30tK+W0VjEPgrGKZZuAp+5WcHCS//I/7hj8A4SYVTDamVzhbTyjg==}
 
-  '@sage-bionetworks/react-datasheet-grid@4.11.5-sage.12':
-    resolution: {integrity: sha512-m/drc9Kw/gsbnzpJ/z1X6QBkPLhbs4XWcS8H5ktqjqtrvKr0i/WNtamdevJ5YZ46YsKUKMbkqOIuQ0rzswi8Zg==}
+  '@sage-bionetworks/react-datasheet-grid@4.11.5-sage.13':
+    resolution: {integrity: sha512-UB5ck5qJs5KCk9ErnmKTYWzSwpzJxot3bqyaPco7O14BEpugtT+CW6HmSCZJs+JE8elGvuXMG87XAt9iAxfKXA==}
     peerDependencies:
       react: ^19.2.7
       react-dom: ^19.2.7
 
-  '@sage-bionetworks/synapse-client@0.0.25':
-    resolution: {integrity: sha512-Ahybdrv/auB+6WEz3noHg5oEixxUj32zQpQSDFXNZLmjbouWJE+bMs4fXLcBAIUm9LfkWp/mmXN2tCtpxzD95A==}
+  '@sage-bionetworks/synapse-client@0.0.27':
+    resolution: {integrity: sha512-pcAZ/pQryBqwG1OXxhMhpjAIyiCFbT7biofOHqUoyhenlGF6bWOfKU9rnq3wwE6XzVwUvM60NL7j7TPMdaz/ug==}
 
-  '@sage-bionetworks/synapse-client@0.0.26':
-    resolution: {integrity: sha512-JmxZO4cI934j2bueC1nlSZMz9JERTiVSTX2ipdW/3T74tvLMWuVR5NFRojUbTahwJeMcLfjZLIb7D4wuyyyB5Q==}
-
-  '@sage-bionetworks/synapse-types@0.0.13':
-    resolution: {integrity: sha512-lG58VGeO9F+8tUJTQMOC574v5RQf8K2IcenhsONTNPAP/hYiK28GR4jYysAjox1+eT+b9FL0n0HqR8Gar2FklQ==}
+  '@sage-bionetworks/synapse-types@0.0.14':
+    resolution: {integrity: sha512-3hzZhEMegKaOoKDsV+BCyrH6YvpEfdVua9crmixkO23ELHJHG4H08T5sm4GLvPsFTO76qlP0WkcrM+WJBIUN6Q==}
 
   '@smithy/core@3.31.1':
     resolution: {integrity: sha512-CyogUINxvi7C7LDsh8Syo6hVJOT9ckz4rG8dRZfTJ8r91HkMY59PnNooaj7WcHyxEkxPfBAmbgztZU+xTo76lg==}
@@ -5262,8 +5255,8 @@ packages:
   symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
 
-  synapse-react-client@4.0.52:
-    resolution: {integrity: sha512-Mz5quHQeILqZeZvRLp2ONWKzzJzhpeapUTFOUp/QhJhAaKeMYgCABp6gTNFrOdD4102sE+8X5NMrdvmLiCCLSQ==}
+  synapse-react-client@4.0.53:
+    resolution: {integrity: sha512-R9HQaCFiaux+0s7r4o8zZOVzhL/RWBwbHAej1VSDBs4T5VXk4XwMCnTG8z7bxO0Twtr5EK41wiCqDVT3UG2CTQ==}
     peerDependencies:
       '@sage-bionetworks/aridhia-client': '*'
       react: ^19.2.7
@@ -6004,8 +5997,6 @@ snapshots:
     dependencies:
       '@babel/types': 7.29.7
 
-  '@babel/runtime@7.29.10': {}
-
   '@babel/runtime@7.29.13': {}
 
   '@babel/runtime@7.29.7': {}
@@ -6368,6 +6359,8 @@ snapshots:
     dependencies:
       '@hapi/hoek': 11.0.7
 
+  '@highlightjs/cdn-assets@10.7.3': {}
+
   '@humanfs/core@0.19.2':
     dependencies:
       '@humanfs/types': 0.15.0
@@ -6391,30 +6384,26 @@ snapshots:
       content-type: 1.0.5
       just-curry-it: 5.3.0
 
-  '@hyperjump/json-pointer@1.1.3': {}
-
   '@hyperjump/json-pointer@1.1.4': {}
 
   '@hyperjump/json-schema-formats@1.0.2':
     dependencies:
-      '@hyperjump/uri': 1.3.9
+      '@hyperjump/uri': 1.4.0
       idn-hostname: 15.1.10
 
   '@hyperjump/json-schema@1.17.7(@hyperjump/browser@1.4.0)':
     dependencies:
       '@hyperjump/browser': 1.4.0
-      '@hyperjump/json-pointer': 1.1.3
+      '@hyperjump/json-pointer': 1.1.4
       '@hyperjump/json-schema-formats': 1.0.2
       '@hyperjump/pact': 1.4.0
-      '@hyperjump/uri': 1.3.9
+      '@hyperjump/uri': 1.4.0
       content-type: 1.0.5
       json-stringify-deterministic: 1.0.15
       just-curry-it: 5.3.0
       uuid: 14.0.0
 
   '@hyperjump/pact@1.4.0': {}
-
-  '@hyperjump/uri@1.3.9': {}
 
   '@hyperjump/uri@1.4.0': {}
 
@@ -6633,7 +6622,7 @@ snapshots:
 
   '@mui/icons-material@7.3.11(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@types/react@19.2.14)(react@19.2.7)':
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
       '@mui/material': 7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react: 19.2.7
     optionalDependencies:
@@ -6718,7 +6707,7 @@ snapshots:
 
   '@mui/x-data-grid@8.29.2(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mui/system@7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
       '@mui/material': 7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@mui/system': 7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7)
       '@mui/utils': 7.3.11(@types/react@19.2.14)(react@19.2.7)
@@ -6737,7 +6726,7 @@ snapshots:
 
   '@mui/x-date-pickers@8.29.2(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mui/system@7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(date-fns@2.30.0)(dayjs@1.11.21)(moment@2.31.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
       '@mui/material': 7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@mui/system': 7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(react@19.2.7)
       '@mui/utils': 7.3.11(@types/react@19.2.14)(react@19.2.7)
@@ -6759,7 +6748,7 @@ snapshots:
 
   '@mui/x-internals@8.29.2(@types/react@19.2.14)(react@19.2.7)':
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
       '@mui/utils': 7.3.11(@types/react@19.2.14)(react@19.2.7)
       react: 19.2.7
       reselect: 5.2.0
@@ -6769,7 +6758,7 @@ snapshots:
 
   '@mui/x-virtualizer@0.4.1(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
       '@mui/utils': 7.3.11(@types/react@19.2.14)(react@19.2.7)
       '@mui/x-internals': 8.29.2(@types/react@19.2.14)(react@19.2.7)
       react: 19.2.7
@@ -7192,7 +7181,7 @@ snapshots:
 
   '@sage-bionetworks/markdown-it-container@4.0.2': {}
 
-  '@sage-bionetworks/react-datasheet-grid@4.11.5-sage.12(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@sage-bionetworks/react-datasheet-grid@4.11.5-sage.13(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@tanstack/react-virtual': 3.14.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       classnames: 2.5.1
@@ -7203,13 +7192,11 @@ snapshots:
       react-resize-detector: 10.0.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       throttle-debounce: 3.0.1
 
-  '@sage-bionetworks/synapse-client@0.0.25': {}
+  '@sage-bionetworks/synapse-client@0.0.27': {}
 
-  '@sage-bionetworks/synapse-client@0.0.26': {}
-
-  '@sage-bionetworks/synapse-types@0.0.13':
+  '@sage-bionetworks/synapse-types@0.0.14':
     dependencies:
-      '@sage-bionetworks/synapse-client': 0.0.25
+      '@sage-bionetworks/synapse-client': 0.0.27
 
   '@smithy/core@3.31.1':
     dependencies:
@@ -10656,7 +10643,7 @@ snapshots:
 
   react-error-boundary@3.1.4(react@19.2.7):
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
       react: 19.2.7
 
   react-focus-lock@1.6.5(react@19.2.7):
@@ -10710,7 +10697,7 @@ snapshots:
 
   react-measure@2.5.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
       get-node-dimensions: 1.2.1
       prop-types: 15.8.1
       react: 19.2.7
@@ -10742,7 +10729,7 @@ snapshots:
 
   react-reflex@4.2.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
       lodash.throttle: 4.1.1
       prop-types: 15.8.1
       react: 19.2.7
@@ -10771,7 +10758,7 @@ snapshots:
 
   react-select@5.10.2(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
       '@emotion/cache': 11.14.0
       '@emotion/react': 11.14.0(@types/react@19.2.14)(react@19.2.7)
       '@floating-ui/dom': 1.8.0
@@ -10880,7 +10867,7 @@ snapshots:
 
   react-vtree@3.0.0-beta.3(react-dom@19.2.7(react@19.2.7))(react-window@1.8.11(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7):
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
       react-merge-refs: 1.1.0
@@ -10892,7 +10879,7 @@ snapshots:
 
   react-window@1.8.11(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
       memoize-one: 5.2.1
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
@@ -11132,7 +11119,7 @@ snapshots:
 
   rtl-css-js@1.16.1:
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
 
   rw@1.3.3: {}
 
@@ -11554,7 +11541,7 @@ snapshots:
 
   symbol-tree@3.2.4: {}
 
-  synapse-react-client@4.0.52(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(csstype@3.2.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.31.0)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2):
+  synapse-react-client@4.0.53(@babel/template@7.29.7)(@hyperjump/browser@1.4.0)(@jsonjoy.com/json-pointer@17.67.0(tslib@2.8.1))(@jsonjoy.com/util@17.67.0(tslib@2.8.1))(@types/json-schema@7.0.15)(@types/react@19.2.14)(csstype@3.2.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.31.0)(nano-theme@1.5.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tslib@2.8.1))(nice-ui@1.32.0(@types/react@19.2.14)(csstype@3.2.3)(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)(tslib@2.8.1))(prop-types@15.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2):
     dependencies:
       '@apidevtools/json-schema-ref-parser': 14.2.1(@types/json-schema@7.0.15)
       '@aws-sdk/client-s3': 3.1101.0
@@ -11579,9 +11566,9 @@ snapshots:
       '@rjsf/utils': 6.0.0-beta.10(react@19.2.7)
       '@rjsf/validator-ajv8': 6.0.0-beta.10(@rjsf/utils@6.0.0-beta.10(react@19.2.7))
       '@sage-bionetworks/markdown-it-container': 4.0.2
-      '@sage-bionetworks/react-datasheet-grid': 4.11.5-sage.12(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@sage-bionetworks/synapse-client': 0.0.26
-      '@sage-bionetworks/synapse-types': 0.0.13
+      '@sage-bionetworks/react-datasheet-grid': 4.11.5-sage.13(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@sage-bionetworks/synapse-client': 0.0.27
+      '@sage-bionetworks/synapse-types': 0.0.14
       '@tanstack/query-core': 5.105.2
       '@tanstack/react-query': 5.105.2(@types/react@19.2.14)(react@19.2.7)
       '@tanstack/react-query-devtools': 5.105.2(@tanstack/react-query@5.105.2(@types/react@19.2.14)(react@19.2.7))(@types/react@19.2.14)(csstype@3.2.3)(react@19.2.7)
@@ -11888,7 +11875,7 @@ snapshots:
 
   use-deep-compare-effect@1.8.1(react@19.2.7):
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
       dequal: 2.0.3
       react: 19.2.7
 
