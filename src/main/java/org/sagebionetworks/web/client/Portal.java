@@ -113,7 +113,21 @@ public class Portal implements EntryPoint {
                         }
                         EventBus eventBus = ginjector.getEventBus();
                         PlaceController placeController = new PlaceController(
-                          eventBus
+                          eventBus,
+                          new PlaceController.DefaultDelegate() {
+                            @Override
+                            public boolean confirm(String message) {
+                              boolean confirmed = super.confirm(message);
+                              if (!confirmed) {
+                                // The user chose to stay (e.g. to keep unsaved changes). If Back/Forward asked, keep
+                                // back-forward-nav-handler.js from reloading the page anyway, which would ask again.
+                                ginjector
+                                  .getSynapseJSNIUtils()
+                                  .setIsInnerProgrammaticHistoryChange();
+                              }
+                              return confirmed;
+                            }
+                          }
                         );
 
                         // Start ActivityManager for the main widget with our ActivityMapper
@@ -139,7 +153,11 @@ public class Portal implements EntryPoint {
                         final PlaceHistoryHandler historyHandler =
                           new PlaceHistoryHandler(
                             historyMapper,
-                            new Html5Historian()
+                            new Html5Historian(token ->
+                              ginjector
+                                .getGlobalApplicationState()
+                                .leavePopStateToCurrentPage(token)
+                            )
                           );
                         historyHandler.register(
                           placeController,
