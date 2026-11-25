@@ -55,6 +55,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.grid.CreateGridRequest;
+import org.sagebionetworks.repo.model.search.table.SearchIndex;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
@@ -99,6 +100,7 @@ import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.SearchManagementPlace;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -140,6 +142,8 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.DefaultEntityActionM
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
+import org.sagebionetworks.web.client.widget.search.SearchConfigBindingModalWidget;
+import org.sagebionetworks.web.client.widget.search.SearchIndexEditorModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
@@ -302,6 +306,8 @@ public class EntityActionControllerImpl
   CreateTableViewWizard createTableViewWizard;
   CreateDatasetOrCollection createDatasetOrCollection;
   SqlDefinedEditorModalWidget sqlDefinedEditorModalWidget;
+  SearchIndexEditorModalWidget searchIndexEditorModalWidget;
+  SearchConfigBindingModalWidget searchConfigBindingModalWidget;
   boolean isShowingVersion = false;
   WizardCallback entityUpdatedWizardCallback;
   CreateTableFromCsvDialog createTableFromCsvDialog;
@@ -499,6 +505,24 @@ public class EntityActionControllerImpl
       this.view.addWidget(createTableViewWizard.asWidget());
     }
     return createTableViewWizard;
+  }
+
+  private SearchIndexEditorModalWidget getSearchIndexEditorModalWidget() {
+    if (searchIndexEditorModalWidget == null) {
+      searchIndexEditorModalWidget =
+        ginInjector.getSearchIndexEditorModalWidget();
+      view.addWidget(searchIndexEditorModalWidget.asWidget());
+    }
+    return searchIndexEditorModalWidget;
+  }
+
+  private SearchConfigBindingModalWidget getSearchConfigBindingModalWidget() {
+    if (searchConfigBindingModalWidget == null) {
+      searchConfigBindingModalWidget =
+        ginInjector.getSearchConfigBindingModalWidget();
+      view.addWidget(searchConfigBindingModalWidget.asWidget());
+    }
+    return searchConfigBindingModalWidget;
   }
 
   private CreateDatasetOrCollection getCreateDatasetOrCollection() {
@@ -705,6 +729,7 @@ public class EntityActionControllerImpl
     configureFullTextSearch();
     configureReportViolation();
     configureGridActions();
+    configureSearchIndexManagementActions();
 
     // These configuration methods are asynchronous
     FluentFuture fileDownloadFuture = configureFileDownload();
@@ -780,6 +805,37 @@ public class EntityActionControllerImpl
       permissions.getCanEdit() &&
       featureFlagConfig.isFeatureEnabled(FeatureFlagKey.SYNAPSE_GRID)
     );
+  }
+
+  private void configureSearchIndexManagementActions() {
+    boolean isFeatureEnabled = featureFlagConfig.isFeatureEnabled(
+      FeatureFlagKey.SEARCH_INDEX_MANAGEMENT
+    );
+
+    actionMenu.setActionVisible(
+      Action.EDIT_SEARCH_INDEX,
+      isFeatureEnabled &&
+      entity instanceof SearchIndex &&
+      permissions.getCanCertifiedUserEdit()
+    );
+    actionMenu.setActionListener(Action.EDIT_SEARCH_INDEX, this);
+
+    actionMenu.setActionVisible(
+      Action.EDIT_SEARCH_CONFIGURATION_BINDING,
+      isFeatureEnabled &&
+      (entity instanceof Project || entity instanceof Folder) &&
+      permissions.getCanEdit()
+    );
+    actionMenu.setActionListener(
+      Action.EDIT_SEARCH_CONFIGURATION_BINDING,
+      this
+    );
+
+    actionMenu.setActionVisible(
+      Action.MANAGE_SEARCH_CONFIGURATIONS,
+      isFeatureEnabled && isUserAuthenticated && entity instanceof SearchIndex
+    );
+    actionMenu.setActionListener(Action.MANAGE_SEARCH_CONFIGURATIONS, this);
   }
 
   private void configureFullTextSearch() {
@@ -2059,6 +2115,17 @@ public class EntityActionControllerImpl
       case ADD_TABLE:
         onAddTable();
         break;
+      case EDIT_SEARCH_INDEX:
+        onEditSearchIndex();
+        break;
+      case EDIT_SEARCH_CONFIGURATION_BINDING:
+        onEditSearchConfigurationBinding();
+        break;
+      case MANAGE_SEARCH_CONFIGURATIONS:
+        getGlobalApplicationState()
+          .getPlaceChanger()
+          .goTo(new SearchManagementPlace("0"));
+        break;
       case ADD_DATASET:
         onAddDataset();
         break;
@@ -2228,6 +2295,27 @@ public class EntityActionControllerImpl
       }
     );
     wizard.setOpen(true);
+  }
+
+  private void onEditSearchIndex() {
+    checkUpdateEntity(() -> {
+      SearchIndexEditorModalWidget modal = getSearchIndexEditorModalWidget();
+      modal.configure(
+        entity.getId(),
+        updatedId -> {
+          modal.setOpen(false);
+          eventBus.fireEvent(new EntityUpdatedEvent(updatedId));
+        },
+        () -> modal.setOpen(false)
+      );
+      modal.setOpen(true);
+    });
+  }
+
+  private void onEditSearchConfigurationBinding() {
+    SearchConfigBindingModalWidget modal = getSearchConfigBindingModalWidget();
+    modal.configure(entity.getId(), () -> modal.setOpen(false));
+    modal.setOpen(true);
   }
 
   private void onCreateFolder() {

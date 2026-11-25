@@ -219,6 +219,7 @@ public class DefaultEntityActionMenuLayoutUtil {
               ActionViewProps.create(Action.SHOW_ANNOTATIONS),
               ActionViewProps.create(Action.SHOW_PROJECT_STATS),
               ActionViewProps.create(Action.CHANGE_STORAGE_LOCATION),
+              ActionViewProps.create(Action.EDIT_SEARCH_CONFIGURATION_BINDING),
               ActionViewProps.create(Action.CREATE_CHALLENGE)
             ),
             Arrays.asList(
@@ -280,7 +281,8 @@ public class DefaultEntityActionMenuLayoutUtil {
               ActionViewProps.create(Action.ADD_CONDITIONS_FOR_USE),
               ActionViewProps.create(Action.CHANGE_ENTITY_NAME),
               ActionViewProps.create(Action.EDIT_PROVENANCE),
-              ActionViewProps.create(Action.CHANGE_STORAGE_LOCATION)
+              ActionViewProps.create(Action.CHANGE_STORAGE_LOCATION),
+              ActionViewProps.create(Action.EDIT_SEARCH_CONFIGURATION_BINDING)
             ),
             Arrays.asList(
               ActionViewProps.create(Action.VIEW_WIKI_SOURCE),
@@ -676,6 +678,9 @@ public class DefaultEntityActionMenuLayoutUtil {
               .create(Action.EDIT_DEFINING_SQL)
               .setVariant("outlined"),
             ActionViewProps
+              .create(Action.EDIT_SEARCH_INDEX)
+              .setVariant("outlined"),
+            ActionViewProps
               .create(Action.VIEW_DEFINING_SQL)
               .setVariant("outlined"),
             ActionViewProps
@@ -689,6 +694,9 @@ public class DefaultEntityActionMenuLayoutUtil {
               ActionViewProps.create(Action.VIEW_SHARING_SETTINGS),
               ActionViewProps.create(Action.ADD_CONDITIONS_FOR_USE),
               ActionViewProps.create(Action.EDIT_PROVENANCE)
+            ),
+            Arrays.asList(
+              ActionViewProps.create(Action.MANAGE_SEARCH_CONFIGURATIONS)
             ),
             Arrays.asList(
               ActionViewProps.create(Action.CREATE_OR_UPDATE_DOI),
