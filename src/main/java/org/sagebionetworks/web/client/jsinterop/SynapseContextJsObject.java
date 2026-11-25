@@ -13,6 +13,10 @@ public class SynapseContextJsObject {
 
   public String downloadCartPageUrl;
   public boolean isAuthenticated;
+
+  @JsNullable
+  public String realmId;
+
   public boolean isInExperimentalMode;
   public boolean utcTime;
   public String appId;
@@ -22,6 +26,7 @@ public class SynapseContextJsObject {
   public static SynapseContextJsObject create(
     String accessToken,
     boolean isAuthenticated,
+    String realmId,
     boolean isInExperimentalMode,
     boolean utcTime,
     String appId
@@ -29,6 +34,7 @@ public class SynapseContextJsObject {
     SynapseContextJsObject context = new SynapseContextJsObject();
     context.accessToken = accessToken;
     context.isAuthenticated = isAuthenticated;
+    context.realmId = realmId;
     context.isInExperimentalMode = isInExperimentalMode;
     context.utcTime = utcTime;
     context.downloadCartPageUrl = "/DownloadCart:0";

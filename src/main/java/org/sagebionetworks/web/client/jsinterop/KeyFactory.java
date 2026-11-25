@@ -9,7 +9,7 @@ import org.sagebionetworks.web.client.jsinterop.reactquery.QueryKey;
 public class KeyFactory {
 
   @JsConstructor
-  public KeyFactory(String accessToken) {}
+  public KeyFactory(String accessToken, KeyFactorySession session) {}
 
   public native QueryKey getDownloadListBaseQueryKey();
 
