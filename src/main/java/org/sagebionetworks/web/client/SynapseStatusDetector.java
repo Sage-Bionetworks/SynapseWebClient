@@ -15,7 +15,6 @@ public class SynapseStatusDetector {
   public static final int INTERVAL_MS = 1000 * 60; // check once every minute
   PopupUtilsView popupUtils;
   GWTWrapper gwt;
-  public static final String STATUS_PAGE_IO_PAGE = "kh896k90gyvg";
   DateTimeFormat iso8601DateFormat = DateTimeFormat.getFormat(
     PredefinedFormat.ISO_8601
   );
